@@ -12,5 +12,13 @@
   "citation_provenance": 1.0,
   "arithmetic_integrity": 1.0,
   "trace_shape": 0.5714285714285714,
-  "abstention_correct_rate": 0.0
+  "abstention_correct_rate": 0.0,
+  "by_bucket": {
+    "B_judgment": {
+      "answer_accuracy": 0.0
+    },
+    "C_lookup": {
+      "answer_accuracy": 0.0
+    }
+  }
 }

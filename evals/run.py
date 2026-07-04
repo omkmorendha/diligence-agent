@@ -83,12 +83,30 @@ def _discover_runs(runs_dir: Path) -> list[Path]:
     )
 
 
+def _fraction(scores: list[dict[str, Optional[str]]], metric: str, positive: str = "pass") -> Optional[float]:
+    values = [s[metric] for s in scores if s.get(metric) is not None]
+    if not values:
+        return None
+    return sum(1 for v in values if v == positive) / len(values)
+
+
 def _aggregate(scores: list[dict[str, Optional[str]]]) -> dict:
     def fraction(metric: str, positive: str = "pass") -> Optional[float]:
-        values = [s[metric] for s in scores if s.get(metric) is not None]
-        if not values:
-            return None
-        return sum(1 for v in values if v == positive) / len(values)
+        return _fraction(scores, metric, positive)
+
+    # spec section 22: per-bucket (A_multi_input/B_judgment/C_lookup) answer_accuracy.
+    # `bucket` rides along on each per-item score dict (see run_system) purely for
+    # this grouping -- it is not itself a pass/fail metric. A bucket is omitted
+    # entirely (rather than emitting a null) when every item in it was abstained,
+    # since backend/app/schemas.py's BucketAccuracy.answer_accuracy is a plain
+    # float, not Optional -- matching the spec section 22 example, which never
+    # shows a null bucket value.
+    by_bucket: dict[str, dict[str, float]] = {}
+    for bucket in sorted({s["bucket"] for s in scores if s.get("bucket")}):
+        bucket_scores = [s for s in scores if s.get("bucket") == bucket]
+        acc = _fraction(bucket_scores, "answer_accuracy")
+        if acc is not None:
+            by_bucket[bucket] = {"answer_accuracy": acc}
 
     return {
         "num_items_scored": len(scores),
@@ -99,6 +117,8 @@ def _aggregate(scores: list[dict[str, Optional[str]]]) -> dict:
         "trace_shape": fraction("trace_shape"),
         # abstention() returns "correct" / "incorrect_but_calibrated", not "pass"/"fail".
         "abstention_correct_rate": fraction("abstention", positive="correct"),
+        # spec section 22: per-bucket (A_multi_input/B_judgment/C_lookup) answer_accuracy.
+        "by_bucket": by_bucket,
     }
 
 
@@ -170,7 +190,9 @@ def run_system(system: str, runs_dir: Path, subset_path: Path, run_judges: bool 
                     file=sys.stderr,
                 )
                 continue
-            per_item_scores.append(score_run(subset_item, trace_events, memo_item))
+            item_score = score_run(subset_item, trace_events, memo_item)
+            item_score["bucket"] = subset_item.bucket
+            per_item_scores.append(item_score)
 
     result = {"system": system, "runs_scored": [d.name for d in run_dirs], **_aggregate(per_item_scores)}
 
