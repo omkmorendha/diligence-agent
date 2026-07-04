@@ -15,6 +15,12 @@ const TABS: { id: Tab; label: string }[] = [
 
 export function App() {
   const [tab, setTab] = useState<Tab>("evals"); // demo opens on Evals (spec section 27)
+  const [memoRunId, setMemoRunId] = useState<string | null>(null);
+
+  function openMemo(runId: string) {
+    setMemoRunId(runId);
+    setTab("memo");
+  }
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", maxWidth: 1100, margin: "0 auto", padding: 16 }}>
@@ -44,8 +50,8 @@ export function App() {
         ))}
       </nav>
 
-      {tab === "run" && <RunTab />}
-      {tab === "memo" && <MemoTab />}
+      {tab === "run" && <RunTab onOpenMemo={openMemo} />}
+      {tab === "memo" && <MemoTab runId={memoRunId} onSelectRun={setMemoRunId} />}
       {tab === "evals" && <EvalsTab />}
     </div>
   );

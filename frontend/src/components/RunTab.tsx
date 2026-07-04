@@ -1,44 +1,23 @@
-// Run tab (spec section 24, Steps 13/15).
+// Run tab (spec section 24, Step 15).
 // Components: company picker, checklist preview, run button, live vertical timeline,
 // past-runs sidebar, status badge. Timeline card types: plan, scratchpad, retrieval,
 // tool_call, tool_result, decision, citation, item_answer, verdict, error.
-// Consume events via EventSource on GET /runs/{id}/events (live queue OR replay —
-// the frontend must not be able to tell them apart).
 //
-// Step 13: built against src/fixtures/demo_trace.jsonl only (no backend calls yet).
-// The "run" button below replays the fixture trace event-by-event to stand in for
-// the live SSE stream that Step 15 will wire up — same rendering path either way.
+// Wired to the live backend (Step 15): POST /runs starts a run, GET /runs lists past
+// runs, GET /companies sources the picker + checklist preview (gold-free), and
+// GET /runs/{id}/events (SSE) drives the timeline -- the same EventSource code path
+// whether the run is still live or being replayed from a completed trace, per spec
+// section 23 ("the frontend should not be able to tell live from replay").
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { RunStatus, TraceEvent, VerdictBadge } from "../types";
-import demoTraceRaw from "../fixtures/demo_trace.jsonl?raw";
-
-const DEMO_COMPANY = "3M";
-const DEMO_RUN_ID = "demo-run-3m-001";
-const STEP_MS = 350; // pacing for the simulated live timeline
-
-function parseTraceFixture(raw: string): TraceEvent[] {
-  return raw
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => JSON.parse(line) as TraceEvent)
-    .sort((a, b) => a.seq - b.seq);
-}
-
-const DEMO_TRACE = parseTraceFixture(demoTraceRaw);
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ApiError, createRun, listCompanies, listRuns, streamRunEvents } from "../api";
+import type { CompanyChecklist, RunCard as RunCardData, RunStatus, TraceEvent, VerdictBadge } from "../types";
 
 interface PlanItem {
   item_id: string;
   question: string;
   strategy: string;
   planned_inputs: string[];
-}
-
-function planItems(events: TraceEvent[]): PlanItem[] {
-  const plan = events.find((e) => e.type === "plan");
-  if (!plan) return [];
-  return (plan.payload.items as PlanItem[]) ?? [];
 }
 
 function itemStatuses(events: TraceEvent[]): Record<string, "answered" | "abstained"> {
@@ -49,6 +28,14 @@ function itemStatuses(events: TraceEvent[]): Record<string, "answered" | "abstai
     }
   }
   return out;
+}
+
+function statusFromEvents(events: TraceEvent[]): RunStatus {
+  if (events.length === 0) return "queued";
+  const last = events[events.length - 1];
+  if (last.type === "verdict") return "completed";
+  if (last.type === "error") return "failed";
+  return "running";
 }
 
 const TYPE_COLOR: Record<TraceEvent["type"], string> = {
@@ -313,34 +300,6 @@ function TimelineCard({ event, statuses }: { event: TraceEvent; statuses: Record
   );
 }
 
-interface RunCardSummary {
-  run_id: string;
-  company: string;
-  status: RunStatus;
-  items_total: number;
-  items_answered: number;
-  items_abstained: number;
-  verdict_badge: VerdictBadge;
-}
-
-function buildRunCardSummary(events: TraceEvent[]): RunCardSummary {
-  const verdict = events.find((e) => e.type === "verdict");
-  const stats = (verdict?.payload.summary_stats as Record<string, number>) ?? {};
-  const abstained = stats.items_abstained ?? 0;
-  const answered = stats.items_answered ?? 0;
-  const total = stats.items_total ?? 0;
-  const badge: VerdictBadge = !verdict ? "unknown" : abstained === 0 ? "strong" : answered > 0 ? "mixed" : "failed";
-  return {
-    run_id: DEMO_RUN_ID,
-    company: DEMO_COMPANY,
-    status: verdict ? "completed" : "queued",
-    items_total: total,
-    items_answered: answered,
-    items_abstained: abstained,
-    verdict_badge: badge,
-  };
-}
-
 const BADGE_COLOR: Record<VerdictBadge, string> = {
   strong: "#1c7a3c",
   mixed: "#a06a1c",
@@ -348,67 +307,107 @@ const BADGE_COLOR: Record<VerdictBadge, string> = {
   unknown: "#888",
 };
 
-export function RunTab() {
-  const [selectedCompany, setSelectedCompany] = useState(DEMO_COMPANY);
-  const [visibleCount, setVisibleCount] = useState(0);
-  const [hasRun, setHasRun] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+export function RunTab({ onOpenMemo }: { onOpenMemo: (runId: string) => void }) {
+  const [companies, setCompanies] = useState<CompanyChecklist[] | null>(null);
+  const [companiesError, setCompaniesError] = useState<string | null>(null);
+  const [selectedCompany, setSelectedCompany] = useState<string>("");
+  const [system, setSystem] = useState<"agent" | "baseline">("agent");
 
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
+  const [pastRuns, setPastRuns] = useState<RunCardData[]>([]);
+  const [currentRunId, setCurrentRunId] = useState<string | null>(null);
+  const [events, setEvents] = useState<TraceEvent[]>([]);
+  const [launching, setLaunching] = useState(false);
+  const [runError, setRunError] = useState<string | null>(null);
+
+  const closeStreamRef = useRef<(() => void) | null>(null);
+
+  const refreshPastRuns = useCallback(() => {
+    listRuns()
+      .then(setPastRuns)
+      .catch(() => {
+        /* past-runs sidebar is best-effort; leave the previous list on failure */
+      });
   }, []);
 
-  const visibleEvents = DEMO_TRACE.slice(0, visibleCount);
-  const statuses = useMemo(() => itemStatuses(visibleEvents), [visibleEvents]);
-  const checklist = planItems(DEMO_TRACE);
+  useEffect(() => {
+    listCompanies()
+      .then((cs) => {
+        setCompanies(cs);
+        if (cs.length > 0) setSelectedCompany(cs[0].company);
+      })
+      .catch((err) => setCompaniesError(err instanceof ApiError ? err.message : String(err)));
+    refreshPastRuns();
+    return () => closeStreamRef.current?.();
+  }, [refreshPastRuns]);
 
-  const runStatus: RunStatus = !hasRun
-    ? "queued"
-    : visibleCount < DEMO_TRACE.length
-      ? "running"
-      : "completed";
-
-  function startRun() {
-    if (timerRef.current) clearInterval(timerRef.current);
-    setHasRun(true);
-    setVisibleCount(0);
-    let i = 0;
-    timerRef.current = setInterval(() => {
-      i += 1;
-      setVisibleCount(i);
-      if (i >= DEMO_TRACE.length && timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    }, STEP_MS);
+  function openStream(runId: string) {
+    closeStreamRef.current?.();
+    setCurrentRunId(runId);
+    setEvents([]);
+    closeStreamRef.current = streamRunEvents<TraceEvent>(
+      runId,
+      (event) => setEvents((prev) => [...prev, event]),
+      () => refreshPastRuns(),
+    );
   }
 
-  function loadPastRun() {
-    if (timerRef.current) clearInterval(timerRef.current);
-    setHasRun(true);
-    setVisibleCount(DEMO_TRACE.length);
+  async function startRun() {
+    if (!selectedCompany) return;
+    setLaunching(true);
+    setRunError(null);
+    try {
+      const res = await createRun({ company: selectedCompany, system });
+      openStream(res.run_id);
+    } catch (err) {
+      setRunError(err instanceof ApiError ? err.message : String(err));
+    } finally {
+      setLaunching(false);
+    }
   }
 
-  const pastRuns: RunCardSummary[] = [buildRunCardSummary(DEMO_TRACE)];
+  function loadPastRun(runId: string) {
+    openStream(runId);
+  }
+
+  const statuses = useMemo(() => itemStatuses(events), [events]);
+  const checklist = companies?.find((c) => c.company === selectedCompany)?.items ?? [];
+  const runStatus = statusFromEvents(events);
+  const hasRun = currentRunId !== null;
+  const verdictSeen = events.some((e) => e.type === "verdict");
 
   return (
     <section style={{ display: "flex", gap: 20 }}>
       <div style={{ flex: 1, minWidth: 0 }}>
         <h2 style={{ fontSize: 16 }}>Run</h2>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
           <label style={{ fontSize: 13, color: "#555" }}>Company</label>
           <select
             value={selectedCompany}
             onChange={(e) => setSelectedCompany(e.target.value)}
+            disabled={!companies || companies.length === 0}
             style={{ fontSize: 13, padding: "4px 6px" }}
           >
-            <option value={DEMO_COMPANY}>{DEMO_COMPANY}</option>
+            {(companies ?? []).map((c) => (
+              <option key={c.company} value={c.company}>
+                {c.company}
+              </option>
+            ))}
           </select>
+
+          <label style={{ fontSize: 13, color: "#555" }}>System</label>
+          <select
+            value={system}
+            onChange={(e) => setSystem(e.target.value as "agent" | "baseline")}
+            style={{ fontSize: 13, padding: "4px 6px" }}
+          >
+            <option value="agent">agent</option>
+            <option value="baseline">baseline</option>
+          </select>
+
           <button
             onClick={startRun}
+            disabled={launching || !selectedCompany}
             style={{
               fontSize: 13,
               padding: "6px 14px",
@@ -416,21 +415,50 @@ export function RunTab() {
               color: "#fff",
               border: "none",
               borderRadius: 4,
-              cursor: "pointer",
+              cursor: launching || !selectedCompany ? "default" : "pointer",
+              opacity: launching || !selectedCompany ? 0.6 : 1,
             }}
           >
-            Run
+            {launching ? "Starting…" : "Run"}
           </button>
-          <StatusBadge status={runStatus} />
+          {hasRun && <StatusBadge status={runStatus} />}
+          {hasRun && verdictSeen && (
+            <button
+              onClick={() => onOpenMemo(currentRunId!)}
+              style={{
+                fontSize: 12,
+                background: "none",
+                border: "1px solid #0a7ea4",
+                color: "#0a7ea4",
+                borderRadius: 4,
+                padding: "4px 10px",
+                cursor: "pointer",
+              }}
+            >
+              View memo →
+            </button>
+          )}
         </div>
+
+        {companiesError && (
+          <div style={{ fontSize: 13, color: "#c0392b", marginBottom: 12 }}>
+            Failed to load companies: {companiesError}
+          </div>
+        )}
+        {runError && (
+          <div style={{ fontSize: 13, color: "#c0392b", marginBottom: 12 }}>Failed to start run: {runError}</div>
+        )}
 
         {!hasRun && (
           <div style={{ marginBottom: 16 }}>
             <h3 style={{ fontSize: 13, color: "#555", margin: "0 0 6px" }}>Checklist preview</h3>
+            {companies === null && !companiesError && (
+              <div style={{ fontSize: 13, color: "#888" }}>Loading…</div>
+            )}
             <ul style={{ margin: 0, paddingLeft: 18 }}>
               {checklist.map((it) => (
                 <li key={it.item_id} style={{ fontSize: 13, marginBottom: 4 }}>
-                  {it.question} <span style={{ color: "#888" }}>({it.strategy})</span>
+                  {it.question}
                 </li>
               ))}
             </ul>
@@ -439,25 +467,29 @@ export function RunTab() {
 
         {hasRun && (
           <div style={{ marginTop: 8 }}>
-            {visibleEvents.map((event) => (
+            {events.length === 0 && runStatus === "queued" && (
+              <div style={{ fontSize: 13, color: "#888" }}>Waiting for the first event…</div>
+            )}
+            {events.map((event) => (
               <TimelineCard key={event.seq} event={event} statuses={statuses} />
             ))}
           </div>
         )}
       </div>
 
-      <aside style={{ width: 220, flexShrink: 0 }}>
+      <aside style={{ width: 240, flexShrink: 0 }}>
         <h3 style={{ fontSize: 13, color: "#555", margin: "0 0 8px" }}>Past runs</h3>
+        {pastRuns.length === 0 && <div style={{ fontSize: 12, color: "#999" }}>No runs yet.</div>}
         {pastRuns.map((run) => (
           <button
             key={run.run_id}
-            onClick={loadPastRun}
+            onClick={() => loadPastRun(run.run_id)}
             style={{
               display: "block",
               width: "100%",
               textAlign: "left",
-              background: "#fafafa",
-              border: "1px solid #e5e5e5",
+              background: run.run_id === currentRunId ? "#eef6fa" : "#fafafa",
+              border: run.run_id === currentRunId ? "1px solid #0a7ea4" : "1px solid #e5e5e5",
               borderRadius: 6,
               padding: 10,
               marginBottom: 8,
@@ -466,8 +498,8 @@ export function RunTab() {
             }}
           >
             <div style={{ fontWeight: 600, marginBottom: 2 }}>{run.company}</div>
-            <div style={{ color: "#666", marginBottom: 4 }}>{run.run_id}</div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ color: "#666", marginBottom: 4, wordBreak: "break-all" }}>{run.run_id}</div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 6 }}>
               <span>
                 {run.items_answered}/{run.items_total} answered
               </span>
@@ -480,6 +512,7 @@ export function RunTab() {
                   borderRadius: 10,
                   padding: "1px 8px",
                   textTransform: "capitalize",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {run.verdict_badge}

@@ -143,6 +143,20 @@ export interface Comparison {
   systems: Record<string, SystemMetrics>;
 }
 
+// --- section 8: agent-visible checklist item (gold fields stripped) ---
+export interface AgentVisibleItem {
+  item_id: string;
+  company: string;
+  question: string;
+}
+
+// --- section 24 "Run tab" company picker + checklist preview (not itemized in
+// section 23's endpoint list, but GET /companies serves this) ---
+export interface CompanyChecklist {
+  company: string;
+  items: AgentVisibleItem[];
+}
+
 // --- section 23: API ---
 export interface RunCard {
   run_id: string;
@@ -159,6 +173,21 @@ export interface CreateRunRequest {
   company: string;
   item_ids?: string[];
   system?: "agent" | "baseline";
+}
+
+export interface CreateRunResponse {
+  run_id: string;
+  status: RunStatus;
+}
+
+export interface RunStatusResponse {
+  run_id: string;
+  company: string;
+  status: RunStatus;
+  created_at: string;
+  started_at?: string | null;
+  completed_at?: string | null;
+  error?: string | null;
 }
 
 export interface PageResponse {

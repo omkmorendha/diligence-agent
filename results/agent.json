@@ -1,0 +1,13 @@
+{
+  "system": "agent",
+  "runs_scored": [
+    "agent-pepsico-full"
+  ],
+  "num_items_scored": 8,
+  "answer_accuracy": 0.0,
+  "citation_precision": 0.8,
+  "citation_provenance": 1.0,
+  "arithmetic_integrity": 0.6,
+  "trace_shape": 0.375,
+  "abstention_correct_rate": 0.0
+}
