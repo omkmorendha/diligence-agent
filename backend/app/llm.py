@@ -40,11 +40,12 @@ def chat(
     * `tools`      -> native OpenAI tool-calling (NativeToolProtocol).
     * `json_mode`  -> request a JSON object response (structured output).
     * `stream`     -> return the streaming iterator instead of a full response.
-    * `reasoning_effort` -> speed knob for the Vultr Nemotron model (e.g. "none" for
-      0 reasoning tokens on high-volume simple-output calls: classification,
-      extraction, judging). Left unset (None) to keep the model's default reasoning
-      where answer quality depends on it (e.g. the agent loop). Sent via
-      `extra_body` since it is not a standard OpenAI chat-completion parameter.
+    * `reasoning_effort` -> speed knob for reasoning models (e.g. "none" for 0
+      reasoning tokens on high-volume simple-output calls: classification,
+      extraction, judging). No-op on the current non-reasoning Kimi-K2.6 model, but
+      honored by reasoning models. Left unset (None) to keep the model's default.
+      Sent via `extra_body` since it is not a standard OpenAI chat-completion
+      parameter.
     """
     kwargs: dict[str, Any] = {
         "model": config.LLM_MODEL,

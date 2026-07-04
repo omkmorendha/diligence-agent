@@ -31,13 +31,13 @@ SMOKE_RESULT_PATH = DATA_DIR / "smoke_llm_result.json"
 # --- LLM (spec section 3) ---
 NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
 LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "https://integrate.api.nvidia.com/v1")
-LLM_MODEL = os.environ.get("LLM_MODEL", "z-ai/glm-5.2")
+LLM_MODEL = os.environ.get("LLM_MODEL", "moonshotai/Kimi-K2.6")
 LLM_TEMPERATURE = float(os.environ.get("LLM_TEMPERATURE", "0.2"))
 LLM_SEED = int(os.environ.get("LLM_SEED", "42"))
 LLM_MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "16384"))
-# Optional speed knob (Vultr Nemotron-3-Nano): "none" -> 0 reasoning tokens, ~2-3s/call.
-# Use for high-volume simple-output calls (classification/extraction/judging); leave
-# unset (None) to keep the model's default reasoning where answer quality depends on it.
+# Optional speed knob for reasoning models: "none" -> 0 reasoning tokens. Kimi-K2.6
+# is non-reasoning so this is a no-op today; kept for models that honor it. Sent via
+# extra_body in llm.chat (see llm.py). Leave unset (None) to keep a model's default.
 LLM_REASONING_EFFORT = os.environ.get("LLM_REASONING_EFFORT") or None
 
 # --- embeddings (spec section 3) ---
