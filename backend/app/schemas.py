@@ -221,6 +221,17 @@ class Comparison(BaseModel):
 
 
 # --- section 23: API contract ----------------------------------------------
+class CompanyChecklist(BaseModel):
+    """Company picker + checklist preview source for the Run tab (spec section 24).
+    Not itemized in the section 23 endpoint list, but the frontend needs a
+    gold-free (`AgentVisibleItem`) source to populate the picker before a run
+    starts. Derived from `data/subset.json` via `agent_visible_item()` -- same
+    no-gold-leakage guarantee as the agent/baseline prompts."""
+
+    company: str
+    items: list[AgentVisibleItem] = Field(default_factory=list)
+
+
 class CreateRunRequest(BaseModel):
     company: str
     item_ids: Optional[list[str]] = None  # omitted => all items for company

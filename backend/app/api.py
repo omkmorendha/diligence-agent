@@ -42,13 +42,16 @@ from .agent import run_agent
 from .baseline import run_baseline
 from .ingest import slugify
 from .schemas import (
+    CompanyChecklist,
     CreateRunRequest,
     CreateRunResponse,
     PageResponse,
     RunCard,
     RunStatusResponse,
+    SubsetItem,
     TraceEvent,
     VerdictBadge,
+    agent_visible_item,
 )
 from .trace import TraceWriter
 
@@ -67,6 +70,31 @@ app.add_middleware(
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+# --------------------------------------------------------------------------
+# Company picker + checklist preview (spec section 24 "Run tab"; not itemized
+# in section 23 but required to populate the picker before POST /runs)
+# --------------------------------------------------------------------------
+@app.get("/companies", response_model=list[CompanyChecklist])
+def list_companies() -> list[CompanyChecklist]:
+    if not config.SUBSET_PATH.exists():
+        raise HTTPException(status_code=404, detail=f"{config.SUBSET_PATH} not found (built in Step 8)")
+
+    try:
+        raw = json.loads(config.SUBSET_PATH.read_text())
+    except (json.JSONDecodeError, OSError) as exc:
+        raise HTTPException(status_code=500, detail=f"corrupt {config.SUBSET_PATH}: {exc}") from exc
+
+    by_company: dict[str, list[Any]] = {}
+    for row in raw:
+        item = agent_visible_item(SubsetItem(**row))
+        by_company.setdefault(item.company, []).append(item)
+
+    return [
+        CompanyChecklist(company=company, items=items)
+        for company, items in sorted(by_company.items())
+    ]
 
 
 def _now_iso() -> str:
