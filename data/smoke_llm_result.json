@@ -2,10 +2,10 @@
   "native_tool_protocol_ok": true,
   "json_tool_protocol_ok": true,
   "json_mode_ok": true,
-  "streaming_ok": true,
+  "streaming_ok": false,
   "seed_ok": true,
   "rate_limit_ok": true,
   "rate_limit_notes": null,
-  "avg_latency_seconds": 3.1,
+  "avg_latency_seconds": 17.53,
   "selected_tool_protocol": "native"
 }

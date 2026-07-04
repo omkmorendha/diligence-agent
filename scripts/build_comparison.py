@@ -61,6 +61,8 @@ def _system_entry(system: str) -> dict:
         "citation_precision": data.get("citation_precision"),
         "citation_provenance": data.get("citation_provenance"),
         "arithmetic_integrity": data.get("arithmetic_integrity"),
+        "trace_shape": data.get("trace_shape"),
+        "abstention_correct_rate": data.get("abstention_correct_rate"),
         "groundedness_judge": data.get("groundedness_judge"),
         "actionability_judge": data.get("actionability_judge"),
         "by_bucket": by_bucket,

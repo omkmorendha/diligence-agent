@@ -74,6 +74,20 @@ function buildRows(comparison: Comparison): Row[] {
       cell: (m) => fraction(m?.arithmetic_integrity),
     },
     {
+      key: "trace_shape",
+      label: "Agentic trace shape",
+      definition:
+        "Share of checklist items whose trace follows the required workflow shape: plan before retrieval, exactly one final answer or abstention, and multi-input items using multiple retrievals plus calculation.",
+      cell: (m) => fraction(m?.trace_shape),
+    },
+    {
+      key: "abstention_correct_rate",
+      label: "Abstention calibration",
+      definition:
+        "Share of abstentions that are correct because the item is genuinely unanswerable or evidence-insufficient. “—” means the system made no scoreable abstentions.",
+      cell: (m) => fraction(m?.abstention_correct_rate),
+    },
+    {
       key: "groundedness_judge",
       label: "Groundedness (judge, 1–5)",
       definition:

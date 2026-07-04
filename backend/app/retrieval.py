@@ -13,6 +13,7 @@ Index layout consumed here (see ingest.py docstring):
 from __future__ import annotations
 
 import json
+import re
 from typing import Any
 
 import numpy as np
@@ -22,6 +23,10 @@ from .schemas import Chunk
 
 # in-process cache: company slug -> (mtime, embeddings, chunk_rows)
 _INDEX_CACHE: dict[str, tuple[float, np.ndarray, list[dict[str, Any]]]] = {}
+_TOKEN_RE = re.compile(r"[a-z0-9]+")
+_SEMANTIC_WEIGHT = 0.78
+_LEXICAL_WEIGHT = 0.17
+_METADATA_WEIGHT = 0.05
 
 
 class IndexNotFoundError(FileNotFoundError):
@@ -52,9 +57,49 @@ def _load_index(company_slug: str) -> tuple[np.ndarray, list[dict[str, Any]]]:
     return embeddings, chunk_rows
 
 
+def _tokens(text: str) -> set[str]:
+    return {t for t in _TOKEN_RE.findall(text.lower()) if len(t) > 1}
+
+
+def _lexical_score(query_tokens: set[str], row: dict[str, Any]) -> float:
+    if not query_tokens:
+        return 0.0
+    text_tokens = _tokens(str(row.get("text") or ""))
+    if not text_tokens:
+        return 0.0
+    overlap = len(query_tokens & text_tokens)
+    return overlap / len(query_tokens)
+
+
+def _metadata_score(query_tokens: set[str], row: dict[str, Any]) -> float:
+    if not query_tokens:
+        return 0.0
+    metadata = " ".join(
+        str(row.get(field) or "")
+        for field in ("doc_id", "doc_name", "doc_type", "filing_period")
+    )
+    metadata_tokens = _tokens(metadata)
+    if not metadata_tokens:
+        return 0.0
+    return len(query_tokens & metadata_tokens) / len(query_tokens)
+
+
+def _combined_score(semantic: float, lexical: float, metadata: float) -> float:
+    return (
+        _SEMANTIC_WEIGHT * semantic
+        + _LEXICAL_WEIGHT * lexical
+        + _METADATA_WEIGHT * metadata
+    )
+
+
 def search(company: str, query: str, k: int = 6, doc_filter: list[str] | None = None) -> list[Chunk]:
-    """Return top-k chunks for a query within a company's corpus, ranked by
-    cosine similarity (embeddings are L2-normalized, so dot product == cosine)."""
+    """Return top-k chunks for a query within a company's corpus.
+
+    Dense cosine similarity is still the primary signal, but financial filing
+    questions often contain exact labels, periods, document types, and line-item
+    names that MiniLM can blur together. A small lexical/metadata rerank makes
+    those exact anchors count without introducing a new index or vector store.
+    """
     slug = slugify(company)
     embeddings, chunk_rows = _load_index(slug)
 
@@ -68,17 +113,25 @@ def search(company: str, query: str, k: int = 6, doc_filter: list[str] | None = 
 
     query_vec = embed_texts([query])[0]
     sub_embeddings = embeddings[keep]
-    scores = sub_embeddings @ query_vec
+    semantic_scores = sub_embeddings @ query_vec
+    query_tokens = _tokens(query)
 
     # Sort by score desc; break ties deterministically by chunk_id so repeated
     # queries against an unchanged index always return the same ordering.
+    scored: list[tuple[float, int]] = []
+    for j, row_idx in enumerate(keep):
+        row = chunk_rows[row_idx]
+        semantic = float(semantic_scores[j])
+        lexical = _lexical_score(query_tokens, row)
+        metadata = _metadata_score(query_tokens, row)
+        scored.append((_combined_score(semantic, lexical, metadata), j))
     order = sorted(
-        range(len(keep)),
-        key=lambda j: (-float(scores[j]), chunk_rows[keep[j]]["chunk_id"]),
+        scored,
+        key=lambda pair: (-pair[0], chunk_rows[keep[pair[1]]]["chunk_id"]),
     )[:k]
 
     results: list[Chunk] = []
-    for j in order:
+    for score, j in order:
         row = chunk_rows[keep[j]]
-        results.append(Chunk(**row, score=float(scores[j])))
+        results.append(Chunk(**row, score=float(score)))
     return results

@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -52,6 +53,7 @@ from .tool_protocol import ToolAction, ToolProtocol
 from .trace import TraceWriter
 
 VALID_STRATEGIES = ("single_lookup", "multi_input_computation", "judgment")
+_NUM_RE = re.compile(r"[-+]?\$?\d[\d,]*(?:\.\d+)?%?")
 
 SYSTEM_PROMPT_RULES = """\
 You are a financial-diligence agent. You answer exactly ONE checklist item at a
@@ -211,6 +213,7 @@ class _ItemState:
     emitted_citation_ids: set[str] = field(default_factory=set)
     requires_calculation: bool = False
     calculate_called: bool = False
+    calculate_values: list[float] = field(default_factory=list)
 
 
 def _system_prompt(protocol_name: str) -> str:
@@ -256,7 +259,7 @@ def _chunk_model_view(chunk: Chunk) -> dict[str, Any]:
     }
 
 
-def _normalize_citation(raw: dict[str, Any], state: _ItemState) -> Citation:
+def _normalize_citation(raw: dict[str, Any], state: _ItemState, *, require_verbatim_quote: bool = True) -> Citation:
     """Resolve a model-supplied {chunk_id, quote?, claim?, citation_id?} into a
     full, accurately-offset Citation using the real retrieved Chunk -- never
     trusting the model's own char_start/char_end. Raises ValueError if
@@ -272,11 +275,16 @@ def _normalize_citation(raw: dict[str, Any], state: _ItemState) -> Citation:
             "search_filing call for this item"
         )
 
-    quote = raw.get("quote") or chunk.text
+    quote = raw.get("quote") or ""
     idx = chunk.text.find(quote) if quote else -1
     if idx == -1:
-        # Model paraphrased instead of quoting verbatim -- fall back to the
-        # whole retrieved chunk so the citation always points at real text.
+        if require_verbatim_quote:
+            raise ValueError(
+                "citation quote must be a verbatim substring of the retrieved chunk; "
+                "search again or copy an exact quote from search_filing output"
+            )
+        # Abstentions can carry partial evidence. Fall back to the whole chunk
+        # there so the citation still points at real text.
         quote = chunk.text
         char_start, char_end = chunk.char_start, chunk.char_end
     else:
@@ -298,6 +306,67 @@ def _normalize_citation(raw: dict[str, Any], state: _ItemState) -> Citation:
         char_start=char_start,
         char_end=char_end,
     )
+
+
+def _extract_numbers(text: str) -> list[float]:
+    values: list[float] = []
+    for match in _NUM_RE.finditer(text):
+        raw = match.group()
+        cleaned = raw.replace("$", "").replace(",", "").replace("%", "")
+        if not cleaned:
+            continue
+        try:
+            value = float(cleaned)
+        except ValueError:
+            continue
+        year_like = (
+            "$" not in raw
+            and "%" not in raw
+            and "," not in raw
+            and "." not in cleaned
+            and 1900 <= value <= 2100
+        )
+        if not year_like:
+            values.append(value)
+    return values
+
+
+def _numeric_close(left: float, right: float, relative: float = 0.01) -> bool:
+    denom = abs(right) if right != 0 else 1.0
+    return abs(left - right) / denom <= relative
+
+
+def _verify_answer_before_record(raw_answer: dict[str, Any], normalized: list[Citation], state: _ItemState) -> None:
+    """Preflight checks before `record_answer`.
+
+    The eval harness catches bad answers after a run; this gate catches common
+    failures while the model still has tool-call budget to repair them.
+    """
+    if raw_answer.get("status", "answered") != "answered":
+        return
+
+    if not normalized:
+        raise ValueError("record_answer: answered items require at least one verified citation")
+
+    confidence = raw_answer.get("confidence") if isinstance(raw_answer.get("confidence"), dict) else {}
+    if _safe_int(confidence.get("assumed_inputs"), 0) > 0:
+        raise ValueError("record_answer: do not record an answered item with assumed inputs; retrieve evidence or abstain")
+
+    value = raw_answer.get("value")
+    if value is None:
+        return
+    try:
+        numeric_value = float(value)
+    except (TypeError, ValueError):
+        return
+
+    grounded_values = list(state.calculate_values)
+    for citation in normalized:
+        grounded_values.extend(_extract_numbers(citation.quote))
+    if not any(_numeric_close(numeric_value, grounded) for grounded in grounded_values):
+        raise ValueError(
+            "record_answer: numeric value must match a calculate result or a number copied in a verified citation quote"
+        )
 
 
 def _maybe_parse_json(value: Any) -> Any:
@@ -362,6 +431,7 @@ def _dispatch(
             item_id=item_id,
         )
         state.calculate_called = True
+        state.calculate_values.append(float(result.value))
         return result.model_dump()
 
     if name == "record_answer":
@@ -379,7 +449,16 @@ def _dispatch(
         if not isinstance(raw_citations, list):
             raise ValueError("record_answer: 'citations' must be a JSON array")
         raw_citations = [_maybe_parse_json(c) for c in raw_citations]
-        normalized = [_normalize_citation(c, state) for c in raw_citations]
+        normalized = [_normalize_citation(c, state, require_verbatim_quote=True) for c in raw_citations]
+
+        # A non-numeric finding (unit == "text") must never carry a fabricated
+        # placeholder value -- e.g. a categorical outcome like "Defeated" must
+        # render as unitless text in the memo, not "0.0 text". Coerce before the
+        # numeric grounding preflight so this remains an allowed repair path.
+        if raw_answer.get("unit") == "text":
+            raw_answer["value"] = None
+
+        _verify_answer_before_record(raw_answer, normalized, state)
         for citation in normalized:
             if citation.citation_id not in state.emitted_citation_ids:
                 trace.emit(
@@ -405,16 +484,6 @@ def _dispatch(
             "grounded_inputs": len(normalized),
             "assumed_inputs": _safe_int(existing_confidence.get("assumed_inputs"), 0),
         }
-
-        # A non-numeric finding (unit == "text") must never carry a fabricated
-        # placeholder value -- e.g. a categorical outcome like "Defeated" must
-        # render as unitless text in the memo, not "0.0 text". Coerce
-        # agent-side rather than relying solely on prompt text, since a model
-        # retrying past a failed Pydantic validation (value must be
-        # float|null) has already shown it will substitute 0 to satisfy the
-        # type constraint.
-        if raw_answer.get("unit") == "text":
-            raw_answer["value"] = None
 
         # Every derived number must trace to a `calculate` tool_call (spec
         # section 14 rules 5/6; issue #11 acceptance criterion). Prompt text
@@ -444,7 +513,13 @@ def _dispatch(
         if isinstance(raw_citations, list):
             for raw_citation in raw_citations:
                 try:
-                    normalized_citations.append(_normalize_citation(_maybe_parse_json(raw_citation), state))
+                    normalized_citations.append(
+                        _normalize_citation(
+                            _maybe_parse_json(raw_citation),
+                            state,
+                            require_verbatim_quote=False,
+                        )
+                    )
                 except ValueError:
                     continue  # partial evidence is best-effort on the abstention path
         return tools.flag_outstanding(

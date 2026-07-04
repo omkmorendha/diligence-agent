@@ -203,6 +203,8 @@ class SystemMetrics(BaseModel):
     citation_precision: float = 0.0
     citation_provenance: float = 0.0
     arithmetic_integrity: float = 0.0
+    trace_shape: Optional[float] = None
+    abstention_correct_rate: Optional[float] = None
     groundedness_judge: Optional[float] = None
     actionability_judge: Optional[float] = None
     by_bucket: dict[str, BucketAccuracy] = Field(default_factory=dict)

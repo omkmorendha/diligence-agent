@@ -126,6 +126,8 @@ export interface SystemMetrics {
   citation_precision: number;
   citation_provenance: number;
   arithmetic_integrity: number;
+  trace_shape?: number | null;
+  abstention_correct_rate?: number | null;
   groundedness_judge?: number | null;
   actionability_judge?: number | null;
   by_bucket: Record<string, { answer_accuracy: number }>;
