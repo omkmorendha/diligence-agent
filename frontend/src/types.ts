@@ -167,5 +167,5 @@ export interface PageResponse {
   doc_name: string;
   page: number;
   text: string;
-  spans: { citation_id: string; char_start: number; char_end: number }[];
+  spans: { run_id: string; item_id: string; citation_id: string; char_start: number; char_end: number }[];
 }
