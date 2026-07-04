@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-07-04T18:56:47Z",
+  "created_at": "2026-07-04T19:42:38Z",
   "subset": {
     "num_questions": 28,
     "num_companies": 4,
@@ -19,6 +19,8 @@
       "citation_precision": 0.0,
       "citation_provenance": 1.0,
       "arithmetic_integrity": 1.0,
+      "trace_shape": 0.5714285714285714,
+      "abstention_correct_rate": 0.0,
       "groundedness_judge": null,
       "actionability_judge": null,
       "by_bucket": {
@@ -37,6 +39,8 @@
       "citation_precision": 0.5454545454545454,
       "citation_provenance": 1.0,
       "arithmetic_integrity": 0.9090909090909091,
+      "trace_shape": 0.6071428571428571,
+      "abstention_correct_rate": 0.0,
       "groundedness_judge": null,
       "actionability_judge": null,
       "by_bucket": {
