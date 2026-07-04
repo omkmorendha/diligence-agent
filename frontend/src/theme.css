@@ -1,0 +1,47 @@
+/* Ledger design tokens — Diligence Agent frontend.
+   Light is default; dark applies via [data-theme="dark"] or OS preference when unset. */
+
+:root {
+  --bg: #f6f7f9; --surface: #ffffff; --surface-2: #f0f1f4;
+  --line: #e5e7ec; --line-strong: #d3d6dd;
+  --text: #171920; --text-2: #5c6270; --text-3: #8d93a0;
+  --accent: #4f5bd5; --accent-text: #4550c4; --accent-soft: #edeffb; --accent-line: #c9cef2;
+  --green: #1a7f4e; --green-soft: #e7f4ec;
+  --amber: #96690f; --amber-soft: #f8f0dd;
+  --red: #bf3a32; --red-soft: #fbeceb;
+  --shadow: 0 1px 2px rgba(20, 22, 30, 0.05), 0 4px 16px rgba(20, 22, 30, 0.04);
+  --mark-bg: #171920; --mark-fg: #ffffff;
+  --sans: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #101216; --surface: #16181e; --surface-2: #1d2028;
+  --line: #262a33; --line-strong: #333845;
+  --text: #e9eaee; --text-2: #9ba1ae; --text-3: #6b7280;
+  --accent: #8b96f0; --accent-text: #a3acf5; --accent-soft: #222540; --accent-line: #3a3f6b;
+  --green: #4cc38a; --green-soft: #16281f;
+  --amber: #d9a94c; --amber-soft: #2b2313;
+  --red: #e5726a; --red-soft: #2e1a18;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.3);
+  --mark-bg: #e9eaee; --mark-fg: #101216;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) {
+    --bg: #101216; --surface: #16181e; --surface-2: #1d2028;
+    --line: #262a33; --line-strong: #333845;
+    --text: #e9eaee; --text-2: #9ba1ae; --text-3: #6b7280;
+    --accent: #8b96f0; --accent-text: #a3acf5; --accent-soft: #222540; --accent-line: #3a3f6b;
+    --green: #4cc38a; --green-soft: #16281f;
+    --amber: #d9a94c; --amber-soft: #2b2313;
+    --red: #e5726a; --red-soft: #2e1a18;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.3);
+    --mark-bg: #e9eaee; --mark-fg: #101216;
+  }
+}
+
+html, body { margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); }
+select { appearance: none; -webkit-appearance: none; }
+::selection { background: var(--accent-soft); }
