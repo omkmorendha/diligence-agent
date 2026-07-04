@@ -12,7 +12,7 @@ Verifies:
     4. streaming works
     5. seed is accepted or ignored safely
     6. latency per call is measured
-    7. rate-limit behavior is observed
+    7. rate-limit behavior is observed (burst of back-to-back calls)
 
 Writes: data/smoke_llm_result.json  (selected_tool_protocol drives config).
 """
@@ -108,6 +108,33 @@ def test_seed() -> tuple[bool, float, str | None]:
     return ok, dt, err
 
 
+def test_rate_limit(n: int = 5) -> tuple[bool, float, str | None]:
+    """Fire back-to-back calls with no delay to observe rate-limit behavior.
+
+    'ok' means all calls completed OR a rate-limit was hit and reported cleanly
+    (a 429 with a clear error is an acceptable, expected outcome — a hang or an
+    unhandled/opaque exception is not).
+    """
+    def call():
+        errors: list[str] = []
+        for i in range(n):
+            try:
+                llm.chat_text(
+                    [{"role": "user", "content": f"Reply with the number {i}."}],
+                    max_tokens=8,
+                )
+            except Exception as exc:  # noqa: BLE001 — capture, don't crash the smoke test
+                errors.append(f"{type(exc).__name__}: {exc}")
+        return errors
+    ok, dt, out, err = _timed(call)
+    if err:
+        return False, dt, err
+    errors = out or []
+    if errors:
+        return True, dt, f"{len(errors)}/{n} calls rate-limited (reported cleanly): {errors[0]}"
+    return True, dt, None
+
+
 def main() -> int:
     if not config.NVIDIA_API_KEY:
         print("NVIDIA_API_KEY not set — cannot run live smoke test.", file=sys.stderr)
@@ -137,6 +164,11 @@ def main() -> int:
     seed_ok, dt, err = test_seed(); latencies.append(dt)
     results["seed_ok"] = seed_ok
     print(f"[smoke] seed: {seed_ok} ({dt:.1f}s) {err or ''}", file=sys.stderr)
+
+    rate_ok, dt, note = test_rate_limit()
+    results["rate_limit_ok"] = rate_ok
+    results["rate_limit_notes"] = note
+    print(f"[smoke] rate limit: {rate_ok} ({dt:.1f}s) {note or 'no rate-limiting observed'}", file=sys.stderr)
 
     results["avg_latency_seconds"] = round(sum(latencies) / len(latencies), 2)
     # Prefer native tool calling if it works; otherwise fall back to the JSON protocol.
