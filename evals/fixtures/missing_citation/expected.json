@@ -1,0 +1,13 @@
+{
+  "fixture": "missing_citation",
+  "scorer_under_test": "citation_precision",
+  "expected_scores": {
+    "answer_accuracy": "pass",
+    "citation_precision": "fail",
+    "citation_provenance": null,
+    "arithmetic_integrity": "fail",
+    "abstention": null,
+    "trace_shape": "pass"
+  },
+  "notes": "The numeric value (210) is correct, so answer_accuracy passes in isolation -- but the memo item carries zero citations for a material financial claim. citation_precision must flag this as a material-claim-without-citation failure (there is no citation to even compare doc_id/page against). Because the number traces to neither a `calculate` result nor a cited quote span, arithmetic_integrity also fails for this item -- the two scorers correctly co-fail on an uncited claim, unlike fixture 3 where citations exist and only accuracy fails."
+}

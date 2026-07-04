@@ -1,0 +1,13 @@
+{
+  "fixture": "correct_calculation",
+  "scorer_under_test": "answer_accuracy",
+  "expected_scores": {
+    "answer_accuracy": "pass",
+    "citation_precision": "pass",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "pass",
+    "abstention": null,
+    "trace_shape": "pass"
+  },
+  "notes": "42.56% matches gold_value 42.56 within 1% relative tolerance. The derived margin traces to a `calculate` result whose inputs are both grounded in citations from prior retrievals (arithmetic_integrity pass). Both citations match gold doc_id/page (citation_precision) and reference chunk_ids seen in retrieval events (citation_provenance). A_multi_input trace shape: 2 retrievals, 1 calculate call, 2 grounded inputs -- all thresholds met."
+}

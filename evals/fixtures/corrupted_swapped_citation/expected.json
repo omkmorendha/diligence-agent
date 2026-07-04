@@ -1,0 +1,13 @@
+{
+  "fixture": "corrupted_swapped_citation",
+  "scorer_under_test": "citation_precision",
+  "expected_scores": {
+    "answer_accuracy": "pass",
+    "citation_precision": "fail",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "fail",
+    "abstention": null,
+    "trace_shape": "pass"
+  },
+  "notes": "Deliberately corrupted memo (spec section 21 calibration gate): the answer value (1250) is still correct, but its sole citation was swapped to an unrelated legal-proceedings chunk on page 12 -- far outside the +/-1 page slack around the gold page (42) -- so citation_precision fails. Because that swapped chunk_id WAS actually returned by a retrieval event this run, citation_provenance still passes: this isolates a precision failure from a provenance failure (contrast fixture 5). Since the cited quote does not support the revenue claim, arithmetic_integrity should also fail. This fixture is also fed to the LLM judges (evals/judges.py) as the swapped-citation half of the calibration gate; judges must score it low on groundedness."
+}

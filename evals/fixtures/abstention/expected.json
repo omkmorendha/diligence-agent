@@ -1,0 +1,13 @@
+{
+  "fixture": "abstention",
+  "scorer_under_test": "abstention",
+  "expected_scores": {
+    "answer_accuracy": null,
+    "citation_precision": null,
+    "citation_provenance": null,
+    "arithmetic_integrity": null,
+    "abstention": "correct",
+    "trace_shape": "pass"
+  },
+  "notes": "subset_item.answer_verifiable_from_evidence=false marks this item as truly unanswerable from the corpus (gold_evidence is empty and gold_answer states it is not disclosed). The agent searched, found nothing on point, and abstained via flag_outstanding with item_answer.status='abstained'. Per spec section 20, abstention is scored correct only when the item is genuinely unanswerable -- which it is here -- so this should score as the correct abstention outcome rather than incorrect-but-calibrated."
+}

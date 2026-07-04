@@ -1,0 +1,22 @@
+{
+  "item_id": "ab-001",
+  "question_id": "q-ab-001",
+  "company": "Acme Corp",
+  "question": "How many employees did Acme Corp have in its EMEA segment at FY2023 year-end?",
+  "gold_answer": "Not disclosed in the filing.",
+  "gold_value": null,
+  "gold_unit": "text",
+  "gold_evidence": [],
+  "bucket": "B_judgment",
+  "expected_formula": null,
+  "expected_inputs": [],
+  "predicted_baseline_failure": false,
+  "answer_verifiable_from_evidence": false,
+  "unit_or_period_ambiguity": false,
+  "demo_candidate": true,
+  "human_reviewed": true,
+  "tolerance": {
+    "relative": 0.01,
+    "absolute": null
+  }
+}

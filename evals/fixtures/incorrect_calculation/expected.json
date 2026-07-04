@@ -1,0 +1,13 @@
+{
+  "fixture": "incorrect_calculation",
+  "scorer_under_test": "answer_accuracy",
+  "expected_scores": {
+    "answer_accuracy": "fail",
+    "citation_precision": "pass",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "pass",
+    "abstention": null,
+    "trace_shape": "pass"
+  },
+  "notes": "The agent used the wrong formula (added COGS to revenue instead of subtracting), so 157.44 misses gold_value 42.56 well outside the 1% tolerance -> answer_accuracy fails. This isolates answer accuracy from arithmetic integrity: the wrong number still traces cleanly to a `calculate` result built from two grounded, correctly-cited inputs, so arithmetic_integrity, citation_precision, and citation_provenance all still pass -- the defect is in the reasoning/formula, not in traceability."
+}

@@ -1,0 +1,13 @@
+{
+  "fixture": "correct_lookup",
+  "scorer_under_test": "answer_accuracy",
+  "expected_scores": {
+    "answer_accuracy": "pass",
+    "citation_precision": "pass",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "pass",
+    "abstention": null,
+    "trace_shape": "pass"
+  },
+  "notes": "Direct string/numeric lookup: $1,250M matches gold_value 1250.0 within the default 1% relative tolerance. The single citation matches the gold doc_id/page and was surfaced by the prior retrieval event, so citation_precision and citation_provenance both pass. C_lookup trace shape: 1 retrieval (<=2), plan precedes it, item ends in exactly one item_answer with status=answered."
+}
