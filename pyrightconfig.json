@@ -1,0 +1,12 @@
+{
+  "include": ["backend", "scripts", "dataset_builder", "evals"],
+  "exclude": ["**/__pycache__", "**/.venv", "data", "runs", "results", "frontend"],
+  "reportMissingImports": "warning",
+  "reportMissingModuleSource": "none",
+  "executionEnvironments": [
+    { "root": "backend" },
+    { "root": "scripts", "extraPaths": ["backend"] },
+    { "root": "dataset_builder", "extraPaths": ["backend"] },
+    { "root": "evals", "extraPaths": ["backend"] }
+  ]
+}

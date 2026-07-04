@@ -1,0 +1,30 @@
+# --- secrets ---
+.env
+
+# --- large / generated data (keep the small curated JSON, ignore bulk) ---
+data/filings/
+data/pages/
+data/raw/*.pdf
+# reproducible via `uv run dataset_builder/d1_pull_raw.py` (derived FinanceBench data)
+data/raw/financebench.jsonl
+data/raw/*.log
+runs/
+
+# --- python ---
+__pycache__/
+*.py[cod]
+.venv/
+.uv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# --- node / frontend ---
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# --- os / editor ---
+.DS_Store
+.idea/
+.vscode/

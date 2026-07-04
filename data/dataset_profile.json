@@ -1,0 +1,363 @@
+{
+  "total_rows": 150,
+  "num_companies": 32,
+  "num_docs": 84,
+  "document_types": {
+    "10k": 112,
+    "10q": 15,
+    "8k": 9,
+    "Earnings": 14
+  },
+  "document_periods": {
+    "2015": 3,
+    "2016": 3,
+    "2017": 6,
+    "2018": 7,
+    "2019": 8,
+    "2020": 10,
+    "2021": 14,
+    "2022": 61,
+    "2023": 35,
+    "2024": 3
+  },
+  "gics_sectors": {
+    "Industrials": 19,
+    "Communication Services": 9,
+    "Information Technology": 22,
+    "Utilities": 6,
+    "Consumer Discretionary": 30,
+    "Materials": 9,
+    "Financials": 13,
+    "Consumer Staples": 23,
+    "Health Care": 19
+  },
+  "question_types": {
+    "metrics-generated": 50,
+    "domain-relevant": 50,
+    "novel-generated": 50
+  },
+  "question_reasonings": {
+    "Information extraction": 31,
+    "Logical reasoning (based on numerical reasoning)": 5,
+    "Logical reasoning (based on numerical reasoning) OR Numerical reasoning OR Logical reasoning": 4,
+    "null": 50,
+    "Logical reasoning (based on numerical reasoning) OR Logical reasoning": 5,
+    "Numerical reasoning": 43,
+    "Numerical reasoning OR information extraction": 4,
+    "Numerical reasoning OR Logical reasoning": 6,
+    "Information extraction OR Logical reasoning OR": 1,
+    "Information extraction OR Logical reasoning": 1
+  },
+  "evidence_count_distribution": {
+    "1": 115,
+    "2": 31,
+    "3": 4
+  },
+  "bucket_preview_totals": {
+    "C_lookup": 31,
+    "A_multi_input": 67,
+    "B_judgment": 52
+  },
+  "candidate_companies": [
+    {
+      "company": "PepsiCo",
+      "usable_questions": 11,
+      "num_docs": 5,
+      "bucket_preview": {
+        "C_lookup": 4,
+        "A_multi_input": 2,
+        "B_judgment": 5
+      }
+    },
+    {
+      "company": "Amcor",
+      "usable_questions": 9,
+      "num_docs": 5,
+      "bucket_preview": {
+        "C_lookup": 2,
+        "B_judgment": 5,
+        "A_multi_input": 2
+      }
+    },
+    {
+      "company": "Johnson & Johnson",
+      "usable_questions": 9,
+      "num_docs": 4,
+      "bucket_preview": {
+        "A_multi_input": 3,
+        "B_judgment": 6
+      }
+    },
+    {
+      "company": "3M",
+      "usable_questions": 8,
+      "num_docs": 3,
+      "bucket_preview": {
+        "C_lookup": 3,
+        "A_multi_input": 3,
+        "B_judgment": 2
+      }
+    },
+    {
+      "company": "AMD",
+      "usable_questions": 8,
+      "num_docs": 2,
+      "bucket_preview": {
+        "A_multi_input": 4,
+        "C_lookup": 2,
+        "B_judgment": 2
+      }
+    },
+    {
+      "company": "Best Buy",
+      "usable_questions": 8,
+      "num_docs": 4,
+      "bucket_preview": {
+        "A_multi_input": 3,
+        "C_lookup": 2,
+        "B_judgment": 3
+      }
+    },
+    {
+      "company": "Boeing",
+      "usable_questions": 8,
+      "num_docs": 2,
+      "bucket_preview": {
+        "C_lookup": 2,
+        "A_multi_input": 2,
+        "B_judgment": 4
+      }
+    },
+    {
+      "company": "American Express",
+      "usable_questions": 7,
+      "num_docs": 1,
+      "bucket_preview": {
+        "C_lookup": 2,
+        "A_multi_input": 3,
+        "B_judgment": 2
+      }
+    },
+    {
+      "company": "MGM Resorts",
+      "usable_questions": 7,
+      "num_docs": 5,
+      "bucket_preview": {
+        "C_lookup": 2,
+        "A_multi_input": 1,
+        "B_judgment": 4
+      }
+    },
+    {
+      "company": "Pfizer",
+      "usable_questions": 6,
+      "num_docs": 2,
+      "bucket_preview": {
+        "B_judgment": 6
+      }
+    },
+    {
+      "company": "Ulta Beauty",
+      "usable_questions": 6,
+      "num_docs": 2,
+      "bucket_preview": {
+        "C_lookup": 2,
+        "B_judgment": 4
+      }
+    },
+    {
+      "company": "Adobe",
+      "usable_questions": 5,
+      "num_docs": 4,
+      "bucket_preview": {
+        "A_multi_input": 4,
+        "B_judgment": 1
+      }
+    },
+    {
+      "company": "JPMorgan",
+      "usable_questions": 5,
+      "num_docs": 4,
+      "bucket_preview": {
+        "B_judgment": 4,
+        "A_multi_input": 1
+      }
+    },
+    {
+      "company": "Verizon",
+      "usable_questions": 5,
+      "num_docs": 2,
+      "bucket_preview": {
+        "B_judgment": 2,
+        "A_multi_input": 3
+      }
+    },
+    {
+      "company": "Corning",
+      "usable_questions": 4,
+      "num_docs": 3,
+      "bucket_preview": {
+        "A_multi_input": 4
+      }
+    },
+    {
+      "company": "CVS Health",
+      "usable_questions": 4,
+      "num_docs": 2,
+      "bucket_preview": {
+        "A_multi_input": 2,
+        "C_lookup": 2
+      }
+    },
+    {
+      "company": "General Mills",
+      "usable_questions": 4,
+      "num_docs": 3,
+      "bucket_preview": {
+        "A_multi_input": 4
+      }
+    },
+    {
+      "company": "Nike",
+      "usable_questions": 4,
+      "num_docs": 4,
+      "bucket_preview": {
+        "A_multi_input": 3,
+        "C_lookup": 1
+      }
+    },
+    {
+      "company": "AES Corporation",
+      "usable_questions": 3,
+      "num_docs": 1,
+      "bucket_preview": {
+        "C_lookup": 1,
+        "A_multi_input": 2
+      }
+    },
+    {
+      "company": "Amazon",
+      "usable_questions": 3,
+      "num_docs": 2,
+      "bucket_preview": {
+        "A_multi_input": 2,
+        "C_lookup": 1
+      }
+    },
+    {
+      "company": "American Water Works",
+      "usable_questions": 3,
+      "num_docs": 3,
+      "bucket_preview": {
+        "C_lookup": 1,
+        "A_multi_input": 2
+      }
+    },
+    {
+      "company": "Block",
+      "usable_questions": 3,
+      "num_docs": 2,
+      "bucket_preview": {
+        "A_multi_input": 2,
+        "C_lookup": 1
+      }
+    },
+    {
+      "company": "Coca-Cola",
+      "usable_questions": 3,
+      "num_docs": 3,
+      "bucket_preview": {
+        "A_multi_input": 3
+      }
+    },
+    {
+      "company": "Lockheed Martin",
+      "usable_questions": 3,
+      "num_docs": 3,
+      "bucket_preview": {
+        "A_multi_input": 3
+      }
+    },
+    {
+      "company": "Walmart",
+      "usable_questions": 3,
+      "num_docs": 3,
+      "bucket_preview": {
+        "A_multi_input": 3
+      }
+    },
+    {
+      "company": "Activision Blizzard",
+      "usable_questions": 2,
+      "num_docs": 1,
+      "bucket_preview": {
+        "A_multi_input": 2
+      }
+    },
+    {
+      "company": "Foot Locker",
+      "usable_questions": 2,
+      "num_docs": 2,
+      "bucket_preview": {
+        "B_judgment": 2
+      }
+    },
+    {
+      "company": "Microsoft",
+      "usable_questions": 2,
+      "num_docs": 2,
+      "bucket_preview": {
+        "C_lookup": 1,
+        "A_multi_input": 1
+      }
+    },
+    {
+      "company": "Netflix",
+      "usable_questions": 2,
+      "num_docs": 2,
+      "bucket_preview": {
+        "A_multi_input": 1,
+        "C_lookup": 1
+      }
+    },
+    {
+      "company": "Costco",
+      "usable_questions": 1,
+      "num_docs": 1,
+      "bucket_preview": {
+        "C_lookup": 1
+      }
+    },
+    {
+      "company": "Kraft Heinz",
+      "usable_questions": 1,
+      "num_docs": 1,
+      "bucket_preview": {
+        "A_multi_input": 1
+      }
+    },
+    {
+      "company": "Paypal",
+      "usable_questions": 1,
+      "num_docs": 1,
+      "bucket_preview": {
+        "A_multi_input": 1
+      }
+    }
+  ],
+  "feasibility": {
+    "ideal_target": "4 companies x ~8 questions = ~32 (16 A / 8 B / 8 C)",
+    "companies_with_8plus_questions": [
+      "PepsiCo",
+      "Amcor",
+      "Johnson & Johnson",
+      "3M",
+      "AMD",
+      "Best Buy",
+      "Boeing"
+    ],
+    "num_companies_with_8plus": 7,
+    "ideal_feasible": true,
+    "note": "bucket_preview is heuristic; D3/D4 classifier is authoritative."
+  }
+}
