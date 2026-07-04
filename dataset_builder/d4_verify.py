@@ -247,7 +247,10 @@ def _verify_one(row: dict[str, Any], classification: dict[str, Any]) -> dict[str
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": _build_user_prompt(row, classification)},
     ]
-    obj, error = call_json_with_retry(messages, _validate_verification, max_tokens=1000)
+    # See the matching comment in d3_classify.py: the reasoning model spends
+    # completion tokens on its `reasoning` field before `content`, so this needs
+    # real headroom, not just enough for the JSON payload.
+    obj, error = call_json_with_retry(messages, _validate_verification, max_tokens=8000)
     if obj is not None:
         verification = {k: obj[k] for k in REQUIRED_KEYS}
         verification["verifier_error"] = None
@@ -359,12 +362,47 @@ def main() -> int:
     print(f"[d4] verifying {len(pairs)} questions with {args.workers} worker(s)...", file=sys.stderr)
     t0 = time.time()
     results: dict[str, dict[str, Any]] = {}
+    pairs_by_qid = {row["question_id"]: (row, cls) for row, cls in pairs}
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         futures = {pool.submit(_verify_one, row, cls): row["question_id"] for row, cls in pairs}
         done = 0
         for fut in as_completed(futures):
             qid = futures[fut]
-            results[qid] = fut.result()
+            try:
+                results[qid] = fut.result()
+            except Exception as exc:  # noqa: BLE001 - should not happen (fallback catches it)
+                row, classification = pairs_by_qid[qid]
+                verification = _heuristic_fallback(f"{type(exc).__name__}: {exc}")
+                results[qid] = {
+                    "question_id": row["question_id"],
+                    "company": row["company"],
+                    "doc_name": row["doc_name"],
+                    "question": row["question"],
+                    "gold_answer": row["gold_answer"],
+                    "bucket_d3": classification["bucket"],
+                    "expected_formula": classification["expected_formula"],
+                    "expected_inputs": classification["expected_inputs"],
+                    "inputs_span_multiple_statements": classification["inputs_span_multiple_statements"],
+                    "predicted_baseline_failure": classification["predicted_baseline_failure"],
+                    "answer_verifiable_from_evidence_d3": classification["answer_verifiable_from_evidence"],
+                    "unit_or_period_ambiguity_d3": classification["unit_or_period_ambiguity"],
+                    "notes_d3": classification["notes"],
+                    "classifier_error": classification.get("classifier_error"),
+                    "verifier_suggested_bucket": verification["suggested_bucket"],
+                    "verifier_bucket_reasonable": verification["bucket_reasonable"],
+                    "verifier_gold_answer_follows_from_evidence": verification["gold_answer_follows_from_evidence"],
+                    "verifier_expected_inputs_correct": verification["expected_inputs_correct"],
+                    "verifier_unit_or_period_ambiguity": verification["unit_or_period_ambiguity"],
+                    "verifier_should_include": verification["should_include"],
+                    "verifier_notes": verification["notes"],
+                    "verifier_error": verification.get("verifier_error"),
+                    "evidence_checks": [],
+                    "evidence_all_findable": False,
+                    "disagreement": True,
+                    "disagreement_reasons": [f"unhandled exception in _verify_one: {type(exc).__name__}: {exc}"],
+                    "human_reviewed": False,
+                    "include": False,
+                }
             done += 1
             if done % 10 == 0 or done == len(pairs):
                 print(f"[d4] {done}/{len(pairs)} verified", file=sys.stderr)

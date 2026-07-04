@@ -158,7 +158,12 @@ def _classify_one(row: dict[str, Any]) -> dict[str, Any]:
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": _build_user_prompt(row)},
     ]
-    obj, error = call_json_with_retry(messages, _validate_classification, max_tokens=1200)
+    # max_tokens is generous (not just for the JSON payload): the configured model
+    # is a reasoning model that emits a separate `reasoning` field consuming from
+    # the same completion-token budget before `content` is written, so a tight
+    # limit here truncates mid-reasoning and yields empty content (see AGENT NOTE
+    # in llm_json.py / dev notes on the Vultr Nemotron-3-Nano-Omni reasoning model).
+    obj, error = call_json_with_retry(messages, _validate_classification, max_tokens=8000)
     if obj is not None:
         classification = {k: obj[k] for k in REQUIRED_KEYS}
         classification["classifier_error"] = None
