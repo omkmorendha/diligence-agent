@@ -86,6 +86,30 @@ pnpm dev            # http://localhost:5173 (proxies /runs, /corpus, /evals to :
 
 ---
 
+### Docker Compose (serving/demo stack only)
+
+One-command bring-up of the whole demo stack against the local dataset and
+whatever runs already exist under `runs/`. This never ingests, builds the
+dataset, or executes eval runs — that stays host-side via `uv run --project
+backend ...` (see above).
+
+```bash
+cp .env.example .env      # add NVIDIA_API_KEY (Vultr endpoint) if not already done
+docker compose up --build
+```
+
+- Frontend: <http://localhost:5173> (nginx, proxies `/runs`, `/companies`,
+  `/corpus`, `/evals`, `/health` to the backend, including the SSE trace
+  stream).
+- Backend: <http://localhost:8000> (FastAPI/uvicorn).
+- `data/` is bind-mounted read-only and `runs/`/`results/` are bind-mounted
+  so the containers replay existing traces and serve corpus pages without
+  rebuilding anything; `.env` is passed via `env_file`, never baked into
+  either image.
+- `docker compose down` then `docker compose up --build` again is idempotent.
+
+---
+
 ## Build order (eval-first)
 
 Follow `v0-spec.md` section 25. The schemas, fixtures, and deterministic eval

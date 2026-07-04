@@ -1,0 +1,37 @@
+# One-command bring-up of the demo stack (spec section 23, 24, 27).
+#
+# `docker compose up --build` serves the API and the frontend against the
+# local dataset and whatever runs already exist under runs/ — it never
+# ingests, re-runs, or re-scores anything. Dataset building, ingestion, and
+# eval runs stay host-side via `uv run --project backend ...` (see README).
+#
+# Before first use: `cp .env.example .env` and fill in real values.
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      # Curated + generated dataset (filings/pages/index are large and
+      # gitignored; mounted read-only so the container only ever replays).
+      - ./data:/app/data:ro
+      # Trace/memo output — read-write so POST /runs can write new runs.
+      - ./runs:/app/runs
+      # Deterministic eval + judge output backing GET /evals/results.
+      - ./results:/app/results:ro
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
