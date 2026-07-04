@@ -1,0 +1,93 @@
+{
+  "run_id": "demo-run-3m-001",
+  "company": "3M",
+  "status": "completed",
+  "created_at": "2026-06-01T14:32:00Z",
+  "completed_at": "2026-06-01T14:32:24Z",
+  "items": [
+    {
+      "item_id": "item_01",
+      "question": "What is the FY2018 capital expenditure amount (in USD millions) for 3M?",
+      "answer": "3M's FY2018 capital expenditures were $1,577 million.",
+      "value": 1577.0,
+      "unit": "USD millions",
+      "citations": [
+        {
+          "citation_id": "cit_001",
+          "claim": "FY2018 capital expenditures were $1,577 million.",
+          "doc_id": "3M_2018_10K",
+          "doc_name": "3M_2018_10K",
+          "doc_type": "10k",
+          "filing_period": "FY2018",
+          "pdf_page": 45,
+          "page_label": "45",
+          "chunk_id": "3m:3M_2018_10K:p45:c2",
+          "quote": "Purchases of property, plant and equipment (PP&E) 1,577",
+          "char_start": 812,
+          "char_end": 868,
+          "source_event_seq": 2
+        }
+      ],
+      "status": "answered",
+      "confidence": { "grounded_inputs": 1, "assumed_inputs": 0 }
+    },
+    {
+      "item_id": "item_02",
+      "question": "What was 3M's fixed asset turnover ratio in FY2018?",
+      "answer": "3M's FY2018 fixed asset turnover ratio was approximately 3.76x, computed as net sales divided by average net PP&E.",
+      "value": 3.76,
+      "unit": "ratio",
+      "citations": [
+        {
+          "citation_id": "cit_002",
+          "claim": "FY2018 net sales were $32,765 million.",
+          "doc_id": "3M_2018_10K",
+          "doc_name": "3M_2018_10K",
+          "doc_type": "10k",
+          "filing_period": "FY2018",
+          "pdf_page": 42,
+          "page_label": "42",
+          "chunk_id": "3m:3M_2018_10K:p42:c1",
+          "quote": "Net sales 32,765",
+          "char_start": 100,
+          "char_end": 130,
+          "source_event_seq": 8
+        },
+        {
+          "citation_id": "cit_003",
+          "claim": "Net PP&E was $8,738 million (FY2018) and $8,689 million (FY2017).",
+          "doc_id": "3M_2018_10K",
+          "doc_name": "3M_2018_10K",
+          "doc_type": "10k",
+          "filing_period": "FY2018",
+          "pdf_page": 50,
+          "page_label": "50",
+          "chunk_id": "3m:3M_2018_10K:p50:c3",
+          "quote": "Property, plant and equipment - net 8,738 8,689",
+          "char_start": 220,
+          "char_end": 270,
+          "source_event_seq": 10
+        }
+      ],
+      "status": "answered",
+      "confidence": { "grounded_inputs": 2, "assumed_inputs": 0 }
+    },
+    {
+      "item_id": "item_03",
+      "question": "What is 3M's FY2023 capital expenditure guidance?",
+      "answer": "Cannot be answered from the available FY2018 10-K filing; no FY2023 capital expenditure guidance is disclosed.",
+      "value": null,
+      "unit": "text",
+      "citations": [],
+      "status": "abstained",
+      "confidence": { "grounded_inputs": 0, "assumed_inputs": 0 }
+    }
+  ],
+  "summary": {
+    "items_total": 3,
+    "items_answered": 2,
+    "items_abstained": 1,
+    "citations_total": 3,
+    "calculate_calls": 1
+  }
+}
