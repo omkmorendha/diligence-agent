@@ -1,7 +1,7 @@
 """Deterministic scorers (spec section 20, Step 3).
 
 Pure functions over memo.json + trace.jsonl + subset.json gold fields. No LLM.
-These are the TDD foundation — every scorer is tested against evals/fixtures/.
+These are the TDD foundation -- every scorer is tested against evals/fixtures/.
 
 Metrics (spec section 20):
     * answer accuracy       numeric: default +/-1% relative tolerance (overridable);
@@ -17,14 +17,27 @@ Metrics (spec section 20):
     * trace shape           A_multi_input: >=2 retrievals, >=1 calculate, >=2 grounded
                             inputs; C_lookup: short path (<=2 retrievals, soft).
 
-TODO(Step 3).
+All scorers return one of "pass" / "fail" / None. None means "not applicable" --
+e.g. citation metrics on an abstained item, or citation_provenance/precision when
+there is nothing to check against gold.
 """
 
 from __future__ import annotations
 
+import json
 import re
+import sys
+from pathlib import Path
+from typing import Optional
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
+
+from app.schemas import MemoItem, SubsetItem, TraceEvent  # noqa: E402
 
 _PUNCT = re.compile(r"[^\w\s.%-]")
+_NUM_RE = re.compile(r"[-+]?\$?\d[\d,]*(?:\.\d+)?%?")
+
+FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures"
 
 
 def normalize_string(s: str) -> str:
@@ -46,5 +59,257 @@ def numeric_within_tolerance(
     return predicted == gold
 
 
-# TODO(Step 3): answer_accuracy(), citation_precision(), citation_provenance(),
-# arithmetic_integrity(), trace_shape(), score_run(), score_fixtures().
+def _extract_numbers(text: str) -> list[float]:
+    """Pull candidate numeric literals out of a quote span.
+
+    Ignores bare 4-digit integers that look like fiscal years/dates (spec section
+    20: "ignore ... fiscal years ... dates") unless they carry a currency/percent/
+    decimal marker that makes them look like an actual financial figure.
+    """
+    values: list[float] = []
+    for m in _NUM_RE.finditer(text):
+        raw = m.group()
+        has_dollar = "$" in raw
+        has_percent = "%" in raw
+        has_comma = "," in raw
+        cleaned = raw.replace("$", "").replace(",", "").replace("%", "")
+        if not cleaned:
+            continue
+        try:
+            val = float(cleaned)
+        except ValueError:
+            continue
+        is_year_like = (
+            not has_dollar
+            and not has_percent
+            and not has_comma
+            and "." not in cleaned
+            and 1900 <= val <= 2100
+        )
+        if is_year_like:
+            continue
+        values.append(val)
+    return values
+
+
+def _retrieval_chunk_ids(item_id: str, trace_events: list[TraceEvent]) -> set[str]:
+    """Every chunk_id surfaced by a `retrieval` event for this item, anywhere in the trace.
+
+    Used by citation_provenance and (transitively) arithmetic_integrity: a citation
+    only "counts" as grounding a number if the exact chunk it points at was actually
+    returned by search, as opposed to invented from memory or gold leakage.
+    """
+    chunk_ids: set[str] = set()
+    for e in trace_events:
+        if e.type == "retrieval" and e.item_id == item_id:
+            for c in e.payload.get("chunks", []):
+                chunk_id = c.get("chunk_id")
+                if chunk_id:
+                    chunk_ids.add(chunk_id)
+    return chunk_ids
+
+
+def _calculate_values(item_id: str, trace_events: list[TraceEvent]) -> list[float]:
+    """Every numeric result produced by a `calculate` tool_result for this item."""
+    values: list[float] = []
+    for e in trace_events:
+        if e.type == "tool_result" and e.item_id == item_id:
+            payload = e.payload
+            if payload.get("tool") == "calculate":
+                out = payload.get("output", {})
+                if "value" in out and out["value"] is not None:
+                    values.append(float(out["value"]))
+    return values
+
+
+def answer_accuracy(memo_item: MemoItem, subset_item: SubsetItem) -> Optional[str]:
+    """Numeric: +/-tolerance relative/absolute match. String: normalized exact match."""
+    if memo_item.status == "abstained":
+        return None
+
+    if subset_item.gold_value is not None and memo_item.value is not None:
+        tol = subset_item.tolerance
+        ok = numeric_within_tolerance(memo_item.value, subset_item.gold_value, tol.relative, tol.absolute)
+        return "pass" if ok else "fail"
+
+    ok = normalize_string(memo_item.answer) == normalize_string(subset_item.gold_answer)
+    return "pass" if ok else "fail"
+
+
+def citation_precision(memo_item: MemoItem, subset_item: SubsetItem, page_slack: int = 1) -> Optional[str]:
+    """doc_id match + cited page within +/-page_slack of a gold evidence document.
+
+    A material claim (any answered item) with zero citations automatically fails --
+    there is nothing to check the claim against.
+    """
+    if memo_item.status == "abstained":
+        return None
+
+    if not memo_item.citations:
+        return "fail"
+    if not subset_item.gold_evidence:
+        return "fail"
+
+    for citation in memo_item.citations:
+        matched = any(
+            citation.doc_id == gold.doc_id and abs(citation.pdf_page - gold.pdf_page) <= page_slack
+            for gold in subset_item.gold_evidence
+        )
+        if not matched:
+            return "fail"
+    return "pass"
+
+
+def citation_provenance(memo_item: MemoItem, item_id: str, trace_events: list[TraceEvent]) -> Optional[str]:
+    """Every cited chunk_id must appear in a prior `retrieval` event in the same trace."""
+    if memo_item.status == "abstained":
+        return None
+    if not memo_item.citations:
+        return None
+
+    retrieved = _retrieval_chunk_ids(item_id, trace_events)
+    for citation in memo_item.citations:
+        if citation.chunk_id not in retrieved:
+            return "fail"
+    return "pass"
+
+
+def arithmetic_integrity(
+    memo_item: MemoItem, item_id: str, trace_events: list[TraceEvent], subset_item: SubsetItem
+) -> Optional[str]:
+    """The claimed numeric value must trace to a `calculate` result or a cited quote span.
+
+    A cited quote only counts as grounding if its chunk_id was itself actually
+    retrieved (i.e. citation_provenance would pass for it) -- a citation invented
+    from memory does not get to double as arithmetic support.
+    """
+    if memo_item.status == "abstained":
+        return None
+    if memo_item.value is None:
+        return "pass"
+
+    grounded_values = list(_calculate_values(item_id, trace_events))
+
+    retrieved = _retrieval_chunk_ids(item_id, trace_events)
+    for citation in memo_item.citations:
+        if citation.chunk_id in retrieved:
+            grounded_values.extend(_extract_numbers(citation.quote))
+
+    tol = subset_item.tolerance
+    for gv in grounded_values:
+        if numeric_within_tolerance(memo_item.value, gv, tol.relative, tol.absolute):
+            return "pass"
+    return "fail"
+
+
+def trace_shape(memo_item: MemoItem, subset_item: SubsetItem, item_id: str, trace_events: list[TraceEvent]) -> str:
+    """Structural checks (spec section 20): plan before retrieval, exactly one final
+    answer/abstention, and bucket-specific thresholds for A_multi_input.
+
+    C_lookup over-retrieval is explicitly a soft/inefficiency signal, not a hard
+    failure, so it is not checked here.
+    """
+    item_events = [e for e in trace_events if e.item_id == item_id]
+    plans = [e for e in trace_events if e.type == "plan"]
+    retrievals = [e for e in item_events if e.type == "retrieval"]
+    calculates = [
+        e for e in item_events if e.type == "tool_call" and e.payload.get("tool") == "calculate"
+    ]
+    answers = [e for e in item_events if e.type == "item_answer"]
+
+    if len(answers) != 1:
+        return "fail"
+    answer_event = answers[0]
+    if answer_event.payload.get("status") not in ("answered", "abstained"):
+        return "fail"
+
+    if not plans:
+        return "fail"
+    first_plan_seq = min(e.seq for e in plans)
+    if retrievals:
+        first_retrieval_seq = min(e.seq for e in retrievals)
+        if first_plan_seq >= first_retrieval_seq:
+            return "fail"
+
+    if subset_item.bucket == "A_multi_input":
+        if len(retrievals) < 2:
+            return "fail"
+        if len(calculates) < 1:
+            return "fail"
+        grounded_inputs = answer_event.payload.get("confidence", {}).get("grounded_inputs", 0)
+        if grounded_inputs < 2:
+            return "fail"
+
+    return "pass"
+
+
+def abstention(memo_item: MemoItem, subset_item: SubsetItem) -> Optional[str]:
+    """Correct only when the item is truly unanswerable / evidence-insufficient.
+
+    Returns None for any item that was actually answered -- abstention scoring only
+    applies to items the agent chose to abstain on.
+    """
+    if memo_item.status != "abstained":
+        return None
+    return "correct" if not subset_item.answer_verifiable_from_evidence else "incorrect_but_calibrated"
+
+
+def score_run(subset_item: SubsetItem, trace_events: list[TraceEvent], memo_item: MemoItem) -> dict[str, Optional[str]]:
+    """Score a single (subset_item, trace, memo_item) triple across all six metrics."""
+    item_id = subset_item.item_id
+    return {
+        "answer_accuracy": answer_accuracy(memo_item, subset_item),
+        "citation_precision": citation_precision(memo_item, subset_item),
+        "citation_provenance": citation_provenance(memo_item, item_id, trace_events),
+        "arithmetic_integrity": arithmetic_integrity(memo_item, item_id, trace_events, subset_item),
+        "abstention": abstention(memo_item, subset_item),
+        "trace_shape": trace_shape(memo_item, subset_item, item_id, trace_events),
+    }
+
+
+def _load_trace(path: Path) -> list[TraceEvent]:
+    events: list[TraceEvent] = []
+    for line in path.read_text().splitlines():
+        if line.strip():
+            events.append(TraceEvent.model_validate_json(line))
+    return events
+
+
+def score_fixture(fixture_dir: Path) -> dict:
+    """Score one fixture directory and diff the result against its expected.json."""
+    name = fixture_dir.name
+    subset_item = SubsetItem.model_validate_json((fixture_dir / "subset_item.json").read_text())
+    trace_events = _load_trace(fixture_dir / "trace.jsonl")
+    memo_item_raw = json.loads((fixture_dir / "memo.json").read_text())["items"][0]
+    memo_item = MemoItem.model_validate(memo_item_raw)
+    expected = json.loads((fixture_dir / "expected.json").read_text())
+
+    actual = score_run(subset_item, trace_events, memo_item)
+    expected_scores: dict[str, Optional[str]] = expected["expected_scores"]
+
+    mismatches = [
+        f"{metric}: expected {expected_scores.get(metric)!r}, got {actual.get(metric)!r}"
+        for metric in expected_scores
+        if actual.get(metric) != expected_scores.get(metric)
+    ]
+
+    return {
+        "fixture": name,
+        "scorer_under_test": expected.get("scorer_under_test"),
+        "actual": actual,
+        "expected": expected_scores,
+        "ok": not mismatches,
+        "mismatches": mismatches,
+    }
+
+
+def score_fixtures(fixtures_dir: Path = FIXTURES_DIR) -> list[dict]:
+    """Score every fixture directory under fixtures_dir. Deterministic, no LLM."""
+    results = []
+    for d in sorted(fixtures_dir.iterdir()):
+        if not d.is_dir():
+            continue
+        if not (d / "expected.json").exists():
+            continue
+        results.append(score_fixture(d))
+    return results
