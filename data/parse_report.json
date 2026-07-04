@@ -1,0 +1,1867 @@
+{
+  "parser_primary": "pymupdf",
+  "parser_fallback": "pdfplumber",
+  "thresholds": {
+    "empty_char_threshold": 15,
+    "low_text_char_threshold": 200,
+    "suspicious_empty_fraction": 0.35
+  },
+  "docs_total": 84,
+  "docs_ok": 84,
+  "docs_failed": 0,
+  "docs_suspicious": 0,
+  "total_pages": 12013,
+  "total_empty_pages": 74,
+  "total_low_text_pages": 113,
+  "total_table_like_pages": 116,
+  "vetoed_doc_ids": [],
+  "suspicious_doc_ids": [],
+  "docs": [
+    {
+      "doc_id": "3M_2018_10K",
+      "doc_name": "3M_2018_10K",
+      "company": "3M",
+      "company_slug": "3m",
+      "pdf_path": "data/filings/3M_2018_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 160,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3785.0,
+      "min_chars_per_page": 526,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "3M_2022_10K",
+      "doc_name": "3M_2022_10K",
+      "company": "3M",
+      "company_slug": "3m",
+      "pdf_path": "data/filings/3M_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 252,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        246
+      ],
+      "avg_chars_per_page": 3680.8,
+      "min_chars_per_page": 458,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "3M_2023Q2_10Q",
+      "doc_name": "3M_2023Q2_10Q",
+      "company": "3M",
+      "company_slug": "3m",
+      "pdf_path": "data/filings/3M_2023Q2_10Q.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 92,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3842.6,
+      "min_chars_per_page": 492,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "ACTIVISIONBLIZZARD_2019_10K",
+      "doc_name": "ACTIVISIONBLIZZARD_2019_10K",
+      "company": "Activision Blizzard",
+      "company_slug": "activision_blizzard",
+      "pdf_path": "data/filings/ACTIVISIONBLIZZARD_2019_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 198,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        128
+      ],
+      "avg_chars_per_page": 3190.5,
+      "min_chars_per_page": 527,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "ADOBE_2015_10K",
+      "doc_name": "ADOBE_2015_10K",
+      "company": "Adobe",
+      "company_slug": "adobe",
+      "pdf_path": "data/filings/ADOBE_2015_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 116,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        107,
+        108
+      ],
+      "avg_chars_per_page": 4098.3,
+      "min_chars_per_page": 506,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "ADOBE_2016_10K",
+      "doc_name": "ADOBE_2016_10K",
+      "company": "Adobe",
+      "company_slug": "adobe",
+      "pdf_path": "data/filings/ADOBE_2016_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 112,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        106
+      ],
+      "avg_chars_per_page": 3703.2,
+      "min_chars_per_page": 513,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "ADOBE_2017_10K",
+      "doc_name": "ADOBE_2017_10K",
+      "company": "Adobe",
+      "company_slug": "adobe",
+      "pdf_path": "data/filings/ADOBE_2017_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 107,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        106
+      ],
+      "avg_chars_per_page": 3750.6,
+      "min_chars_per_page": 498,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "ADOBE_2022_10K",
+      "doc_name": "ADOBE_2022_10K",
+      "company": "Adobe",
+      "company_slug": "adobe",
+      "pdf_path": "data/filings/ADOBE_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 99,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        97,
+        98
+      ],
+      "avg_chars_per_page": 3799.8,
+      "min_chars_per_page": 513,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "AES_2022_10K",
+      "doc_name": "AES_2022_10K",
+      "company": "AES Corporation",
+      "company_slug": "aes_corporation",
+      "pdf_path": "data/filings/AES_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 257,
+      "empty_pages": [
+        131,
+        188
+      ],
+      "low_text_pages": [
+        136,
+        206
+      ],
+      "table_like_pages": [
+        212,
+        252,
+        253
+      ],
+      "avg_chars_per_page": 3533.7,
+      "min_chars_per_page": 0,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "AMAZON_2017_10K",
+      "doc_name": "AMAZON_2017_10K",
+      "company": "Amazon",
+      "company_slug": "amazon",
+      "pdf_path": "data/filings/AMAZON_2017_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 85,
+      "empty_pages": [],
+      "low_text_pages": [
+        15
+      ],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3447.3,
+      "min_chars_per_page": 61,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "AMAZON_2019_10K",
+      "doc_name": "AMAZON_2019_10K",
+      "company": "Amazon",
+      "company_slug": "amazon",
+      "pdf_path": "data/filings/AMAZON_2019_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 83,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3367.0,
+      "min_chars_per_page": 291,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "AMCOR_2020_10K",
+      "doc_name": "AMCOR_2020_10K",
+      "company": "Amcor",
+      "company_slug": "amcor",
+      "pdf_path": "data/filings/AMCOR_2020_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 195,
+      "empty_pages": [
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188
+      ],
+      "low_text_pages": [
+        5,
+        71,
+        147,
+        164
+      ],
+      "table_like_pages": [
+        121
+      ],
+      "avg_chars_per_page": 2877.9,
+      "min_chars_per_page": 0,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "AMCOR_2022_8K_dated-2022-07-01",
+      "doc_name": "AMCOR_2022_8K_dated-2022-07-01",
+      "company": "Amcor",
+      "company_slug": "amcor",
+      "pdf_path": "data/filings/AMCOR_2022_8K_dated-2022-07-01.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 9,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 2694.8,
+      "min_chars_per_page": 315,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "AMCOR_2023Q2_10Q",
+      "doc_name": "AMCOR_2023Q2_10Q",
+      "company": "Amcor",
+      "company_slug": "amcor",
+      "pdf_path": "data/filings/AMCOR_2023Q2_10Q.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 57,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        57
+      ],
+      "avg_chars_per_page": 2178.5,
+      "min_chars_per_page": 419,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "AMCOR_2023Q4_EARNINGS",
+      "doc_name": "AMCOR_2023Q4_EARNINGS",
+      "company": "Amcor",
+      "company_slug": "amcor",
+      "pdf_path": "data/filings/AMCOR_2023Q4_EARNINGS.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 14,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3208.4,
+      "min_chars_per_page": 743,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "AMCOR_2023_10K",
+      "doc_name": "AMCOR_2023_10K",
+      "company": "Amcor",
+      "company_slug": "amcor",
+      "pdf_path": "data/filings/AMCOR_2023_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 156,
+      "empty_pages": [],
+      "low_text_pages": [
+        8
+      ],
+      "table_like_pages": [
+        116,
+        156
+      ],
+      "avg_chars_per_page": 3121.8,
+      "min_chars_per_page": 151,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "AMD_2015_10K",
+      "doc_name": "AMD_2015_10K",
+      "company": "AMD",
+      "company_slug": "amd",
+      "pdf_path": "data/filings/AMD_2015_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 215,
+      "empty_pages": [
+        130
+      ],
+      "low_text_pages": [
+        109,
+        169,
+        206
+      ],
+      "table_like_pages": [
+        106
+      ],
+      "avg_chars_per_page": 3539.8,
+      "min_chars_per_page": 1,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "AMD_2022_10K",
+      "doc_name": "AMD_2022_10K",
+      "company": "AMD",
+      "company_slug": "amd",
+      "pdf_path": "data/filings/AMD_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 121,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        84,
+        108,
+        115
+      ],
+      "avg_chars_per_page": 3418.2,
+      "min_chars_per_page": 316,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "AMERICANEXPRESS_2022_10K",
+      "doc_name": "AMERICANEXPRESS_2022_10K",
+      "company": "American Express",
+      "company_slug": "american_express",
+      "pdf_path": "data/filings/AMERICANEXPRESS_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 260,
+      "empty_pages": [],
+      "low_text_pages": [
+        166,
+        237
+      ],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3171.9,
+      "min_chars_per_page": 24,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "AMERICANWATERWORKS_2020_10K",
+      "doc_name": "AMERICANWATERWORKS_2020_10K",
+      "company": "American Water Works",
+      "company_slug": "american_water_works",
+      "pdf_path": "data/filings/AMERICANWATERWORKS_2020_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 152,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        147
+      ],
+      "avg_chars_per_page": 4050.5,
+      "min_chars_per_page": 327,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "AMERICANWATERWORKS_2021_10K",
+      "doc_name": "AMERICANWATERWORKS_2021_10K",
+      "company": "American Water Works",
+      "company_slug": "american_water_works",
+      "pdf_path": "data/filings/AMERICANWATERWORKS_2021_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 181,
+      "empty_pages": [
+        151,
+        153,
+        155,
+        157
+      ],
+      "low_text_pages": [
+        140,
+        176
+      ],
+      "table_like_pages": [
+        178
+      ],
+      "avg_chars_per_page": 3720.6,
+      "min_chars_per_page": 0,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "AMERICANWATERWORKS_2022_10K",
+      "doc_name": "AMERICANWATERWORKS_2022_10K",
+      "company": "American Water Works",
+      "company_slug": "american_water_works",
+      "pdf_path": "data/filings/AMERICANWATERWORKS_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 306,
+      "empty_pages": [],
+      "low_text_pages": [
+        166,
+        186,
+        254,
+        294,
+        295,
+        296
+      ],
+      "table_like_pages": [
+        301
+      ],
+      "avg_chars_per_page": 3323.2,
+      "min_chars_per_page": 110,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "BESTBUY_2017_10K",
+      "doc_name": "BESTBUY_2017_10K",
+      "company": "Best Buy",
+      "company_slug": "best_buy",
+      "pdf_path": "data/filings/BESTBUY_2017_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 109,
+      "empty_pages": [
+        20,
+        101
+      ],
+      "low_text_pages": [],
+      "table_like_pages": [
+        99
+      ],
+      "avg_chars_per_page": 3176.2,
+      "min_chars_per_page": 0,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "BESTBUY_2019_10K",
+      "doc_name": "BESTBUY_2019_10K",
+      "company": "Best Buy",
+      "company_slug": "best_buy",
+      "pdf_path": "data/filings/BESTBUY_2019_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 107,
+      "empty_pages": [
+        21,
+        100
+      ],
+      "low_text_pages": [],
+      "table_like_pages": [
+        98
+      ],
+      "avg_chars_per_page": 3302.7,
+      "min_chars_per_page": 0,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "BESTBUY_2023_10K",
+      "doc_name": "BESTBUY_2023_10K",
+      "company": "Best Buy",
+      "company_slug": "best_buy",
+      "pdf_path": "data/filings/BESTBUY_2023_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 75,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        68,
+        71
+      ],
+      "avg_chars_per_page": 4074.7,
+      "min_chars_per_page": 549,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "BESTBUY_2024Q2_10Q",
+      "doc_name": "BESTBUY_2024Q2_10Q",
+      "company": "Best Buy",
+      "company_slug": "best_buy",
+      "pdf_path": "data/filings/BESTBUY_2024Q2_10Q.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 30,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3459.4,
+      "min_chars_per_page": 477,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "BLOCK_2016_10K",
+      "doc_name": "BLOCK_2016_10K",
+      "company": "Block",
+      "company_slug": "block",
+      "pdf_path": "data/filings/BLOCK_2016_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 121,
+      "empty_pages": [
+        74
+      ],
+      "low_text_pages": [
+        8,
+        36,
+        64,
+        114
+      ],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3149.5,
+      "min_chars_per_page": 2,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "BLOCK_2020_10K",
+      "doc_name": "BLOCK_2020_10K",
+      "company": "Block",
+      "company_slug": "block",
+      "pdf_path": "data/filings/BLOCK_2020_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 158,
+      "empty_pages": [],
+      "low_text_pages": [
+        7,
+        48,
+        141,
+        146
+      ],
+      "table_like_pages": [
+        148
+      ],
+      "avg_chars_per_page": 3423.4,
+      "min_chars_per_page": 36,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "BOEING_2018_10K",
+      "doc_name": "BOEING_2018_10K",
+      "company": "Boeing",
+      "company_slug": "boeing",
+      "pdf_path": "data/filings/BOEING_2018_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 136,
+      "empty_pages": [],
+      "low_text_pages": [
+        54,
+        73
+      ],
+      "table_like_pages": [],
+      "avg_chars_per_page": 2736.2,
+      "min_chars_per_page": 73,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "BOEING_2022_10K",
+      "doc_name": "BOEING_2022_10K",
+      "company": "Boeing",
+      "company_slug": "boeing",
+      "pdf_path": "data/filings/BOEING_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 190,
+      "empty_pages": [
+        58,
+        60
+      ],
+      "low_text_pages": [
+        181
+      ],
+      "table_like_pages": [
+        186
+      ],
+      "avg_chars_per_page": 2684.1,
+      "min_chars_per_page": 0,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "COCACOLA_2017_10K",
+      "doc_name": "COCACOLA_2017_10K",
+      "company": "Coca-Cola",
+      "company_slug": "coca_cola",
+      "pdf_path": "data/filings/COCACOLA_2017_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 197,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        165,
+        166
+      ],
+      "avg_chars_per_page": 3747.0,
+      "min_chars_per_page": 320,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "COCACOLA_2021_10K",
+      "doc_name": "COCACOLA_2021_10K",
+      "company": "Coca-Cola",
+      "company_slug": "coca_cola",
+      "pdf_path": "data/filings/COCACOLA_2021_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 183,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        1,
+        127,
+        134,
+        141,
+        142,
+        146
+      ],
+      "avg_chars_per_page": 3797.7,
+      "min_chars_per_page": 322,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "COCACOLA_2022_10K",
+      "doc_name": "COCACOLA_2022_10K",
+      "company": "Coca-Cola",
+      "company_slug": "coca_cola",
+      "pdf_path": "data/filings/COCACOLA_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 183,
+      "empty_pages": [],
+      "low_text_pages": [
+        144,
+        157,
+        158
+      ],
+      "table_like_pages": [
+        1,
+        127,
+        142,
+        143
+      ],
+      "avg_chars_per_page": 3675.0,
+      "min_chars_per_page": 60,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "CORNING_2020_10K",
+      "doc_name": "CORNING_2020_10K",
+      "company": "Corning",
+      "company_slug": "corning",
+      "pdf_path": "data/filings/CORNING_2020_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 138,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3195.8,
+      "min_chars_per_page": 453,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "CORNING_2021_10K",
+      "doc_name": "CORNING_2021_10K",
+      "company": "Corning",
+      "company_slug": "corning",
+      "pdf_path": "data/filings/CORNING_2021_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 125,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        58
+      ],
+      "avg_chars_per_page": 3464.3,
+      "min_chars_per_page": 621,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "CORNING_2022_10K",
+      "doc_name": "CORNING_2022_10K",
+      "company": "Corning",
+      "company_slug": "corning",
+      "pdf_path": "data/filings/CORNING_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 159,
+      "empty_pages": [],
+      "low_text_pages": [
+        121,
+        138,
+        139
+      ],
+      "table_like_pages": [
+        51
+      ],
+      "avg_chars_per_page": 3143.9,
+      "min_chars_per_page": 35,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "COSTCO_2021_10K",
+      "doc_name": "COSTCO_2021_10K",
+      "company": "Costco",
+      "company_slug": "costco",
+      "pdf_path": "data/filings/COSTCO_2021_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 76,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 2923.7,
+      "min_chars_per_page": 643,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "CVSHEALTH_2018_10K",
+      "doc_name": "CVSHEALTH_2018_10K",
+      "company": "CVS Health",
+      "company_slug": "cvs_health",
+      "pdf_path": "data/filings/CVSHEALTH_2018_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 392,
+      "empty_pages": [
+        74,
+        78
+      ],
+      "low_text_pages": [
+        75,
+        179,
+        198
+      ],
+      "table_like_pages": [
+        73,
+        388
+      ],
+      "avg_chars_per_page": 3645.8,
+      "min_chars_per_page": 0,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "CVSHEALTH_2022_10K",
+      "doc_name": "CVSHEALTH_2022_10K",
+      "company": "CVS Health",
+      "company_slug": "cvs_health",
+      "pdf_path": "data/filings/CVSHEALTH_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 213,
+      "empty_pages": [
+        206
+      ],
+      "low_text_pages": [],
+      "table_like_pages": [
+        192,
+        209
+      ],
+      "avg_chars_per_page": 4018.6,
+      "min_chars_per_page": 0,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "FOOTLOCKER_2022_8K_dated-2022-05-20",
+      "doc_name": "FOOTLOCKER_2022_8K_dated-2022-05-20",
+      "company": "Foot Locker",
+      "company_slug": "foot_locker",
+      "pdf_path": "data/filings/FOOTLOCKER_2022_8K_dated-2022-05-20.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 4,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 1675.8,
+      "min_chars_per_page": 362,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "FOOTLOCKER_2022_8K_dated_2022-08-19",
+      "doc_name": "FOOTLOCKER_2022_8K_dated_2022-08-19",
+      "company": "Foot Locker",
+      "company_slug": "foot_locker",
+      "pdf_path": "data/filings/FOOTLOCKER_2022_8K_dated_2022-08-19.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 31,
+      "empty_pages": [],
+      "low_text_pages": [
+        10
+      ],
+      "table_like_pages": [],
+      "avg_chars_per_page": 2720.4,
+      "min_chars_per_page": 151,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "GENERALMILLS_2019_10K",
+      "doc_name": "GENERALMILLS_2019_10K",
+      "company": "General Mills",
+      "company_slug": "general_mills",
+      "pdf_path": "data/filings/GENERALMILLS_2019_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 140,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        72,
+        117
+      ],
+      "avg_chars_per_page": 3224.6,
+      "min_chars_per_page": 684,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "GENERALMILLS_2020_10K",
+      "doc_name": "GENERALMILLS_2020_10K",
+      "company": "General Mills",
+      "company_slug": "general_mills",
+      "pdf_path": "data/filings/GENERALMILLS_2020_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 127,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        65,
+        72,
+        104
+      ],
+      "avg_chars_per_page": 3432.4,
+      "min_chars_per_page": 250,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "GENERALMILLS_2022_10K",
+      "doc_name": "GENERALMILLS_2022_10K",
+      "company": "General Mills",
+      "company_slug": "general_mills",
+      "pdf_path": "data/filings/GENERALMILLS_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 127,
+      "empty_pages": [
+        98,
+        115,
+        117,
+        119,
+        121,
+        123,
+        125,
+        127
+      ],
+      "low_text_pages": [],
+      "table_like_pages": [
+        68,
+        96
+      ],
+      "avg_chars_per_page": 3222.4,
+      "min_chars_per_page": 0,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "JOHNSON_JOHNSON_2022Q4_EARNINGS",
+      "doc_name": "JOHNSON_JOHNSON_2022Q4_EARNINGS",
+      "company": "Johnson & Johnson",
+      "company_slug": "johnson_johnson",
+      "pdf_path": "data/filings/JOHNSON_JOHNSON_2022Q4_EARNINGS.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 24,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        5
+      ],
+      "avg_chars_per_page": 3136.4,
+      "min_chars_per_page": 784,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "JOHNSON_JOHNSON_2022_10K",
+      "doc_name": "JOHNSON_JOHNSON_2022_10K",
+      "company": "Johnson & Johnson",
+      "company_slug": "johnson_johnson",
+      "pdf_path": "data/filings/JOHNSON_JOHNSON_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 151,
+      "empty_pages": [],
+      "low_text_pages": [
+        122
+      ],
+      "table_like_pages": [
+        117,
+        118
+      ],
+      "avg_chars_per_page": 3455.3,
+      "min_chars_per_page": 144,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "JOHNSON_JOHNSON_2023Q2_EARNINGS",
+      "doc_name": "JOHNSON_JOHNSON_2023Q2_EARNINGS",
+      "company": "Johnson & Johnson",
+      "company_slug": "johnson_johnson",
+      "pdf_path": "data/filings/JOHNSON_JOHNSON_2023Q2_EARNINGS.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 24,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        5
+      ],
+      "avg_chars_per_page": 3021.9,
+      "min_chars_per_page": 840,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "JOHNSON_JOHNSON_2023_8K_dated-2023-08-30",
+      "doc_name": "JOHNSON_JOHNSON_2023_8K_dated-2023-08-30",
+      "company": "Johnson & Johnson",
+      "company_slug": "johnson_johnson",
+      "pdf_path": "data/filings/JOHNSON_JOHNSON_2023_8K_dated-2023-08-30.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 27,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        6
+      ],
+      "avg_chars_per_page": 2111.7,
+      "min_chars_per_page": 374,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "JPMORGAN_2021Q1_10Q",
+      "doc_name": "JPMORGAN_2021Q1_10Q",
+      "company": "JPMorgan",
+      "company_slug": "jpmorgan",
+      "pdf_path": "data/filings/JPMORGAN_2021Q1_10Q.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 179,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3403.4,
+      "min_chars_per_page": 254,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "JPMORGAN_2022Q2_10Q",
+      "doc_name": "JPMORGAN_2022Q2_10Q",
+      "company": "JPMorgan",
+      "company_slug": "jpmorgan",
+      "pdf_path": "data/filings/JPMORGAN_2022Q2_10Q.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 197,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3313.3,
+      "min_chars_per_page": 253,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "JPMORGAN_2022_10K",
+      "doc_name": "JPMORGAN_2022_10K",
+      "company": "JPMorgan",
+      "company_slug": "jpmorgan",
+      "pdf_path": "data/filings/JPMORGAN_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 382,
+      "empty_pages": [],
+      "low_text_pages": [
+        44,
+        351
+      ],
+      "table_like_pages": [
+        306
+      ],
+      "avg_chars_per_page": 4073.7,
+      "min_chars_per_page": 20,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "JPMORGAN_2023Q2_10Q",
+      "doc_name": "JPMORGAN_2023Q2_10Q",
+      "company": "JPMorgan",
+      "company_slug": "jpmorgan",
+      "pdf_path": "data/filings/JPMORGAN_2023Q2_10Q.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 217,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3434.3,
+      "min_chars_per_page": 253,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "KRAFTHEINZ_2019_10K",
+      "doc_name": "KRAFTHEINZ_2019_10K",
+      "company": "Kraft Heinz",
+      "company_slug": "kraft_heinz",
+      "pdf_path": "data/filings/KRAFTHEINZ_2019_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 152,
+      "empty_pages": [],
+      "low_text_pages": [
+        130
+      ],
+      "table_like_pages": [
+        148
+      ],
+      "avg_chars_per_page": 3612.6,
+      "min_chars_per_page": 37,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "LOCKHEEDMARTIN_2020_10K",
+      "doc_name": "LOCKHEEDMARTIN_2020_10K",
+      "company": "Lockheed Martin",
+      "company_slug": "lockheed_martin",
+      "pdf_path": "data/filings/LOCKHEEDMARTIN_2020_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 132,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        115,
+        118
+      ],
+      "avg_chars_per_page": 3978.3,
+      "min_chars_per_page": 536,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "LOCKHEEDMARTIN_2021_10K",
+      "doc_name": "LOCKHEEDMARTIN_2021_10K",
+      "company": "Lockheed Martin",
+      "company_slug": "lockheed_martin",
+      "pdf_path": "data/filings/LOCKHEEDMARTIN_2021_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 136,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        115,
+        121
+      ],
+      "avg_chars_per_page": 3949.2,
+      "min_chars_per_page": 538,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "LOCKHEEDMARTIN_2022_10K",
+      "doc_name": "LOCKHEEDMARTIN_2022_10K",
+      "company": "Lockheed Martin",
+      "company_slug": "lockheed_martin",
+      "pdf_path": "data/filings/LOCKHEEDMARTIN_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 130,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        111,
+        115
+      ],
+      "avg_chars_per_page": 4011.9,
+      "min_chars_per_page": 920,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "MGMRESORTS_2018_10K",
+      "doc_name": "MGMRESORTS_2018_10K",
+      "company": "MGM Resorts",
+      "company_slug": "mgm_resorts",
+      "pdf_path": "data/filings/MGMRESORTS_2018_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 188,
+      "empty_pages": [
+        143
+      ],
+      "low_text_pages": [],
+      "table_like_pages": [
+        113,
+        114
+      ],
+      "avg_chars_per_page": 3680.8,
+      "min_chars_per_page": 0,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "MGMRESORTS_2020_10K",
+      "doc_name": "MGMRESORTS_2020_10K",
+      "company": "MGM Resorts",
+      "company_slug": "mgm_resorts",
+      "pdf_path": "data/filings/MGMRESORTS_2020_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 150,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        42,
+        117,
+        118,
+        128,
+        129,
+        132,
+        138
+      ],
+      "avg_chars_per_page": 3995.0,
+      "min_chars_per_page": 210,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "MGMRESORTS_2022Q4_EARNINGS",
+      "doc_name": "MGMRESORTS_2022Q4_EARNINGS",
+      "company": "MGM Resorts",
+      "company_slug": "mgm_resorts",
+      "pdf_path": "data/filings/MGMRESORTS_2022Q4_EARNINGS.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 15,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3252.4,
+      "min_chars_per_page": 1909,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "MGMRESORTS_2022_10K",
+      "doc_name": "MGMRESORTS_2022_10K",
+      "company": "MGM Resorts",
+      "company_slug": "mgm_resorts",
+      "pdf_path": "data/filings/MGMRESORTS_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 220,
+      "empty_pages": [],
+      "low_text_pages": [
+        63,
+        198,
+        206
+      ],
+      "table_like_pages": [
+        112,
+        113
+      ],
+      "avg_chars_per_page": 3185.4,
+      "min_chars_per_page": 17,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "MGMRESORTS_2023Q2_10Q",
+      "doc_name": "MGMRESORTS_2023Q2_10Q",
+      "company": "MGM Resorts",
+      "company_slug": "mgm_resorts",
+      "pdf_path": "data/filings/MGMRESORTS_2023Q2_10Q.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 62,
+      "empty_pages": [],
+      "low_text_pages": [
+        54,
+        57
+      ],
+      "table_like_pages": [],
+      "avg_chars_per_page": 2816.8,
+      "min_chars_per_page": 17,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "MICROSOFT_2016_10K",
+      "doc_name": "MICROSOFT_2016_10K",
+      "company": "Microsoft",
+      "company_slug": "microsoft",
+      "pdf_path": "data/filings/MICROSOFT_2016_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 121,
+      "empty_pages": [
+        90
+      ],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3415.3,
+      "min_chars_per_page": 2,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "MICROSOFT_2023_10K",
+      "doc_name": "MICROSOFT_2023_10K",
+      "company": "Microsoft",
+      "company_slug": "microsoft",
+      "pdf_path": "data/filings/MICROSOFT_2023_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 116,
+      "empty_pages": [
+        116
+      ],
+      "low_text_pages": [
+        39,
+        108
+      ],
+      "table_like_pages": [
+        90
+      ],
+      "avg_chars_per_page": 3199.3,
+      "min_chars_per_page": 0,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "NETFLIX_2015_10K",
+      "doc_name": "NETFLIX_2015_10K",
+      "company": "Netflix",
+      "company_slug": "netflix",
+      "pdf_path": "data/filings/NETFLIX_2015_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 72,
+      "empty_pages": [],
+      "low_text_pages": [
+        35
+      ],
+      "table_like_pages": [
+        64
+      ],
+      "avg_chars_per_page": 3232.2,
+      "min_chars_per_page": 53,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "NETFLIX_2017_10K",
+      "doc_name": "NETFLIX_2017_10K",
+      "company": "Netflix",
+      "company_slug": "netflix",
+      "pdf_path": "data/filings/NETFLIX_2017_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 73,
+      "empty_pages": [],
+      "low_text_pages": [
+        36,
+        39
+      ],
+      "table_like_pages": [
+        67
+      ],
+      "avg_chars_per_page": 3231.8,
+      "min_chars_per_page": 53,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "NIKE_2018_10K",
+      "doc_name": "NIKE_2018_10K",
+      "company": "Nike",
+      "company_slug": "nike",
+      "pdf_path": "data/filings/NIKE_2018_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 97,
+      "empty_pages": [],
+      "low_text_pages": [
+        80,
+        87,
+        93
+      ],
+      "table_like_pages": [],
+      "avg_chars_per_page": 4068.3,
+      "min_chars_per_page": 53,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "NIKE_2019_10K",
+      "doc_name": "NIKE_2019_10K",
+      "company": "Nike",
+      "company_slug": "nike",
+      "pdf_path": "data/filings/NIKE_2019_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 104,
+      "empty_pages": [],
+      "low_text_pages": [
+        92
+      ],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3563.4,
+      "min_chars_per_page": 64,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "NIKE_2021_10K",
+      "doc_name": "NIKE_2021_10K",
+      "company": "Nike",
+      "company_slug": "nike",
+      "pdf_path": "data/filings/NIKE_2021_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 109,
+      "empty_pages": [],
+      "low_text_pages": [
+        29,
+        102
+      ],
+      "table_like_pages": [
+        103,
+        104
+      ],
+      "avg_chars_per_page": 3700.1,
+      "min_chars_per_page": 69,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "NIKE_2023_10K",
+      "doc_name": "NIKE_2023_10K",
+      "company": "Nike",
+      "company_slug": "nike",
+      "pdf_path": "data/filings/NIKE_2023_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 106,
+      "empty_pages": [],
+      "low_text_pages": [
+        1,
+        31,
+        101,
+        106
+      ],
+      "table_like_pages": [
+        103
+      ],
+      "avg_chars_per_page": 3552.4,
+      "min_chars_per_page": 19,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "PAYPAL_2022_10K",
+      "doc_name": "PAYPAL_2022_10K",
+      "company": "Paypal",
+      "company_slug": "paypal",
+      "pdf_path": "data/filings/PAYPAL_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 134,
+      "empty_pages": [],
+      "low_text_pages": [
+        126
+      ],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3608.4,
+      "min_chars_per_page": 54,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "PEPSICO_2021_10K",
+      "doc_name": "PEPSICO_2021_10K",
+      "company": "PepsiCo",
+      "company_slug": "pepsico",
+      "pdf_path": "data/filings/PEPSICO_2021_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 549,
+      "empty_pages": [],
+      "low_text_pages": [
+        115,
+        120,
+        167,
+        171,
+        194,
+        243,
+        340,
+        384,
+        430
+      ],
+      "table_like_pages": [
+        95,
+        122,
+        124,
+        130,
+        131,
+        546
+      ],
+      "avg_chars_per_page": 2039.8,
+      "min_chars_per_page": 55,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "PEPSICO_2022_10K",
+      "doc_name": "PEPSICO_2022_10K",
+      "company": "PepsiCo",
+      "company_slug": "pepsico",
+      "pdf_path": "data/filings/PEPSICO_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 503,
+      "empty_pages": [],
+      "low_text_pages": [
+        117,
+        172,
+        213,
+        217,
+        241,
+        285,
+        332,
+        395,
+        433
+      ],
+      "table_like_pages": [
+        124,
+        125,
+        130,
+        131,
+        500
+      ],
+      "avg_chars_per_page": 2345.7,
+      "min_chars_per_page": 123,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "PEPSICO_2023Q1_EARNINGS",
+      "doc_name": "PEPSICO_2023Q1_EARNINGS",
+      "company": "PepsiCo",
+      "company_slug": "pepsico",
+      "pdf_path": "data/filings/PEPSICO_2023Q1_EARNINGS.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 16,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 2309.6,
+      "min_chars_per_page": 910,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "PEPSICO_2023_8K_dated-2023-05-05",
+      "doc_name": "PEPSICO_2023_8K_dated-2023-05-05",
+      "company": "PepsiCo",
+      "company_slug": "pepsico",
+      "pdf_path": "data/filings/PEPSICO_2023_8K_dated-2023-05-05.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 5,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        2
+      ],
+      "avg_chars_per_page": 1228.6,
+      "min_chars_per_page": 359,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "PEPSICO_2023_8K_dated-2023-05-30",
+      "doc_name": "PEPSICO_2023_8K_dated-2023-05-30",
+      "company": "PepsiCo",
+      "company_slug": "pepsico",
+      "pdf_path": "data/filings/PEPSICO_2023_8K_dated-2023-05-30.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 172,
+      "empty_pages": [],
+      "low_text_pages": [
+        77,
+        79,
+        80,
+        158,
+        162,
+        167,
+        171
+      ],
+      "table_like_pages": [],
+      "avg_chars_per_page": 3122.1,
+      "min_chars_per_page": 72,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "PFIZER_2021_10K",
+      "doc_name": "PFIZER_2021_10K",
+      "company": "Pfizer",
+      "company_slug": "pfizer",
+      "pdf_path": "data/filings/PFIZER_2021_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 143,
+      "empty_pages": [],
+      "low_text_pages": [
+        5
+      ],
+      "table_like_pages": [
+        121,
+        139
+      ],
+      "avg_chars_per_page": 4862.6,
+      "min_chars_per_page": 29,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "Pfizer_2023Q2_10Q",
+      "doc_name": "Pfizer_2023Q2_10Q",
+      "company": "Pfizer",
+      "company_slug": "pfizer",
+      "pdf_path": "data/filings/Pfizer_2023Q2_10Q.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 72,
+      "empty_pages": [
+        2,
+        7
+      ],
+      "low_text_pages": [
+        5
+      ],
+      "table_like_pages": [
+        68
+      ],
+      "avg_chars_per_page": 3779.8,
+      "min_chars_per_page": 0,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "ULTABEAUTY_2023Q4_EARNINGS",
+      "doc_name": "ULTABEAUTY_2023Q4_EARNINGS",
+      "company": "Ulta Beauty",
+      "company_slug": "ulta_beauty",
+      "pdf_path": "data/filings/ULTABEAUTY_2023Q4_EARNINGS.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 9,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [],
+      "avg_chars_per_page": 2278.4,
+      "min_chars_per_page": 1425,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "ULTABEAUTY_2023_10K",
+      "doc_name": "ULTABEAUTY_2023_10K",
+      "company": "Ulta Beauty",
+      "company_slug": "ulta_beauty",
+      "pdf_path": "data/filings/ULTABEAUTY_2023_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 105,
+      "empty_pages": [],
+      "low_text_pages": [],
+      "table_like_pages": [
+        83
+      ],
+      "avg_chars_per_page": 3024.6,
+      "min_chars_per_page": 426,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "VERIZON_2021_10K",
+      "doc_name": "VERIZON_2021_10K",
+      "company": "Verizon",
+      "company_slug": "verizon",
+      "pdf_path": "data/filings/VERIZON_2021_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 120,
+      "empty_pages": [],
+      "low_text_pages": [
+        118,
+        119,
+        120
+      ],
+      "table_like_pages": [
+        1,
+        112,
+        113
+      ],
+      "avg_chars_per_page": 4069.9,
+      "min_chars_per_page": 37,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "VERIZON_2022_10K",
+      "doc_name": "VERIZON_2022_10K",
+      "company": "Verizon",
+      "company_slug": "verizon",
+      "pdf_path": "data/filings/VERIZON_2022_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 124,
+      "empty_pages": [],
+      "low_text_pages": [
+        121,
+        122,
+        123,
+        124
+      ],
+      "table_like_pages": [
+        1,
+        115,
+        116
+      ],
+      "avg_chars_per_page": 3983.6,
+      "min_chars_per_page": 37,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "WALMART_2018_10K",
+      "doc_name": "WALMART_2018_10K",
+      "company": "Walmart",
+      "company_slug": "walmart",
+      "pdf_path": "data/filings/WALMART_2018_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 304,
+      "empty_pages": [
+        60,
+        230
+      ],
+      "low_text_pages": [
+        28,
+        97,
+        99,
+        100,
+        192,
+        193,
+        207,
+        228,
+        231
+      ],
+      "table_like_pages": [
+        73,
+        92,
+        297,
+        300
+      ],
+      "avg_chars_per_page": 3088.4,
+      "min_chars_per_page": 0,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "WALMART_2019_10K",
+      "doc_name": "WALMART_2019_10K",
+      "company": "Walmart",
+      "company_slug": "walmart",
+      "pdf_path": "data/filings/WALMART_2019_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 155,
+      "empty_pages": [
+        90,
+        92,
+        94,
+        96,
+        98,
+        100,
+        102,
+        104,
+        106,
+        108,
+        110,
+        112,
+        114,
+        116,
+        118,
+        120,
+        122,
+        124,
+        126,
+        128,
+        130,
+        132,
+        134,
+        136,
+        138,
+        140,
+        142,
+        144,
+        146
+      ],
+      "low_text_pages": [
+        91
+      ],
+      "table_like_pages": [
+        66,
+        85,
+        147,
+        149
+      ],
+      "avg_chars_per_page": 2896.5,
+      "min_chars_per_page": 0,
+      "suspicious_extraction": false,
+      "error": null
+    },
+    {
+      "doc_id": "WALMART_2020_10K",
+      "doc_name": "WALMART_2020_10K",
+      "company": "Walmart",
+      "company_slug": "walmart",
+      "pdf_path": "data/filings/WALMART_2020_10K.pdf",
+      "status": "ok",
+      "parser_used": "pymupdf",
+      "num_pages": 170,
+      "empty_pages": [
+        54,
+        57,
+        71
+      ],
+      "low_text_pages": [
+        69,
+        76
+      ],
+      "table_like_pages": [
+        89,
+        161,
+        163
+      ],
+      "avg_chars_per_page": 3475.4,
+      "min_chars_per_page": 0,
+      "suspicious_extraction": false,
+      "error": null
+    }
+  ]
+}
