@@ -1,0 +1,29 @@
+{
+  "run_id": "fixture-abstention",
+  "company": "Acme Corp",
+  "status": "completed",
+  "created_at": "2024-01-01T00:00:00Z",
+  "completed_at": "2024-01-01T00:00:09Z",
+  "items": [
+    {
+      "item_id": "ab-001",
+      "question": "How many employees did Acme Corp have in its EMEA segment at FY2023 year-end?",
+      "answer": "The filing does not disclose EMEA-segment headcount, so this cannot be answered from the evidence.",
+      "value": null,
+      "unit": "text",
+      "citations": [],
+      "status": "abstained",
+      "confidence": {
+        "grounded_inputs": 0,
+        "assumed_inputs": 0
+      }
+    }
+  ],
+  "summary": {
+    "items_total": 1,
+    "items_answered": 0,
+    "items_abstained": 1,
+    "citations_total": 0,
+    "calculate_calls": 0
+  }
+}

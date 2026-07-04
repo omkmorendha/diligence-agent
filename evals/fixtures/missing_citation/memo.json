@@ -1,0 +1,29 @@
+{
+  "run_id": "fixture-missing-citation",
+  "company": "Acme Corp",
+  "status": "completed",
+  "created_at": "2024-01-01T00:00:00Z",
+  "completed_at": "2024-01-01T00:00:08Z",
+  "items": [
+    {
+      "item_id": "mc-001",
+      "question": "What was Acme Corp's FY2023 R&D expense (in USD millions)?",
+      "answer": "Acme Corp's FY2023 R&D expense was $210 million.",
+      "value": 210.0,
+      "unit": "USD millions",
+      "citations": [],
+      "status": "answered",
+      "confidence": {
+        "grounded_inputs": 0,
+        "assumed_inputs": 1
+      }
+    }
+  ],
+  "summary": {
+    "items_total": 1,
+    "items_answered": 1,
+    "items_abstained": 0,
+    "citations_total": 0,
+    "calculate_calls": 0
+  }
+}

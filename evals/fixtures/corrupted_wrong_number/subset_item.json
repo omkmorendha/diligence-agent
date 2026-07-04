@@ -1,0 +1,44 @@
+{
+  "item_id": "wn-001",
+  "question_id": "q-wn-001",
+  "company": "Acme Corp",
+  "question": "What was Acme Corp's FY2023 gross margin percentage?",
+  "gold_answer": "42.56%",
+  "gold_value": 42.56,
+  "gold_unit": "percent",
+  "gold_evidence": [
+    {
+      "doc_id": "acme_2023_10k",
+      "doc_name": "Acme Corp FY2023 10-K",
+      "doc_type": "10k",
+      "filing_period": "FY2023",
+      "pdf_page": 40,
+      "page_label": "40",
+      "evidence_text": "Total net revenue for fiscal 2023 was $1,250 million."
+    },
+    {
+      "doc_id": "acme_2023_10k",
+      "doc_name": "Acme Corp FY2023 10-K",
+      "doc_type": "10k",
+      "filing_period": "FY2023",
+      "pdf_page": 41,
+      "page_label": "41",
+      "evidence_text": "Total cost of goods sold for fiscal 2023 was $718 million."
+    }
+  ],
+  "bucket": "A_multi_input",
+  "expected_formula": "(revenue - cogs) / revenue * 100",
+  "expected_inputs": [
+    "revenue",
+    "cogs"
+  ],
+  "predicted_baseline_failure": false,
+  "answer_verifiable_from_evidence": true,
+  "unit_or_period_ambiguity": false,
+  "demo_candidate": false,
+  "human_reviewed": true,
+  "tolerance": {
+    "relative": 0.01,
+    "absolute": null
+  }
+}

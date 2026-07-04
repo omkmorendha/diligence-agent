@@ -1,0 +1,43 @@
+{
+  "run_id": "fixture-citation-unretrieved-chunk",
+  "company": "Acme Corp",
+  "status": "completed",
+  "created_at": "2024-01-01T00:00:00Z",
+  "completed_at": "2024-01-01T00:00:09Z",
+  "items": [
+    {
+      "item_id": "uc-001",
+      "question": "What was Acme Corp's total debt outstanding at FY2023 year-end (in USD millions)?",
+      "answer": "Acme Corp's total debt outstanding at FY2023 year-end was $980 million.",
+      "value": 980.0,
+      "unit": "USD millions",
+      "citations": [
+        {
+          "citation_id": "citation_001",
+          "doc_id": "acme_2023_10k",
+          "doc_name": "Acme Corp FY2023 10-K",
+          "doc_type": "10k",
+          "filing_period": "FY2023",
+          "pdf_page": 60,
+          "page_label": "60",
+          "chunk_id": "acme:acme_2023_10k:p60:c9",
+          "quote": "Total debt outstanding at fiscal year-end 2023 was $980 million.",
+          "char_start": 0,
+          "char_end": 64
+        }
+      ],
+      "status": "answered",
+      "confidence": {
+        "grounded_inputs": 1,
+        "assumed_inputs": 0
+      }
+    }
+  ],
+  "summary": {
+    "items_total": 1,
+    "items_answered": 1,
+    "items_abstained": 0,
+    "citations_total": 1,
+    "calculate_calls": 0
+  }
+}

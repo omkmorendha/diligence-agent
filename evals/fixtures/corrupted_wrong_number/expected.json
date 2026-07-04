@@ -1,0 +1,13 @@
+{
+  "fixture": "corrupted_wrong_number",
+  "scorer_under_test": "arithmetic_integrity",
+  "expected_scores": {
+    "answer_accuracy": "fail",
+    "citation_precision": "pass",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "fail",
+    "abstention": null,
+    "trace_shape": "pass"
+  },
+  "notes": "Deliberately corrupted memo (spec section 21 calibration gate): the trace shows a correctly-computed `calculate` result of 42.56 from two properly grounded, correctly-cited inputs, but memo.json's item_answer.value was post-hoc injected as 99.9 -- matching neither the calculate result nor any cited quote span. arithmetic_integrity fails because the reported number is untraceable, even though the citations themselves are individually valid (citation_precision and citation_provenance both still pass -- contrast fixture 7, where the citation itself is the corrupted element). answer_accuracy also fails since 99.9 misses gold_value 42.56. This fixture is also fed to the LLM judges (evals/judges.py) as the wrong-number half of the calibration gate; judges must score it low on groundedness."
+}

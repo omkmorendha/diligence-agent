@@ -1,0 +1,13 @@
+{
+  "fixture": "citation_unretrieved_chunk",
+  "scorer_under_test": "citation_provenance",
+  "expected_scores": {
+    "answer_accuracy": "pass",
+    "citation_precision": "pass",
+    "citation_provenance": "fail",
+    "arithmetic_integrity": "fail",
+    "abstention": null,
+    "trace_shape": "pass"
+  },
+  "notes": "The cited chunk_id (...:p60:c9) matches gold doc_id/page (60), so citation_precision -- which only checks doc_id + page slack -- passes. But that exact chunk_id never appears in any prior `retrieval` event's chunk list (only c0 was ever retrieved), so citation_provenance fails: this is a citation invented from memory/gold leakage rather than an actual retrieval. Because the cited chunk itself is unverified, arithmetic_integrity should also treat the number as untraceable and fail."
+}
