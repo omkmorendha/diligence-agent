@@ -420,8 +420,17 @@ def _spans_for_page(doc_id: str, page: int) -> list[dict[str, Any]]:
     if not config.RUNS_DIR.is_dir():
         return spans
 
-    seen: set[str] = set()
+    # citation_id is assigned per-item by the agent/baseline (e.g. "citation_001",
+    # "citation_002", ...) and is scoped to that item only — it is NOT globally
+    # unique. It collides across different items within a single run's memo
+    # (each item restarts its own citation_001, citation_002, ...) and, a
+    # fortiori, across different runs. The only combination that uniquely
+    # identifies a citation is (run_id, item_id, citation_id), so dedup (and
+    # key returned spans) on that triple, and include run_id/item_id in each
+    # span so the frontend can disambiguate exactly which citation it is.
+    seen: set[tuple[str, str, str]] = set()
     for run_dir in config.RUNS_DIR.iterdir():
+        run_id = run_dir.name
         memo_path = run_dir / "memo.json"
         if not memo_path.exists():
             continue
@@ -430,15 +439,19 @@ def _spans_for_page(doc_id: str, page: int) -> list[dict[str, Any]]:
         except (json.JSONDecodeError, OSError):
             continue
         for item in memo.get("items", []):
+            item_id = item.get("item_id")
             for citation in item.get("citations", []):
                 if citation.get("doc_id") != doc_id or citation.get("pdf_page") != page:
                     continue
                 citation_id = citation.get("citation_id")
-                if citation_id in seen:
+                key = (run_id, item_id, citation_id)
+                if key in seen:
                     continue
-                seen.add(citation_id)
+                seen.add(key)
                 spans.append(
                     {
+                        "run_id": run_id,
+                        "item_id": item_id,
                         "citation_id": citation_id,
                         "char_start": citation.get("char_start"),
                         "char_end": citation.get("char_end"),
