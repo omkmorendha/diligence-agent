@@ -23,6 +23,9 @@ __pycache__/
 node_modules/
 frontend/dist/
 frontend/.vite/
+*.tsbuildinfo
+frontend/vite.config.d.ts
+frontend/vite.config.js
 
 # --- os / editor ---
 .DS_Store
