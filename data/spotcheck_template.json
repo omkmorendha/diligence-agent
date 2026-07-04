@@ -1,0 +1,227 @@
+{
+  "sample_size": 8,
+  "instructions": "For each record, check: (1) gold answer follows from evidence, (2) evidence page is valid, (3) bucket label is reasonable, (4) expected inputs are reasonable, (5) unit/period is clear. Fill each `checks.*` with true/false, set the record's `pass` to true only if all five checks pass, and add `reviewer_notes` for any failure. Then run: uv run --project backend dataset_builder/d6_spotcheck_template.py --mode score",
+  "records": [
+    {
+      "item_id": "amd_01",
+      "company": "AMD",
+      "question": "Does AMD have a reasonably healthy liquidity profile based on its quick ratio for FY22? If the quick ratio is not relevant to measure liquidity, please state that and explain why.",
+      "gold_answer": "Yes. The quick ratio is 1.57, calculated as (cash and cash equivalents+Short term investments+Accounts receivable, net+receivables from related parties)/ (current liabilities).",
+      "bucket": "A_multi_input",
+      "expected_inputs": [
+        "cash_and_cash_equivalents",
+        "short_term_investments",
+        "accounts_receivable_net",
+        "receivables_from_related_parties",
+        "current_liabilities"
+      ],
+      "gold_evidence": [
+        {
+          "doc_name": "AMD_2022_10K",
+          "pdf_page": 56,
+          "evidence_text": "Consolidated Balance Sheets\n \nDecember 31,\n2022\nDecember 25,\n2021\n \n(In millions, except par value amounts)\nASSETS\nCurrent assets:\nCash and cash equivalents\n$\n4,835 \n$\n2,535 \nShort-term investments\n1,020 \n1,073 \nAccounts receivable, net\n4,126 \n2,706 \nInventories\n3,771 \n1,955 \nReceivables from related parties\n2 \n2 \nPrepaid expenses and other current assets\n1,265 \n312 \nTotal current assets\n15,019 \n8,583 \nProperty and equipment, net\n1,513 \n702 \nOperating lease right-of-use assets\n460 \n367 \nGoodwill\n24,177 \n289 \nAcquisition-related intangibles\n24,118 \n \nInvestment: equity method\n83 \n69 \nDeferred tax assets\n58 \n931 \nOther non-current assets\n2,152 \n1,478 \nTotal assets\n$\n67,580 \n$\n12,419 \nLIABILITIES AND STOCKHOLDERS EQUITY\nCurrent liabilities:\nAccounts payable\n$\n2,493 \n$\n1,321 \nPayables to related parties\n463 \n85 \nAccrued liabilities\n3,077 \n2,424 \nCurrent portion of long-term debt, net\n \n312 \nOther current liabilities\n336 \n98 \nTotal current liabilities\n6,369 \n4,240 \nLong-term debt, net of current portion\n2,467 \n1 \nLong-term operating lease liabilities\n396 \n348 \nDeferred tax liabilities\n1,934 \n12 \nOther long-term liabilities\n1,664 \n321 \nCommitments and Contingencies (see Notes 16 and 17)\nStockholders equity:\nCapital stock:\nCommon stock, par value $0.01; shares authorized: 2,250; shares issued: 1,645 and 1,232; shares\noutstanding: 1,612 and 1,207\n16 \n12 \nAdditional paid-in capital\n58,005 \n11,069 \nTreasury stock, at cost (shares held: 33 and 25)\n(3,099)\n(2,130)\nAccumulated deficit\n(131)\n(1,451)\nAccumulated other comprehensive loss\n(41)\n(3)\nTotal stockholders equity\n54,750 \n7,497 \nTotal liabilities and stockholders equity\n$\n67,580 \n$\n12,419"
+        }
+      ],
+      "checks": {
+        "gold_answer_follows_from_evidence": null,
+        "evidence_page_valid": null,
+        "bucket_label_reasonable": null,
+        "expected_inputs_reasonable": null,
+        "unit_or_period_clear": null
+      },
+      "pass": null,
+      "reviewer_notes": ""
+    },
+    {
+      "item_id": "amd_04",
+      "company": "AMD",
+      "question": "Did AMD report customer concentration in FY22?",
+      "gold_answer": "Yes, one customer accounted for 16% of consolidated net revenue",
+      "bucket": "C_lookup",
+      "expected_inputs": [
+        "One customer accounted for 16% of our consolidated net revenue for the year ended December 31, 2022."
+      ],
+      "gold_evidence": [
+        {
+          "doc_name": "AMD_2022_10K",
+          "pdf_page": 12,
+          "evidence_text": "One customer accounted for 16% of our consolidated net revenue for the year ended December 31, 2022. Sales to this customer consisted of sales of products\nfrom our Gaming segment. A loss of this customer would have a material adverse effect on our business."
+        }
+      ],
+      "checks": {
+        "gold_answer_follows_from_evidence": null,
+        "evidence_page_valid": null,
+        "bucket_label_reasonable": null,
+        "expected_inputs_reasonable": null,
+        "unit_or_period_clear": null
+      },
+      "pass": null,
+      "reviewer_notes": ""
+    },
+    {
+      "item_id": "boeing_01",
+      "company": "Boeing",
+      "question": "Are there any product categories / service categories that represent more than 20% of Boeing's revenue for FY2022?",
+      "gold_answer": "Yes. Boeing has product and service categories that represent more than 20% of Boeing's revenue for FY2022. These categories are Commercial Airplanes which comprises 39% of total revenue, Defence which comprises 35% of total revenue and Services which comprises 26% of total revenue.",
+      "bucket": "A_multi_input",
+      "expected_inputs": [
+        "Commercial Airplanes revenue",
+        "Defense revenue",
+        "Services revenue",
+        "Total revenue"
+      ],
+      "gold_evidence": [
+        {
+          "doc_name": "BOEING_2022_10K",
+          "pdf_page": 62,
+          "evidence_text": "The Boeing Company and Subsidiaries\nNotes to the Consolidated Financial Statements\nSummary of Business Segment Data\n(Dollars in millions)\n \nYears ended December 31,\n2022\n2021\n2020\nRevenues:\nCommercial Airplanes\n$25,867 \n$19,493 \n$16,162 \nDefense, Space & Security\n23,162 \n26,540 \n26,257 \nGlobal Services\n17,611 \n16,328 \n15,543 \nBoeing Capital\n199 \n272 \n261 \nUnallocated items, eliminations and other\n(231)\n(347)\n(65)\nTotal revenues\n$66,608 \n$62,286 \n$58,158"
+        }
+      ],
+      "checks": {
+        "gold_answer_follows_from_evidence": null,
+        "evidence_page_valid": null,
+        "bucket_label_reasonable": null,
+        "expected_inputs_reasonable": null,
+        "unit_or_period_clear": null
+      },
+      "pass": null,
+      "reviewer_notes": ""
+    },
+    {
+      "item_id": "boeing_03",
+      "company": "Boeing",
+      "question": "We need to calculate a financial metric by using information only provided within the balance sheet. Please answer the following question: what is Boeing's year end FY2018 net property, plant, and equipment (in USD millions)?",
+      "gold_answer": "$12645.00",
+      "bucket": "C_lookup",
+      "expected_inputs": [
+        "Property, plant and equipment, net"
+      ],
+      "gold_evidence": [
+        {
+          "doc_name": "BOEING_2018_10K",
+          "pdf_page": 52,
+          "evidence_text": "Table of Contents\nThe Boeing Company and Subsidiaries\nConsolidated Statements of Financial Position \n(Dollarsinmillions,exceptpersharedata)\n\n \nDecember 31,\n2018\n\n2017\nAssets\n\n \nCash and cash equivalents\n$7,637\n\n$8,813\nShort-term and other investments\n927\n\n1,179\nAccounts receivable, net\n3,879\n\n2,894\nUnbilled receivables, net\n10,025\n\n8,194\nCurrent portion of customer financing, net\n460\n\n309\nInventories\n62,567\n\n61,388\nOther current assets\n2,335\n\n2,417\nTotal current assets\n87,830\n\n85,194\nCustomer financing, net\n2,418\n\n2,756\nProperty, plant and equipment, net\n12,645\n\n12,672\nGoodwill\n7,840\n\n5,559\nAcquired intangible assets, net\n3,429\n\n2,573\nDeferred income taxes\n284\n\n321\nInvestments\n1,087\n\n1,260\nOther assets, net of accumulated amortization of $503 and $482\n1,826\n\n2,027\nTotal assets\n$117,359\n\n$112,362\nLiabilities and equity\n\n \nAccounts payable\n$12,916\n\n$12,202\nAccrued liabilities\n14,808\n\n13,069\nAdvances and progress billings\n50,676\n\n48,042\nShort-term debt and current portion of long-term debt\n3,190\n\n1,335\nTotal current liabilities\n81,590\n\n74,648\nDeferred income taxes\n1,736\n\n2,188\nAccrued retiree health care\n4,584\n\n5,545\nAccrued pension plan liability, net\n15,323\n\n16,471\nOther long-term liabilities\n3,059\n\n2,015\nLong-term debt\n10,657\n\n9,782\nShareholders equity:\n\n \nCommon stock, par value $5.00 1,200,000,000 shares authorized; 1,012,261,159 shares issued\n5,061\n\n5,061\nAdditional paid-in capital\n6,768\n\n6,804\nTreasury stock, at cost\n(52,348) \n(43,454)\nRetained earnings\n55,941\n\n49,618\nAccumulated other comprehensive loss\n(15,083) \n(16,373)\nTotal shareholders equity\n339\n\n1,656\nNoncontrolling interests\n71\n\n57\nTotal equity\n410\n\n1,713\nTotal liabilities and equity\n$117,359\n\n$112,362\nSee Notes to the Consolidated Financial Statements on pages 54 113 .\n50"
+        }
+      ],
+      "checks": {
+        "gold_answer_follows_from_evidence": null,
+        "evidence_page_valid": null,
+        "bucket_label_reasonable": null,
+        "expected_inputs_reasonable": null,
+        "unit_or_period_clear": null
+      },
+      "pass": null,
+      "reviewer_notes": ""
+    },
+    {
+      "item_id": "johnson_johnson_01",
+      "company": "Johnson & Johnson",
+      "question": "Roughly how many times has JnJ sold its inventory in FY2022? Calculate inventory turnover ratio for FY2022; if conventional inventory management is not meaningful for the company then state that and explain why.",
+      "gold_answer": "JnJ sold its inventory 2.7 times in FY2022.",
+      "bucket": "A_multi_input",
+      "expected_inputs": [
+        "Cost of products sold (FY2022)",
+        "Inventories at Jan 1 2022",
+        "Inventories at Jan 2 2022"
+      ],
+      "gold_evidence": [
+        {
+          "doc_name": "JOHNSON_JOHNSON_2022_10K",
+          "pdf_page": 46,
+          "evidence_text": "JOHNSON & JOHNSON AND SUBSIDIARIES\nCONSOLIDATED BALANCE SHEETS\nAt January 1, 2023 and January 2, 2022\n(Dollars in Millions Except Share and Per Share Amounts) (Note 1)\n2022\n2021\nAssets\nCurrent assets\n \n \nCash and cash equivalents (Notes 1 and 2)\n$\n14,127 \n14,487 \nMarketable securities (Notes 1 and 2)\n9,392 \n17,121 \nAccounts receivable trade, less allowances for doubtful accounts $203 (2021, $230)\n16,160 \n15,283 \nInventories (Notes 1 and 3)\n12,483 \n10,387"
+        },
+        {
+          "doc_name": "JOHNSON_JOHNSON_2022_10K",
+          "pdf_page": 47,
+          "evidence_text": "JOHNSON & JOHNSON AND SUBSIDIARIES\nCONSOLIDATED STATEMENTS OF EARNINGS\n(Dollars and Shares in Millions Except Per Share Amounts) (Note 1)\n2022\n2021\n2020\nSales to customers\n$\n94,943 \n93,775 \n82,584 \nCost of products sold\n31,089 \n29,855 \n28,427"
+        }
+      ],
+      "checks": {
+        "gold_answer_follows_from_evidence": null,
+        "evidence_page_valid": null,
+        "bucket_label_reasonable": null,
+        "expected_inputs_reasonable": null,
+        "unit_or_period_clear": null
+      },
+      "pass": null,
+      "reviewer_notes": ""
+    },
+    {
+      "item_id": "johnson_johnson_03",
+      "company": "Johnson & Johnson",
+      "question": "Which business segment of JnJ will be treated as a discontinued operation from August 30, 2023 onward?",
+      "gold_answer": "The Consumer Health business segment will be treated as a discontinued operation from August 30, 2023 onward.",
+      "bucket": "C_lookup",
+      "expected_inputs": [
+        "Johnson & Johnson will now present its Consumer Health business financial results as discontinued operations"
+      ],
+      "gold_evidence": [
+        {
+          "doc_name": "JOHNSON_JOHNSON_2023_8K_dated-2023-08-30",
+          "pdf_page": 4,
+          "evidence_text": "Exhibit 99.1\nJohnson & Johnson Announces Updated Financials and 2023 Guidance Following Completion of the Kenvue\nSeparation\n\nCompany expects increased 2023 Reported Sales Growth of 7.0% - 8.0%, Operational Sales Growth of 7.5% - 8.5%, and\nAdjusted Operational Sales Growth of 6.2% - 7.2%; Figures exclude the COVID-19 Vaccine\n\nCompany expects 2023 Adjusted Reported Earnings Per Share (EPS) of $10.00 - $10.10, reflecting increased growth of\n12.5% at the mid-point and Adjusted Operational EPS of $9.90 - $10.00, reflecting increased growth of 11.5% at the mid-\npoint\n\nCompany reduced outstanding share count by approximately 191 million; 2023 guidance reflects only a partial-year benefit\nof approximately 73.5 million shares or $0.28 benefit to EPS\n\nCompany secured $13.2 billion in cash proceeds from the Kenvue debt offering and initial public offering and maintains 9.5%\nof equity stake in Kenvue\n\nCompany maintains its quarterly dividend of $1.19 per share\nNew Brunswick, N.J. (August 30, 2023) Johnson & Johnson (NYSE: JNJ) (the Company) today announced updates to its financials and\n2023 guidance which reflect its operations as a company focused on transformational innovation in Pharmaceutical and MedTech. The\nCompany has published a recorded webinar for investors to provide additional context behind the updated financials and 2023 guidance\nfound in this release, which may be accessed by visiting the Investors section of the Company's website at webcasts & presentations.\nThe completion of this transaction uniquely positions Johnson & Johnson as a Pharmaceutical and MedTech company focused on delivering\ntransformative healthcare solutions to patients, said Joaquin Duato, Chairman of the Board and Chief Executive Officer. We are incredibly\nproud of the focus and dedication of our employees worldwide to achieve this milestone, which we are confident will unlock near- and long-\nterm value for all of our stakeholders.\nAs previously announced, the Company recently completed an exchange offer to finalize the separation of Kenvue Inc., formerly Johnson &\nJohnsons Consumer Health business. As a result of the completion of the exchange offer, Johnson & Johnson will now present its\nConsumer Health business financial results as discontinued operations, including a gain of approximately $20 billion in the third quarter of\n2023"
+        }
+      ],
+      "checks": {
+        "gold_answer_follows_from_evidence": null,
+        "evidence_page_valid": null,
+        "bucket_label_reasonable": null,
+        "expected_inputs_reasonable": null,
+        "unit_or_period_clear": null
+      },
+      "pass": null,
+      "reviewer_notes": ""
+    },
+    {
+      "item_id": "pepsico_01",
+      "company": "PepsiCo",
+      "question": "By how much did Pepsico increase its unsecured five year revolving credit agreement on May 26, 2023?",
+      "gold_answer": "$400,000,000 increase.",
+      "bucket": "A_multi_input",
+      "expected_inputs": [
+        "$3,800,000,000",
+        "$4,200,000,000"
+      ],
+      "gold_evidence": [
+        {
+          "doc_name": "PEPSICO_2023_8K_dated-2023-05-30",
+          "pdf_page": 2,
+          "evidence_text": "Effective May 26, 2023, PepsiCo terminated the $3,800,000,000 five year unsecured revolving credit agreement, dated as of May 27, 2022, among\nPepsiCo, as borrower, the lenders party thereto, and Citibank, N.A., as administrative agent (the 2022 Five Year Credit Agreement). There were no\noutstanding borrowings under the 2022 Five Year Credit Agreement at the time of its termination.\n\nOn May 26, 2023, PepsiCo entered into a new $4,200,000,000 five year unsecured revolving credit agreement (the 2023 Five Year Credit\nAgreement) among PepsiCo, as borrower, the lenders party thereto, and Citibank, N.A., as administrative agent. The 2023 Five Year Credit Agreement\nenables PepsiCo and its borrowing subsidiaries to borrow up to $4,200,000,000 in U.S. Dollars and/or Euros, including a $750,000,000 swing line\nsubfacility for Euro-denominated borrowings permitted to be borrowed on a same day basis, subject to customary terms and conditions, and expires on\nMay 26, 2028. PepsiCo may also, upon the agreement of either the then existing lenders or of additional banks not currently party to the 2023 Five Year\nCredit Agreement, increase the commitments under the 2023 Five Year Credit Agreement to up to $4,950,000,000 in U.S. Dollars and/or Euros. PepsiCo\nmay, once a year, request renewal of the 2023 Five Year Credit Agreement for an additional one year period. Subject to certain conditions stated in the 2023\nFive Year Credit Agreement, PepsiCo and its borrowing subsidiaries may borrow, prepay and reborrow amounts under the 2023 Five Year Credit\nAgreement at any time during the term of the 2023 Five Year Credit Agreement. Funds borrowed under the 2023 Five Year Credit Agreement may be used\nfor general corporate purposes of PepsiCo and its subsidiaries. The 2023 Five Year Credit Agreement contains customary representations and warranties\nand events of default. In the ordinary course of their respective businesses, the lenders under the 2023 Five Year Credit Agreement and their affiliates have\nengaged, and may in the future engage, in commercial banking and/or investment banking transactions with PepsiCo and its affiliates."
+        }
+      ],
+      "checks": {
+        "gold_answer_follows_from_evidence": null,
+        "evidence_page_valid": null,
+        "bucket_label_reasonable": null,
+        "expected_inputs_reasonable": null,
+        "unit_or_period_clear": null
+      },
+      "pass": null,
+      "reviewer_notes": ""
+    },
+    {
+      "item_id": "pepsico_06",
+      "company": "PepsiCo",
+      "question": "What is the quantity of restructuring costs directly outlined in Pepsico's income statements for FY2022? If restructuring costs are not explicitly outlined then state 0.",
+      "gold_answer": "Pepsico's restructuring costs in FY2022 amounted to $411 million .",
+      "bucket": "C_lookup",
+      "expected_inputs": [],
+      "gold_evidence": [
+        {
+          "doc_name": "PEPSICO_2022_10K",
+          "pdf_page": 78,
+          "evidence_text": "Note 3 Restructuring and Impairment Charges\n2019 Multi-Year Productivity Plan\nWe publicly announced a multi-year productivity plan on February 15, 2019 (2019 Productivity Plan) that will leverage new\ntechnology and business models to further simplify, harmonize and automate processes; re-engineer our go-to-market and\ninformation systems, including deploying the right automation for each market; and simplify our organization and optimize our\nmanufacturing and supply chain footprint. To build on the successful implementation of the 2019 Productivity Plan, in the fourth\nquarter of 2022, we expanded and extended the plan through the end of 2028 to take advantage of additional opportunities within\nthe initiatives described above. As a result, we expect to incur pre-tax charges of approximately $3.65 billion, including cash\nexpenditures of approximately $2.9 billion. These pre-tax charges are expected to consist of approximately 55% of severance and\nother employee-related costs, 10% for asset impairments (all non-cash) resulting from plant closures and related actions and 35%\nfor other costs associated with the implementation of our initiatives.\nThe total plan pre-tax charges are expected to be incurred by division approximately as follows:\nFLNA\nQFNA\nPBNA\nLatAm\nEurope\nAMESA\nAPAC\nCorporate\nExpected pre-tax charges\n15 %\n1 %\n25 %\n10 %\n25 %\n5 %\n4 %\n15 %\nA summary of our 2019 Productivity Plan charges is as follows:\n2022\n2021\n2020\nCost of sales\n$\n33 \n$\n29 $\n30 \nSelling, general and administrative expenses\n347 \n208 \n239 \nOther pension and retiree medical benefits expense\n31 \n10 \n20 \nTotal restructuring and impairment charges\n$\n411 \n$\n247 $\n289"
+        }
+      ],
+      "checks": {
+        "gold_answer_follows_from_evidence": null,
+        "evidence_page_valid": null,
+        "bucket_label_reasonable": null,
+        "expected_inputs_reasonable": null,
+        "unit_or_period_clear": null
+      },
+      "pass": null,
+      "reviewer_notes": ""
+    }
+  ]
+}
