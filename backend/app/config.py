@@ -35,6 +35,10 @@ LLM_MODEL = os.environ.get("LLM_MODEL", "z-ai/glm-5.2")
 LLM_TEMPERATURE = float(os.environ.get("LLM_TEMPERATURE", "0.2"))
 LLM_SEED = int(os.environ.get("LLM_SEED", "42"))
 LLM_MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "16384"))
+# Optional speed knob (Vultr Nemotron-3-Nano): "none" -> 0 reasoning tokens, ~2-3s/call.
+# Use for high-volume simple-output calls (classification/extraction/judging); leave
+# unset (None) to keep the model's default reasoning where answer quality depends on it.
+LLM_REASONING_EFFORT = os.environ.get("LLM_REASONING_EFFORT") or None
 
 # --- embeddings (spec section 3) ---
 EMBED_MODEL = os.environ.get("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")

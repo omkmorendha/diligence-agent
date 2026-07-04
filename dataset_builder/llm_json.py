@@ -70,10 +70,14 @@ def call_json_with_retry(
     max_repair_retries: int = 2,
     max_rate_limit_retries: int = 6,
     base_delay_seconds: float = 2.0,
+    **chat_kwargs: Any,
 ) -> tuple[dict[str, Any] | None, str | None]:
     """Call the LLM in json_mode, repairing malformed JSON and backing off on
     rate limits. `messages` is mutated in place (repair turns are appended) so
     the caller can inspect the final conversation if needed.
+
+    `**chat_kwargs` is forwarded to `llm.chat_text` as-is (e.g. `reasoning_effort=
+    "none"` for high-volume simple-output calls -- see backend/app/llm.py).
 
     Returns (validated_object, None) on success, or (None, error) if every
     repair AND rate-limit retry is exhausted.
@@ -85,7 +89,7 @@ def call_json_with_retry(
         text = ""
         while True:
             try:
-                text = llm.chat_text(messages, json_mode=True, max_tokens=max_tokens)
+                text = llm.chat_text(messages, json_mode=True, max_tokens=max_tokens, **chat_kwargs)
                 break
             except (openai.RateLimitError, openai.APIStatusError, openai.APIConnectionError) as exc:
                 last_error = f"{type(exc).__name__}: {exc}"

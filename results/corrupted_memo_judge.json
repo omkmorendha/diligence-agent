@@ -1,0 +1,18 @@
+{
+  "threshold": 2,
+  "fixtures": {
+    "corrupted_swapped_citation": {
+      "criterion": "groundedness",
+      "score": 1,
+      "justification": "The cited passage about legal proceedings provides no information about Acme Corp's FY2023 revenue, and no tool outputs are available to support the claimed $1,250 million figure.",
+      "calibration_passed": true
+    },
+    "corrupted_wrong_number": {
+      "criterion": "groundedness",
+      "score": 1,
+      "justification": "The answer claims 99.9% gross margin, but the cited passages and tool output show gross margin is 42.56%, making the claim unsupported and contradictory.",
+      "calibration_passed": true
+    }
+  },
+  "passed": true
+}

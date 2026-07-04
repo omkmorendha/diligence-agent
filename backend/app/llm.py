@@ -31,6 +31,7 @@ def chat(
     stream: bool = False,
     max_tokens: int = config.LLM_MAX_TOKENS,
     seed: int = config.LLM_SEED,
+    reasoning_effort: Optional[str] = None,
 ) -> Any:
     """Send a chat completion. Returns the raw OpenAI response (or a stream iterator).
 
@@ -39,6 +40,11 @@ def chat(
     * `tools`      -> native OpenAI tool-calling (NativeToolProtocol).
     * `json_mode`  -> request a JSON object response (structured output).
     * `stream`     -> return the streaming iterator instead of a full response.
+    * `reasoning_effort` -> speed knob for the Vultr Nemotron model (e.g. "none" for
+      0 reasoning tokens on high-volume simple-output calls: classification,
+      extraction, judging). Left unset (None) to keep the model's default reasoning
+      where answer quality depends on it (e.g. the agent loop). Sent via
+      `extra_body` since it is not a standard OpenAI chat-completion parameter.
     """
     kwargs: dict[str, Any] = {
         "model": config.LLM_MODEL,
@@ -53,6 +59,8 @@ def chat(
         kwargs["tool_choice"] = "auto"
     if json_mode:
         kwargs["response_format"] = {"type": "json_object"}
+    if reasoning_effort:
+        kwargs["extra_body"] = {"reasoning_effort": reasoning_effort}
 
     return _client().chat.completions.create(**kwargs)
 
