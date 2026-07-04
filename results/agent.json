@@ -1,13 +1,27 @@
 {
   "system": "agent",
   "runs_scored": [
-    "agent-pepsico-full"
+    "agent-pepsico-full",
+    "agent_amd_full",
+    "agent_boeing_full",
+    "agent_johnson_johnson_full"
   ],
-  "num_items_scored": 8,
-  "answer_accuracy": 0.0,
-  "citation_precision": 0.8,
+  "num_items_scored": 28,
+  "answer_accuracy": 0.13636363636363635,
+  "citation_precision": 0.5454545454545454,
   "citation_provenance": 1.0,
-  "arithmetic_integrity": 0.6,
-  "trace_shape": 0.375,
-  "abstention_correct_rate": 0.0
+  "arithmetic_integrity": 0.9090909090909091,
+  "trace_shape": 0.6071428571428571,
+  "abstention_correct_rate": 0.0,
+  "by_bucket": {
+    "A_multi_input": {
+      "answer_accuracy": 0.25
+    },
+    "B_judgment": {
+      "answer_accuracy": 0.0
+    },
+    "C_lookup": {
+      "answer_accuracy": 0.16666666666666666
+    }
+  }
 }

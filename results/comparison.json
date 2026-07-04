@@ -1,12 +1,12 @@
 {
-  "created_at": "2026-07-04T17:57:12Z",
+  "created_at": "2026-07-04T18:56:47Z",
   "subset": {
     "num_questions": 28,
     "num_companies": 4,
     "bucket_counts": {
       "A_multi_input": 12,
-      "B_judgment": 10,
-      "C_lookup": 6
+      "C_lookup": 6,
+      "B_judgment": 10
     }
   },
   "systems": {
@@ -30,28 +30,28 @@
         }
       },
       "label": "Naive-RAG baseline",
-      "notes": "Real deterministic scores from results/baseline.json: 4 runs (1 per company), 28/28 subset items scored."
+      "notes": "Real deterministic scores from results/baseline.json: 4 run(s), 28/28 subset items scored."
     },
     "agent": {
-      "answer_accuracy": 0.0,
-      "citation_precision": 0.8,
+      "answer_accuracy": 0.13636363636363635,
+      "citation_precision": 0.5454545454545454,
       "citation_provenance": 1.0,
-      "arithmetic_integrity": 0.6,
+      "arithmetic_integrity": 0.9090909090909091,
       "groundedness_judge": null,
       "actionability_judge": null,
       "by_bucket": {
         "A_multi_input": {
-          "answer_accuracy": 0.0
+          "answer_accuracy": 0.25
         },
         "B_judgment": {
           "answer_accuracy": 0.0
         },
         "C_lookup": {
-          "answer_accuracy": 0.0
+          "answer_accuracy": 0.16666666666666666
         }
       },
       "label": "Agent",
-      "notes": "SAMPLE: real deterministic scores from a single completed run (runs/agent-pepsico-full) -- 1 of 4 companies, 8/28 subset items. Full 4-company agent run lands in Step 17. answer_accuracy on this run is understated by a known scorer limitation: several PepsiCo items have a text-typed gold_answer (e.g. \"$400,000,000 increase.\") that the scorer exact-string-matches against the agent's normalized numeric answer (e.g. \"400\") -- citation_precision (0.8) and arithmetic_integrity (0.6) are a more reliable read of this sample's quality than answer_accuracy."
+      "notes": "Real deterministic scores from results/agent.json: 4 run(s), 28/28 subset items scored."
     }
   }
 }
