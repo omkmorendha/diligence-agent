@@ -1,0 +1,16 @@
+{
+  "system": "baseline",
+  "runs_scored": [
+    "baseline_amd_1783180548",
+    "baseline_boeing_1783180280",
+    "baseline_johnson_johnson_1783180452",
+    "baseline_pepsico_1783180104"
+  ],
+  "num_items_scored": 28,
+  "answer_accuracy": 0.0,
+  "citation_precision": 0.0,
+  "citation_provenance": 1.0,
+  "arithmetic_integrity": 1.0,
+  "trace_shape": 0.5714285714285714,
+  "abstention_correct_rate": 0.0
+}
