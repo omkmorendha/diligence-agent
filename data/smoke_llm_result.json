@@ -1,0 +1,11 @@
+{
+  "native_tool_protocol_ok": true,
+  "json_tool_protocol_ok": true,
+  "json_mode_ok": true,
+  "streaming_ok": true,
+  "seed_ok": true,
+  "rate_limit_ok": true,
+  "rate_limit_notes": null,
+  "avg_latency_seconds": 3.1,
+  "selected_tool_protocol": "native"
+}
