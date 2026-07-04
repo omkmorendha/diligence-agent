@@ -70,11 +70,11 @@ def _discover_runs(runs_dir: Path) -> list[Path]:
 
 
 def _aggregate(scores: list[dict[str, Optional[str]]]) -> dict:
-    def fraction(metric: str) -> Optional[float]:
+    def fraction(metric: str, positive: str = "pass") -> Optional[float]:
         values = [s[metric] for s in scores if s.get(metric) is not None]
         if not values:
             return None
-        return sum(1 for v in values if v == "pass") / len(values)
+        return sum(1 for v in values if v == positive) / len(values)
 
     return {
         "num_items_scored": len(scores),
@@ -83,7 +83,8 @@ def _aggregate(scores: list[dict[str, Optional[str]]]) -> dict:
         "citation_provenance": fraction("citation_provenance"),
         "arithmetic_integrity": fraction("arithmetic_integrity"),
         "trace_shape": fraction("trace_shape"),
-        "abstention_correct_rate": fraction("abstention"),
+        # abstention() returns "correct" / "incorrect_but_calibrated", not "pass"/"fail".
+        "abstention_correct_rate": fraction("abstention", positive="correct"),
     }
 
 
