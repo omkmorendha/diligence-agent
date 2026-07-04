@@ -1,92 +1,100 @@
-// Memo tab (spec section 24, Step 15).
-// Renders the memo with inline citation markers. Clicking a citation opens a side
-// panel that calls GET /corpus/{company}/{doc_id}/page/{n} and highlights the
-// cited span within the full page text. Per-item confidence shown as
-// "2 inputs grounded / 0 assumed". Item statuses: answered / abstained / error.
+// Memo tab — Ledger redesign. Same wiring as before (GET /runs for the picker,
+// getMemo, getPage for the citation panel with char_start/char_end highlighting).
+// Rendering changes only: memo header with mono meta row, numbered item cards,
+// chip-style citation markers, refined sticky source panel.
 
 import { useEffect, useState } from "react";
 import { ApiError, getMemo, getPage, listRuns } from "../api";
 import type { Citation, Memo, MemoItem, PageResponse, RunCard } from "../types";
+import { Card, MONO, Pill, selectStyle } from "../ui";
 
-const STATUS_COLOR: Record<MemoItem["status"], string> = {
-  answered: "#1c7a3c",
-  abstained: "#b3391f",
+const STATUS_COLOR: Record<MemoItem["status"], [string, string]> = {
+  answered: ["var(--green)", "var(--green-soft)"],
+  abstained: ["var(--amber)", "var(--amber-soft)"],
 };
 
-function StatusPill({ status }: { status: MemoItem["status"] }) {
+function CitationMarker({
+  index,
+  citation,
+  active,
+  onOpen,
+}: {
+  index: number;
+  citation: Citation;
+  active: boolean;
+  onOpen: (c: Citation) => void;
+}) {
   return (
-    <span
+    <button
+      onClick={() => onOpen(citation)}
+      title={`${citation.doc_name} p${citation.pdf_page}`}
       style={{
+        fontFamily: MONO,
         fontSize: 11,
-        fontWeight: 700,
-        color: "#fff",
-        background: STATUS_COLOR[status],
-        borderRadius: 10,
-        padding: "1px 8px",
-        textTransform: "capitalize",
+        fontWeight: 600,
+        color: "var(--accent-text)",
+        background: active ? "var(--accent-soft)" : "transparent",
+        border: `1px solid ${active ? "var(--accent-line)" : "var(--line-strong)"}`,
+        borderRadius: 5,
+        cursor: "pointer",
+        padding: "1px 6px",
+        verticalAlign: 2,
+        marginLeft: 4,
       }}
     >
-      {status}
-    </span>
+      {index + 1}
+    </button>
   );
 }
 
-function CitationMarker({ index, citation, onOpen }: { index: number; citation: Citation; onOpen: (c: Citation) => void }) {
+function MemoItemCard({
+  item,
+  index,
+  openCitation,
+  onOpenCitation,
+}: {
+  item: MemoItem;
+  index: number;
+  openCitation: Citation | null;
+  onOpenCitation: (c: Citation) => void;
+}) {
+  const [statusColor, statusBg] = STATUS_COLOR[item.status];
   return (
-    <sup>
-      <button
-        onClick={() => onOpen(citation)}
-        title={`${citation.doc_name} p${citation.pdf_page}`}
-        style={{
-          fontSize: 11,
-          fontWeight: 700,
-          color: "#0a7ea4",
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          padding: "0 1px",
-        }}
-      >
-        [{index + 1}]
-      </button>
-    </sup>
-  );
-}
-
-function MemoItemCard({ item, onOpenCitation }: { item: MemoItem; onOpenCitation: (c: Citation) => void }) {
-  return (
-    <div
-      style={{
-        border: "1px solid #e5e5e5",
-        borderRadius: 6,
-        padding: 14,
-        marginBottom: 12,
-        background: "#fafafa",
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 6 }}>
-        <div style={{ fontSize: 14, fontWeight: 600 }}>{item.question}</div>
-        <StatusPill status={item.status} />
+    <Card style={{ padding: "18px 20px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 8 }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "baseline" }}>
+          <span style={{ fontFamily: MONO, fontSize: 12, color: "var(--text-3)" }}>{String(index + 1).padStart(2, "0")}</span>
+          <span style={{ fontSize: 14.5, fontWeight: 600, lineHeight: 1.45 }}>{item.question}</span>
+        </div>
+        <Pill color={statusColor} bg={statusBg} style={{ alignSelf: "flex-start" }}>
+          {item.status}
+        </Pill>
       </div>
 
-      <div style={{ fontSize: 14, marginBottom: 8 }}>
+      <div style={{ fontSize: 14, lineHeight: 1.6, color: "var(--text)", marginBottom: 12 }}>
         {item.answer}
         {item.citations.map((c, i) => (
-          <CitationMarker key={c.citation_id} index={i} citation={c} onOpen={onOpenCitation} />
+          <CitationMarker
+            key={c.citation_id}
+            index={i}
+            citation={c}
+            active={openCitation?.citation_id === c.citation_id}
+            onOpen={onOpenCitation}
+          />
         ))}
       </div>
 
-      <div style={{ display: "flex", gap: 14, fontSize: 12, color: "#666" }}>
+      <div style={{ display: "flex", gap: 18, fontSize: 12, color: "var(--text-3)", fontFamily: MONO, borderTop: "1px solid var(--line)", paddingTop: 10 }}>
         {item.value != null && (
-          <span>
-            value: <strong>{item.value}</strong> {item.unit}
+          <span style={{ color: "var(--text-2)" }}>
+            value {item.value} {item.unit}
           </span>
         )}
         <span>
-          {item.confidence.grounded_inputs} inputs grounded / {item.confidence.assumed_inputs} assumed
+          {item.confidence.grounded_inputs} grounded · {item.confidence.assumed_inputs} assumed
         </span>
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -101,31 +109,31 @@ function HighlightedPage({ page, citation }: { page: PageResponse; citation: Cit
       style={{
         margin: 0,
         fontSize: 12,
+        lineHeight: 1.55,
         whiteSpace: "pre-wrap",
         wordBreak: "break-word",
-        maxHeight: 260,
+        maxHeight: 240,
         overflowY: "auto",
         fontFamily: "inherit",
+        color: "var(--text-2)",
+        background: "var(--surface-2)",
+        border: "1px solid var(--line)",
+        borderRadius: 8,
+        padding: "10px 12px",
       }}
     >
       {start > 200 && "… "}
       {before}
-      <mark style={{ background: "#ffe9a8", padding: "0 1px" }}>{match || "(span out of range)"}</mark>
+      <mark style={{ background: "var(--accent-soft)", color: "var(--accent-text)", padding: "0 1px", borderRadius: 2 }}>
+        {match || "(span out of range)"}
+      </mark>
       {after}
       {end + 200 < page.text.length && " …"}
     </pre>
   );
 }
 
-function CitationPanel({
-  company,
-  citation,
-  onClose,
-}: {
-  company: string;
-  citation: Citation;
-  onClose: () => void;
-}) {
+function CitationPanel({ company, citation, onClose }: { company: string; citation: Citation; onClose: () => void }) {
   const [page, setPage] = useState<PageResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -143,97 +151,65 @@ function CitationPanel({
   return (
     <aside
       style={{
-        width: 340,
-        flexShrink: 0,
-        border: "1px solid #e5e5e5",
-        borderRadius: 6,
-        padding: 14,
-        background: "#fff",
-        alignSelf: "flex-start",
+        minWidth: 0,
         position: "sticky",
-        top: 16,
+        top: 84,
+        alignSelf: "flex-start",
+        background: "var(--surface)",
+        border: "1px solid var(--line)",
+        borderRadius: 12,
+        boxShadow: "var(--shadow)",
+        overflow: "hidden",
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <h3 style={{ fontSize: 13, margin: 0 }}>Source</h3>
-        <button
-          onClick={onClose}
-          style={{ background: "none", border: "none", cursor: "pointer", color: "#888", fontSize: 13 }}
-        >
-          close
-        </button>
-      </div>
-      <div style={{ fontSize: 13, fontWeight: 600, marginTop: 8 }}>{citation.doc_name}</div>
-      <div style={{ fontSize: 12, color: "#666", marginBottom: 8 }}>
-        {citation.doc_type ? `${citation.doc_type} · ` : ""}
-        {citation.filing_period ? `${citation.filing_period} · ` : ""}
-        page {citation.page_label ?? citation.pdf_page}
-      </div>
-      {citation.claim && <div style={{ fontSize: 13, marginBottom: 8 }}>{citation.claim}</div>}
-      <blockquote
+      <div
         style={{
-          margin: "0 0 10px",
-          padding: "6px 10px",
-          borderLeft: "3px solid #0a7ea4",
-          background: "#eef6fa",
-          fontSize: 13,
-          color: "#222",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "12px 16px",
+          borderBottom: "1px solid var(--line)",
+          background: "var(--surface-2)",
         }}
       >
-        {citation.quote}
-      </blockquote>
-
-      <div style={{ fontSize: 11, color: "#999", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.4 }}>
-        Page text
+        <span style={{ fontSize: 11, fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: 0.7 }}>
+          Source evidence
+        </span>
+        <button
+          onClick={onClose}
+          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-3)", fontSize: 15, lineHeight: 1, padding: 2, fontFamily: "inherit" }}
+        >
+          ×
+        </button>
       </div>
-      {loading && <div style={{ fontSize: 12, color: "#888" }}>Loading page…</div>}
-      {error && <div style={{ fontSize: 12, color: "#c0392b" }}>Failed to load page: {error}</div>}
-      {page && <HighlightedPage page={page} citation={citation} />}
+      <div style={{ padding: 16 }}>
+        <div style={{ fontFamily: MONO, fontSize: 12.5, fontWeight: 600, color: "var(--text)" }}>{citation.doc_name}</div>
+        <div style={{ fontSize: 12, color: "var(--text-3)", margin: "3px 0 12px" }}>
+          {citation.doc_type ? `${citation.doc_type.toUpperCase()} · ` : ""}
+          {citation.filing_period ? `${citation.filing_period} · ` : ""}
+          page {citation.page_label ?? citation.pdf_page}
+        </div>
+        {citation.claim && <div style={{ fontSize: 13, lineHeight: 1.5, color: "var(--text)", marginBottom: 10 }}>{citation.claim}</div>}
+        <div style={{ borderLeft: "2px solid var(--accent)", padding: "2px 0 2px 12px", fontFamily: MONO, fontSize: 12, color: "var(--text-2)", marginBottom: 14 }}>
+          “{citation.quote}”
+        </div>
 
-      <div style={{ fontSize: 11, color: "#999", marginTop: 8, wordBreak: "break-all" }}>
-        GET /corpus/{company}/{citation.doc_id}/page/{citation.pdf_page}
+        <div style={{ fontSize: 10.5, fontWeight: 600, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 6 }}>
+          Page text
+        </div>
+        {loading && <div style={{ fontSize: 12, color: "var(--text-3)" }}>Loading page…</div>}
+        {error && <div style={{ fontSize: 12, color: "var(--red)" }}>Failed to load page: {error}</div>}
+        {page && <HighlightedPage page={page} citation={citation} />}
+
+        <div style={{ fontFamily: MONO, fontSize: 10.5, color: "var(--text-3)", marginTop: 10, wordBreak: "break-all" }}>
+          GET /corpus/{company}/{citation.doc_id}/page/{citation.pdf_page}
+        </div>
       </div>
     </aside>
   );
 }
 
-function RunPicker({
-  runs,
-  selectedRunId,
-  onSelect,
-}: {
-  runs: RunCard[];
-  selectedRunId: string | null;
-  onSelect: (runId: string) => void;
-}) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-      <label style={{ fontSize: 13, color: "#555" }}>Run</label>
-      <select
-        value={selectedRunId ?? ""}
-        onChange={(e) => onSelect(e.target.value)}
-        style={{ fontSize: 13, padding: "4px 6px", minWidth: 260 }}
-      >
-        <option value="" disabled>
-          Select a run…
-        </option>
-        {runs.map((r) => (
-          <option key={r.run_id} value={r.run_id}>
-            {r.company} · {r.run_id} ({r.status})
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-export function MemoTab({
-  runId,
-  onSelectRun,
-}: {
-  runId: string | null;
-  onSelectRun: (runId: string) => void;
-}) {
+export function MemoTab({ runId, onSelectRun }: { runId: string | null; onSelectRun: (runId: string) => void }) {
   const [runs, setRuns] = useState<RunCard[]>([]);
   const [memo, setMemo] = useState<Memo | null>(null);
   const [memoState, setMemoState] = useState<"idle" | "pending" | "missing" | "failed" | "error">("idle");
@@ -277,42 +253,66 @@ export function MemoTab({
       });
   }, [runId]);
 
+  const emptyStateStyle = {
+    fontSize: 13,
+    color: "var(--text-3)",
+    padding: "32px 0",
+    textAlign: "center" as const,
+    border: "1px dashed var(--line-strong)",
+    borderRadius: 12,
+  };
+
   return (
-    <section style={{ display: "flex", gap: 20 }}>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <h2 style={{ fontSize: 16 }}>Memo</h2>
+    <section
+      style={{
+        display: "grid",
+        gridTemplateColumns: memo && openCitation ? "minmax(0,1fr) 340px" : "minmax(0,1fr)",
+        gap: 28,
+      }}
+    >
+      <div style={{ minWidth: 0, maxWidth: 760 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+          <select value={runId ?? ""} onChange={(e) => onSelectRun(e.target.value)} style={{ ...selectStyle, minWidth: 280 }}>
+            <option value="" disabled>
+              Select a run…
+            </option>
+            {runs.map((r) => (
+              <option key={r.run_id} value={r.run_id}>
+                {r.company} · {r.run_id} ({r.status})
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <RunPicker runs={runs} selectedRunId={runId} onSelect={onSelectRun} />
-
-        {!runId && <div style={{ fontSize: 13, color: "#888" }}>Pick a run above, or start one from the Run tab.</div>}
+        {!runId && <div style={emptyStateStyle}>Pick a run, or start one from the Run tab.</div>}
         {runId && memoState === "pending" && (
-          <div style={{ fontSize: 13, color: "#0a7ea4" }}>Run still in progress — memo not ready yet.</div>
+          <div style={{ ...emptyStateStyle, color: "var(--accent-text)" }}>Run still in progress — memo not ready yet.</div>
         )}
-        {runId && memoState === "missing" && <div style={{ fontSize: 13, color: "#c0392b" }}>No memo found for this run.</div>}
-        {runId && memoState === "failed" && (
-          <div style={{ fontSize: 13, color: "#c0392b" }}>Run failed: {memoError}</div>
-        )}
-        {runId && memoState === "error" && (
-          <div style={{ fontSize: 13, color: "#c0392b" }}>Failed to load memo: {memoError}</div>
-        )}
+        {runId && memoState === "missing" && <div style={{ ...emptyStateStyle, color: "var(--red)" }}>No memo found for this run.</div>}
+        {runId && memoState === "failed" && <div style={{ ...emptyStateStyle, color: "var(--red)" }}>Run failed: {memoError}</div>}
+        {runId && memoState === "error" && <div style={{ ...emptyStateStyle, color: "var(--red)" }}>Failed to load memo: {memoError}</div>}
 
         {memo && (
           <>
-            <div style={{ fontSize: 13, color: "#666", marginBottom: 14 }}>
-              {memo.company} · {memo.summary.items_answered}/{memo.summary.items_total} answered ·{" "}
-              {memo.summary.citations_total} citations
+            <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: -0.3, margin: "0 0 6px" }}>{memo.company} diligence memo</h2>
+            <div style={{ display: "flex", gap: 16, fontSize: 12.5, color: "var(--text-2)", marginBottom: 22, fontFamily: MONO }}>
+              <span>
+                {memo.summary.items_answered}/{memo.summary.items_total} answered
+              </span>
+              <span>{memo.summary.citations_total} citations</span>
+              <span>{memo.summary.calculate_calls} calculator calls</span>
             </div>
 
-            {memo.items.map((item) => (
-              <MemoItemCard key={item.item_id} item={item} onOpenCitation={setOpenCitation} />
-            ))}
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {memo.items.map((item, i) => (
+                <MemoItemCard key={item.item_id} item={item} index={i} openCitation={openCitation} onOpenCitation={setOpenCitation} />
+              ))}
+            </div>
           </>
         )}
       </div>
 
-      {memo && openCitation && (
-        <CitationPanel company={memo.company} citation={openCitation} onClose={() => setOpenCitation(null)} />
-      )}
+      {memo && openCitation && <CitationPanel company={memo.company} citation={openCitation} onClose={() => setOpenCitation(null)} />}
     </section>
   );
 }
