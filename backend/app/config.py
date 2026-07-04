@@ -22,6 +22,7 @@ DATA_DIR = ROOT / "data"
 FILINGS_DIR = DATA_DIR / "filings"
 PAGES_DIR = DATA_DIR / "pages"
 RAW_DIR = DATA_DIR / "raw"
+INDEX_DIR = DATA_DIR / "index"  # embedded chunk index (ingest.py), gitignored
 RUNS_DIR = ROOT / "runs"
 RESULTS_DIR = ROOT / "results"
 SUBSET_PATH = DATA_DIR / "subset.json"

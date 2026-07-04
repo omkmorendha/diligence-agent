@@ -4,6 +4,7 @@
 # --- large / generated data (keep the small curated JSON, ignore bulk) ---
 data/filings/
 data/pages/
+data/index/
 data/raw/*.pdf
 # reproducible via `uv run dataset_builder/d1_pull_raw.py` (derived FinanceBench data)
 data/raw/financebench.jsonl
