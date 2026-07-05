@@ -6,6 +6,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ApiError, createRun, listCompanies, listRuns, streamRunEvents } from "../api";
+import { formatDecimal } from "../format";
 import type { CompanyChecklist, RunCard as RunCardData, RunStatus, TraceEvent, VerdictBadge } from "../types";
 import { Card, ExpanderButton, MONO, Pill, SectionLabel, selectStyle } from "../ui";
 
@@ -129,7 +130,7 @@ function RetrievalCard({ event, open, onToggle }: { event: TraceEvent; open: boo
                 <span style={{ color: "var(--accent-text)" }}>
                   {String(c.doc_name)} · p{String(c.page)}
                 </span>
-                <span>score {Number(c.score).toFixed(2)}</span>
+                <span>score {formatDecimal(Number(c.score))}</span>
               </div>
               <div style={{ fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.5 }}>{String(c.snippet ?? "")}</div>
             </div>

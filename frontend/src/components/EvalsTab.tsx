@@ -5,6 +5,7 @@
 
 import { useEffect, useState } from "react";
 import { ApiError, getEvalIterations, getEvalResults } from "../api";
+import { formatDecimal, formatPercent } from "../format";
 import type { Comparison, IterationEntry, IterationsReport, SystemMetrics } from "../types";
 import { Card, MONO } from "../ui";
 
@@ -120,7 +121,7 @@ function cellColor(cell: Cell): string {
 
 function formatCell(cell: Cell): string {
   if (cell.value == null) return "—";
-  return cell.kind === "fraction" ? `${Math.round(cell.value * 100)}%` : cell.value.toFixed(1);
+  return cell.kind === "fraction" ? formatPercent(cell.value) : formatDecimal(cell.value);
 }
 
 function MetricValue({ cell }: { cell: Cell }) {
@@ -190,8 +191,8 @@ function MetricDetailPanel({
     const diff = agentCell.value - baselineCell.value;
     const text =
       baselineCell.kind === "fraction"
-        ? `${diff >= 0 ? "+" : "−"}${Math.abs(Math.round(diff * 100))} pts`
-        : `${diff >= 0 ? "+" : "−"}${Math.abs(diff).toFixed(1)}`;
+        ? `${diff >= 0 ? "+" : "−"}${formatDecimal(Math.abs(diff * 100))} pts`
+        : `${diff >= 0 ? "+" : "−"}${formatDecimal(Math.abs(diff))}`;
     delta = {
       text,
       color: diff > 0 ? "var(--green)" : diff < 0 ? "var(--red)" : "var(--text-3)",
@@ -380,7 +381,7 @@ const TREND_COLS: TrendCol[] = [
       if (v == null) return <MonoValue text="—" color="var(--text-3)" bold={false} />;
       return (
         <div>
-          <MonoValue text={`${v.toFixed(0)}s`} color="var(--text-2)" />
+          <MonoValue text={`${formatDecimal(v)}s`} color="var(--text-2)" />
           <TrendBar ratio={ctx.maxLatency ? v / ctx.maxLatency : 0} color="var(--text-3)" />
         </div>
       );

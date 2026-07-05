@@ -14,6 +14,7 @@ import {
   runFullReview,
   streamReviewEvents,
 } from "../api";
+import { formatDecimal } from "../format";
 import type {
   Citation,
   ClaimValue,
@@ -131,20 +132,25 @@ function formatDate(ts: string): string {
 }
 
 function formatFileSize(bytes: number): string {
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${formatDecimal(bytes / (1024 * 1024))} MB`;
 }
 
 function formatClaimValue(value: ClaimValue | null | undefined): string {
   if (!value) return "-";
   const hasValue = value.value !== null && value.value !== undefined;
   if (!hasValue && !value.unit) return "-";
-  return [hasValue ? String(value.value) : null, value.unit].filter(Boolean).join(" ");
+  return [hasValue ? formatDecimal(value.value!) : null, value.unit].filter(Boolean).join(" ");
 }
 
 function payloadLabel(value: unknown): string {
   if (value === null || value === undefined || value === "") return "-";
+  if (typeof value === "number") return formatDecimal(value);
   if (Array.isArray(value)) return value.map(payloadLabel).join(", ");
-  if (typeof value === "object") return JSON.stringify(value);
+  if (typeof value === "object") {
+    return Object.entries(value)
+      .map(([key, nested]) => `${key}: ${payloadLabel(nested)}`)
+      .join(", ");
+  }
   return String(value);
 }
 
