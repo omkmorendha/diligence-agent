@@ -45,6 +45,7 @@ from .schemas import (
     CompanyChecklist,
     CreateRunRequest,
     CreateRunResponse,
+    IterativeEvalReport,
     PageResponse,
     RunCard,
     RunStatusResponse,
@@ -532,3 +533,59 @@ def get_eval_results() -> JSONResponse:
         return JSONResponse(content=json.loads(path.read_text()))
     except (json.JSONDecodeError, OSError) as exc:
         raise HTTPException(status_code=500, detail=f"corrupt results/comparison.json: {exc}") from exc
+
+
+def _iterations_dir() -> Path:
+    return config.RESULTS_DIR / "iterations"
+
+
+def _read_iteration_report(path: Path) -> IterativeEvalReport:
+    try:
+        return IterativeEvalReport.model_validate_json(path.read_text())
+    except (json.JSONDecodeError, OSError, ValueError) as exc:
+        raise HTTPException(status_code=500, detail=f"corrupt iterative eval report {path}: {exc}") from exc
+
+
+@app.get("/evals/iterations")
+def list_eval_iterations() -> list[dict[str, Any]]:
+    base = _iterations_dir()
+    if not base.exists():
+        return []
+
+    experiments: list[dict[str, Any]] = []
+    for manifest_path in sorted(base.glob("*/manifest.json"), key=lambda p: p.stat().st_mtime, reverse=True):
+        try:
+            manifest = json.loads(manifest_path.read_text())
+        except (json.JSONDecodeError, OSError):
+            continue
+        experiments.append(
+            {
+                "experiment_id": manifest.get("experiment_id", manifest_path.parent.name),
+                "status": manifest.get("status", "unknown"),
+                "created_at": manifest.get("created_at"),
+                "completed_at": manifest.get("completed_at"),
+                "model": manifest.get("model"),
+                "tool_protocol": manifest.get("tool_protocol"),
+                "run_selection": manifest.get("run_selection", {}),
+            }
+        )
+    return experiments
+
+
+@app.get("/evals/iterations/latest", response_model=IterativeEvalReport)
+def get_latest_eval_iteration() -> IterativeEvalReport:
+    path = _iterations_dir() / "latest.json"
+    if not path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="results/iterations/latest.json not found; run scripts/run_iterative_eval.py first",
+        )
+    return _read_iteration_report(path)
+
+
+@app.get("/evals/iterations/{experiment_id}", response_model=IterativeEvalReport)
+def get_eval_iteration(experiment_id: str) -> IterativeEvalReport:
+    path = _iterations_dir() / experiment_id / "latest.json"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail=f"iterative eval experiment {experiment_id!r} not found")
+    return _read_iteration_report(path)

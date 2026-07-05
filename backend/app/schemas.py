@@ -222,6 +222,87 @@ class Comparison(BaseModel):
     systems: dict[str, Any]
 
 
+# --- iterative eval analytics ----------------------------------------------
+class IterationTiming(BaseModel):
+    total_seconds: float = 0.0
+    stage_seconds: dict[str, float] = Field(default_factory=dict)
+    started_at: Optional[str] = None
+    completed_at: Optional[str] = None
+
+
+class IterationBehavior(BaseModel):
+    answer_coverage: Optional[float] = None
+    abstention_rate: Optional[float] = None
+    citations_per_answered_item: Optional[float] = None
+    retrieval_events: int = 0
+    tool_calls: int = 0
+    calculate_calls: int = 0
+    error_events: int = 0
+    c_lookup_over_retrieval_items: list[str] = Field(default_factory=list)
+
+
+class IterationRunSummary(BaseModel):
+    run_id: str
+    company: str
+    status: str
+    num_items_scored: int = 0
+    timing: IterationTiming = Field(default_factory=IterationTiming)
+    item_timing: dict[str, dict[str, Any]] = Field(default_factory=dict)
+    behavior: IterationBehavior = Field(default_factory=IterationBehavior)
+
+
+class IterationSummary(BaseModel):
+    iteration: int
+    run_ids: list[str] = Field(default_factory=list)
+    status: str = "unknown"
+    started_at: Optional[str] = None
+    completed_at: Optional[str] = None
+    metrics: dict[str, Any] = Field(default_factory=dict)
+    duration_seconds: float = 0.0
+    stage_seconds: dict[str, float] = Field(default_factory=dict)
+    behavior: dict[str, Any] = Field(default_factory=dict)
+
+
+class IterationRegressionDelta(BaseModel):
+    metric: str
+    previous: float
+    current: float
+    delta: float
+    direction: Literal["improvement", "regression", "flat"]
+
+
+class IterationRegression(BaseModel):
+    from_iteration: int
+    to_iteration: int
+    deltas: list[IterationRegressionDelta] = Field(default_factory=list)
+
+
+class MissingMetric(BaseModel):
+    metric: str
+    status: Literal["missing", "partial"]
+    reason: str
+    needed_instrumentation: str
+
+
+class IterativeEvalReport(BaseModel):
+    schema_version: str = "0.1"
+    experiment_id: str
+    created_at: str
+    system: str = "agent"
+    model: Optional[str] = None
+    tool_protocol: Optional[str] = None
+    run_selection: dict[str, Any] = Field(default_factory=dict)
+    subset: SubsetSummary
+    iterations: list[IterationSummary] = Field(default_factory=list)
+    cumulative: list[dict[str, Any]] = Field(default_factory=list)
+    overall: dict[str, Any] = Field(default_factory=dict)
+    regressions: list[IterationRegression] = Field(default_factory=list)
+    bottlenecks: dict[str, Any] = Field(default_factory=dict)
+    missing_metrics: list[MissingMetric] = Field(default_factory=list)
+    per_run: list[IterationRunSummary] = Field(default_factory=list)
+    per_item_scores: list[dict[str, Any]] = Field(default_factory=list)
+
+
 # --- section 23: API contract ----------------------------------------------
 class CompanyChecklist(BaseModel):
     """Company picker + checklist preview source for the Run tab (spec section 24).

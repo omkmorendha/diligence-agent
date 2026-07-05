@@ -34,7 +34,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 
@@ -83,6 +83,18 @@ def _discover_runs(runs_dir: Path) -> list[Path]:
     )
 
 
+def _load_trace(trace_path: Path) -> list[TraceEvent]:
+    return [
+        TraceEvent.model_validate_json(line)
+        for line in trace_path.read_text().splitlines()
+        if line.strip()
+    ]
+
+
+def _load_memo(memo_path: Path) -> Memo:
+    return Memo.model_validate_json(memo_path.read_text())
+
+
 def _fraction(scores: list[dict[str, Optional[str]]], metric: str, positive: str = "pass") -> Optional[float]:
     values = [s[metric] for s in scores if s.get(metric) is not None]
     if not values:
@@ -122,6 +134,92 @@ def _aggregate(scores: list[dict[str, Optional[str]]]) -> dict:
     }
 
 
+def _score_run_dir(run_dir: Path, subset_by_item: dict[str, SubsetItem]) -> tuple[dict[str, Any], list[dict[str, Any]], Memo, list[TraceEvent]]:
+    """Score one completed run directory and keep enough detail for iteration analytics."""
+    trace_events = _load_trace(run_dir / "trace.jsonl")
+    memo = _load_memo(run_dir / "memo.json")
+
+    per_item_scores: list[dict[str, Any]] = []
+    skipped_items: list[str] = []
+    for memo_item in memo.items:
+        subset_item = subset_by_item.get(memo_item.item_id)
+        if subset_item is None:
+            skipped_items.append(memo_item.item_id)
+            continue
+        item_score = score_run(subset_item, trace_events, memo_item)
+        per_item_scores.append(
+            {
+                "run_id": run_dir.name,
+                "company": memo.company,
+                "item_id": memo_item.item_id,
+                "question": memo_item.question,
+                "bucket": subset_item.bucket,
+                "status": memo_item.status,
+                "answer": memo_item.answer,
+                "scores": item_score,
+                # Duplicate score keys at top level so existing _aggregate can work
+                # without knowing about the richer per-item shape.
+                **item_score,
+            }
+        )
+
+    run_summary = {
+        "run_id": run_dir.name,
+        "company": memo.company,
+        "status": memo.status,
+        "created_at": memo.created_at,
+        "completed_at": memo.completed_at,
+        "items_total": memo.summary.items_total,
+        "items_answered": memo.summary.items_answered,
+        "items_abstained": memo.summary.items_abstained,
+        "citations_total": memo.summary.citations_total,
+        "calculate_calls": memo.summary.calculate_calls,
+        "num_items_scored": len(per_item_scores),
+        "skipped_items": skipped_items,
+        **_aggregate(per_item_scores),
+    }
+    return run_summary, per_item_scores, memo, trace_events
+
+
+def score_run_dirs(
+    system: str,
+    run_dirs: list[Path],
+    subset_path: Path,
+    run_judges: bool = False,
+) -> dict[str, Any]:
+    """Score an explicit set of run dirs.
+
+    This is the reusable entrypoint for iterative experiments. The legacy
+    run_system() CLI still discovers all runs under runs/ by default.
+    """
+    subset_by_item = _load_subset(subset_path)
+    per_run: list[dict[str, Any]] = []
+    per_item_scores: list[dict[str, Any]] = []
+    memo_trace_pairs: list[tuple[Memo, list[TraceEvent]]] = []
+
+    for run_dir in run_dirs:
+        run_summary, run_item_scores, memo, trace_events = _score_run_dir(run_dir, subset_by_item)
+        per_run.append(run_summary)
+        per_item_scores.extend(run_item_scores)
+        memo_trace_pairs.append((memo, trace_events))
+
+    aggregate = _aggregate(per_item_scores)
+    result: dict[str, Any] = {
+        "system": system,
+        "runs_scored": [d.name for d in run_dirs],
+        **aggregate,
+        "per_run": per_run,
+        "per_item_scores": per_item_scores,
+    }
+
+    if run_judges:
+        judge_scores = _run_judges_over(memo_trace_pairs)
+        if judge_scores is not None:
+            result.update(judge_scores)
+
+    return result
+
+
 def _run_judges_over(memo_trace_pairs: list[tuple[Memo, list[TraceEvent]]]) -> Optional[dict[str, float]]:
     """Run the LLM judges (spec section 21) over every memo item in the given runs.
 
@@ -156,7 +254,13 @@ def _run_judges_over(memo_trace_pairs: list[tuple[Memo, list[TraceEvent]]]) -> O
     }
 
 
-def run_system(system: str, runs_dir: Path, subset_path: Path, run_judges: bool = False) -> int:
+def run_system(
+    system: str,
+    runs_dir: Path,
+    subset_path: Path,
+    run_judges: bool = False,
+    run_ids: Optional[list[str]] = None,
+) -> int:
     """Score real runs/{run_id}/{trace.jsonl,memo.json} against data/subset.json."""
     if not subset_path.exists():
         print(
@@ -166,40 +270,29 @@ def run_system(system: str, runs_dir: Path, subset_path: Path, run_judges: bool 
         )
         return 1
 
-    subset_by_item = _load_subset(subset_path)
-    run_dirs = _discover_runs(runs_dir)
+    if run_ids:
+        run_dirs = [
+            runs_dir / run_id
+            for run_id in run_ids
+            if (runs_dir / run_id / "trace.jsonl").exists() and (runs_dir / run_id / "memo.json").exists()
+        ]
+        missing = sorted(set(run_ids) - {d.name for d in run_dirs})
+        for run_id in missing:
+            print(f"[eval] skipping missing/incomplete run_id={run_id}", file=sys.stderr)
+    else:
+        run_dirs = _discover_runs(runs_dir)
     if not run_dirs:
         print(f"[eval] no runs found under {runs_dir} -- nothing to score for system={system}.", file=sys.stderr)
         return 1
 
-    per_item_scores: list[dict[str, Optional[str]]] = []
-    memo_trace_pairs: list[tuple[Memo, list[TraceEvent]]] = []
-    for run_dir in run_dirs:
-        trace_events = [
-            TraceEvent.model_validate_json(line)
-            for line in (run_dir / "trace.jsonl").read_text().splitlines()
-            if line.strip()
-        ]
-        memo = Memo.model_validate_json((run_dir / "memo.json").read_text())
-        memo_trace_pairs.append((memo, trace_events))
-        for memo_item in memo.items:
-            subset_item = subset_by_item.get(memo_item.item_id)
-            if subset_item is None:
-                print(
-                    f"[eval] skipping {memo_item.item_id} in {run_dir.name}: not present in {subset_path}",
-                    file=sys.stderr,
-                )
-                continue
-            item_score = score_run(subset_item, trace_events, memo_item)
-            item_score["bucket"] = subset_item.bucket
-            per_item_scores.append(item_score)
-
-    result = {"system": system, "runs_scored": [d.name for d in run_dirs], **_aggregate(per_item_scores)}
-
-    if run_judges:
-        judge_scores = _run_judges_over(memo_trace_pairs)
-        if judge_scores is not None:
-            result.update(judge_scores)
+    scored = score_run_dirs(system, run_dirs, subset_path, run_judges=run_judges)
+    # Keep the historic results/{system}.json compact. Iterative evals persist
+    # per-run/per-item detail in results/iterations/{experiment_id}/ instead.
+    result = {
+        key: value
+        for key, value in scored.items()
+        if key not in ("per_run", "per_item_scores")
+    }
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     out_path = RESULTS_DIR / f"{system}.json"
@@ -214,6 +307,10 @@ def main() -> int:
     ap.add_argument("--fixtures", action="store_true", help="Score bundled fixtures instead of real runs.")
     ap.add_argument("--runs-dir", default=str(ROOT / "runs"), help="Override runs/ directory (real mode).")
     ap.add_argument("--subset", default=str(ROOT / "data" / "subset.json"), help="Override data/subset.json path.")
+    ap.add_argument(
+        "--run-ids",
+        help="Comma-separated run IDs to score. Omitted means every completed run in --runs-dir.",
+    )
     ap.add_argument(
         "--judges", action="store_true",
         help="Also run LLM judges (spec section 21, evals/judges.py) behind this flag. "
@@ -233,7 +330,8 @@ def main() -> int:
             status = "PASS" if calibration["passed"] else "FAIL"
             print(f"[eval] judge calibration gate: {status} (results/corrupted_memo_judge.json)", file=sys.stderr)
         return rc
-    return run_system(args.system, Path(args.runs_dir), Path(args.subset), run_judges=args.judges)
+    run_ids = [s.strip() for s in args.run_ids.split(",") if s.strip()] if args.run_ids else None
+    return run_system(args.system, Path(args.runs_dir), Path(args.subset), run_judges=args.judges, run_ids=run_ids)
 
 
 if __name__ == "__main__":

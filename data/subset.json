@@ -1047,5 +1047,494 @@
       "relative": 0.01,
       "absolute": null
     }
+  },
+  {
+    "item_id": "mgm_resorts_01",
+    "question_id": "financebench_id_03849",
+    "company": "MGM Resorts",
+    "question": "What is the FY2018 - FY2020 3 year average of capex as a % of revenue for MGM Resorts? Answer in units of percents and round to one decimal place. Please utilize information provided primarily within the statement of cash flows and the statement of income.",
+    "gold_answer": "7.9%",
+    "gold_value": 7.9,
+    "gold_unit": "percent",
+    "gold_evidence": [
+      {
+        "doc_id": "MGMRESORTS_2020_10K",
+        "doc_name": "MGMRESORTS_2020_10K",
+        "doc_type": "10k",
+        "filing_period": "FY2020",
+        "pdf_page": 65,
+        "page_label": "65",
+        "evidence_text": "MGM RESORTS INTERNATIONAL AND SUBSIDIARIES\nCONSOLIDATED STATEMENTS OF OPERATIONS\n(In thousands, except per share data)\n\n\n \nYear Ended December 31,\n \n \n \n2020\n \n \n2019\n \n \n2018\n \nRevenues\n\n\n\n\n\n\nCasino\n$\n2,871,720\n$\n6,517,759\n$\n5,753,150\nRooms\n\n830,382\n\n2,322,579\n\n2,212,573\nFoodandbeverage\n\n696,040\n\n2,145,247\n\n1,959,021\nEntertainment,retailandother\n\n518,991\n\n1,477,200\n\n1,412,860\nReimbursedcosts\n\n244,949\n\n436,887\n\n425,492\n\n\n5,162,082\n\n12,899,672\n\n11,763,096\nExpenses\n\n\n\n\n\n\nCasino\n\n1,701,783\n\n3,623,899\n\n3,199,775\nRooms\n\n419,156\n\n829,677\n\n791,761\nFoodandbeverage\n\n674,118\n\n1,661,626\n\n1,501,868\nEntertainment,retailandother\n\n412,705\n\n1,051,400\n\n999,979\nReimbursedcosts\n\n244,949\n\n436,887\n\n425,492\nGeneralandadministrative\n\n2,122,333\n\n2,101,217\n\n1,764,638\nCorporateexpense\n\n460,148\n\n464,642\n\n419,204\nPreopeningandstart-upexpenses\n\n84\n\n7,175\n\n151,392\nPropertytransactions,net\n\n93,567\n\n275,802\n\n9,147\nGainonREITtransactions,net\n\n(1,491,945)\n\n(2,677,996)\n\n\nDepreciationandamortization\n\n1,210,556\n\n1,304,649\n\n1,178,044\n\n\n5,847,454\n\n9,078,978\n\n10,441,300\nIncome from unconsolidated affiliates\n\n42,938\n\n119,521\n\n147,690\nOperating income (loss)\n\n(642,434)\n\n3,940,215\n\n1,469,486\nNon-operating income (expense)\n\n\n\n\n\n\nInterestexpense,netofamountscapitalized\n\n(676,380)\n\n(847,932)\n\n(769,513)\nNon-operatingitemsfromunconsolidatedaffiliates\n\n(103,304)\n\n(62,296)\n\n(47,827)\nOther,net\n\n(89,361)\n\n(183,262)\n\n(18,140)\n\n\n(869,045)\n\n(1,093,490)\n\n(835,480)\nIncome (loss) before income taxes\n\n(1,511,479)\n\n2,846,725\n\n634,006\nBenefit(provision)forincometaxes\n\n191,572\n\n(632,345)\n\n(50,112)\nNet income (loss)\n\n(1,319,907)\n\n2,214,380\n\n583,894\nLess:Net(income)lossattributabletononcontrollinginterests\n\n287,183\n\n(165,234)\n\n(117,122)\nNet income (loss) attributable to MGM Resorts International\n$\n(1,032,724)\n$\n2,049,146\n$\n466,772\n \n\n\n\n\n\n\nEarnings (loss) per share\n\n\n\n\n\n\nBasic\n$\n(2.02)\n$\n3.90\n$\n0.82\nDiluted\n$\n(2.02)\n$\n3.88\n$\n0.81\nWeighted average common shares outstanding\n\n\n\n\n\n\nBasic\n\n494,152\n\n524,173\n\n544,253\nDiluted\n\n494,152\n\n527,645\n\n549,536\n\n\nThe accompanying notes are an integral part of these consolidated financial statements.\n\n63"
+      },
+      {
+        "doc_id": "MGMRESORTS_2020_10K",
+        "doc_name": "MGMRESORTS_2020_10K",
+        "doc_type": "10k",
+        "filing_period": "FY2020",
+        "pdf_page": 67,
+        "page_label": "67",
+        "evidence_text": "\nMGM RESORTS INTERNATIONAL AND SUBSIDIARIES\nCONSOLIDATED STATEMENTS OF CASH FLOWS\n(In thousands)\n\n\n \nYear Ended December 31,\n \n \n \n2020\n \n \n2019\n \n \n2018\n \nCash flows from operating activities\n \n\n \n\n \n\n\nNetincome(loss)\n\n$\n(1,319,907)\n$\n2,214,380\n$\n583,894\nAdjustmentstoreconcilenetincome(loss)tonetcashprovidedby(usedin)\noperatingactivities:\n\n\n\n\n\n\n\nDepreciationandamortization\n\n\n1,210,556\n\n1,304,649\n\n1,178,044\nAmortizationofdebtdiscounts,premiumsandissuancecosts\n\n\n34,363\n\n38,972\n\n41,102\nLossonearlyretirementofdebt\n\n\n126,462\n\n198,151\n\n3,619\nProvisionforcreditlosses\n\n\n71,422\n\n39,270\n\n39,762\nStock-basedcompensation\n\n\n106,956\n\n88,838\n\n70,177\nPropertytransactions,net\n\n\n93,567\n\n275,802\n\n9,147\nGainonREITtransactions,net\n\n\n(1,491,945)\n\n(2,677,996)\n\n\nNoncashleaseexpense\n\n\n183,399\n\n71,784\n\n\nLoss(income)fromunconsolidatedaffiliates\n\n\n60,366\n\n(57,225)\n\n(96,542)\nDistributionsfromunconsolidatedaffiliates\n\n\n86,584\n\n299\n\n11,563\nDeferredincometaxes\n\n\n18,347\n\n595,046\n\n46,720\nChangeinoperatingassetsandliabilities:\n\n\n\n\n\n\n\nAccountsreceivable\n\n\n960,099\n\n(726,610)\n\n(149,554)\nInventories\n\n\n14,705\n\n6,522\n\n(7,860)\nIncometaxesreceivableandpayable,net\n\n\n(216,250)\n\n1,259\n\n14,120\nPrepaidexpensesandother\n\n\n(37)\n\n7,567\n\n(8,656)\nAccountspayableandaccruedliabilities\n\n\n(1,382,980)\n\n465,602\n\n21,508\nOther\n\n\n(48,750)\n\n(35,909)\n\n(34,505)\nNetcashprovidedby(usedin)operatingactivities\n\n\n(1,493,043)\n\n1,810,401\n\n1,722,539\nCash flows from investing activities\n \n\n\n\n\n\n\nCapitalexpenditures,netofconstructionpayable\n\n\n(270,579)\n\n(739,006)\n\n(1,486,843)\nDispositionsofpropertyandequipment\n\n\n6,136\n\n2,578\n\n25,612\nProceedsfromMandalayBayandMGMGrandLasVegastransaction\n\n\n2,455,839\n\n\n\n\nProceedsfromBellagiotransaction\n\n\n\n\n4,151,499\n\n\nProceedsfromsaleofCircusCircusLasVegasandadjacentland\n\n\n\n\n652,333\n\n\nProceedsfromsaleofbusinessunitsandinvestmentinunconsolidatedaffiliate\n\n\n\n\n\n\n163,616\nAcquisitionofNorthfield,netofcashacquired\n\n\n\n\n\n\n(1,034,534)\nAcquisitionofEmpireCityCasino,netofcashacquired\n\n\n\n\n(535,681)\n\n\nInvestmentsinunconsolidatedaffiliates\n\n\n(96,925)\n\n(81,877)\n\n(56,295)\nDistributionsfromunconsolidatedaffiliates\n\n\n63,960\n\n100,700\n\n322,631\nOther\n\n\n873\n\n(31,112)\n\n(17,208)\nNetcashprovidedby(usedin)investingactivities\n\n\n2,159,304\n\n3,519,434\n\n(2,083,021)\nCash flows from financing activities\n \n\n\n\n\n\n\nNetborrowings(repayments)underbankcreditfacilitiesmaturitiesof\n90daysorless\n\n\n(1,595,089)\n\n(3,634,049)\n\n1,242,259\nIssuanceoflong-termdebt\n\n\n3,550,000\n\n3,250,000\n\n1,000,000\nRetirementofseniornotes\n\n\n(846,815)\n\n(3,764,167)\n\n(2,265)\nDebtissuancecosts\n\n\n(62,348)\n\n(63,391)\n\n(76,519)\nProceedsfromissuanceofbridgeloanfacility\n\n\n1,304,625\n\n\n\n\nIssuanceofMGMGrowthPropertiesClassAshares,net\n\n\n524,704\n\n1,250,006\n\n\nDividendspaidtocommonshareholders\n\n\n(77,606)\n\n(271,288)\n\n(260,592)\nDistributionstononcontrollinginterestowners\n\n\n(286,385)\n\n(223,303)\n\n(184,932)\nPurchasesofcommonstock\n\n\n(353,720)\n\n(1,031,534)\n\n(1,283,333)\nOther\n\n\n(53,939)\n\n(41,868)\n\n(45,384)\nNetcashprovidedby(usedin)financingactivities\n\n\n2,103,427\n\n(4,529,594)\n\n389,234\nEffect of exchange rate on cash\n\n\n2,345\n\n2,601\n\n(1,985)\nCash and cash equivalents\n \n\n\n\n\n\n\nNetincreasefortheperiod\n\n\n2,772,033\n\n802,842\n\n26,767\nBalance,beginningofperiod\n\n\n2,329,604\n\n1,526,762\n\n1,499,995\nBalance,endofperiod\n\n$\n5,101,637\n$\n2,329,604\n$\n1,526,762\nSupplemental cash flow disclosures\n \n\n\n\n\n\n\nInterestpaid,netofamountscapitalized\n\n$\n639,718\n$\n826,970\n$\n723,609\nFederal,stateandforeignincometaxespaid(refundsreceived),net\n\n\n8,543\n\n28,493\n\n(10,100)\nNon-cash investing and financing activities\n \n\n\n\n\n\n\nNotereceivablerelatedtosaleofCircusCircusLasVegasandadjacentland\n\n$\n\n$\n133,689\n$\n\nInvestmentinBellagioBREITVenture\n\n\n\n\n62,133\n\n\nInvestmentinMGPBREITVenture\n\n\n802,000\n\n\n\n\nMGPBREITVentureassumptionofbridgeloanfacility\n\n\n1,304,625\n\n\n\n\n\n\nThe accompanying notes are an integral part of these consolidated financial statements.\n65"
+      }
+    ],
+    "bucket": "A_multi_input",
+    "expected_formula": "(capex_2018/revenue_2018 + capex_2019/revenue_2019 + capex_2020/revenue_2020) / 3",
+    "expected_inputs": [
+      "Capex 2018",
+      "Capex 2019",
+      "Capex 2020",
+      "Revenue 2018",
+      "Revenue 2019",
+      "Revenue 2020"
+    ],
+    "predicted_baseline_failure": true,
+    "answer_verifiable_from_evidence": true,
+    "unit_or_period_ambiguity": false,
+    "demo_candidate": true,
+    "human_reviewed": false,
+    "tolerance": {
+      "relative": 0.01,
+      "absolute": null
+    }
+  },
+  {
+    "item_id": "mgm_resorts_02",
+    "question_id": "financebench_id_00407",
+    "company": "MGM Resorts",
+    "question": "Which type of debt received the largest investment among the short term investments for MGM in H1 FY2023?",
+    "gold_answer": "the biggest short term investment is in corporate bonds (almost 82% of the total investment)",
+    "gold_value": null,
+    "gold_unit": "text",
+    "gold_evidence": [
+      {
+        "doc_id": "MGMRESORTS_2023Q2_10Q",
+        "doc_name": "MGMRESORTS_2023Q2_10Q",
+        "doc_type": "10q",
+        "filing_period": "2023Q2",
+        "pdf_page": 11,
+        "page_label": "11",
+        "evidence_text": "Fair value level\nJune 30, 2023\nDecember 31, 2022\n(In thousands)\nCash and cash equivalents:\nMoney market funds\nLevel 1\n$\n2,195 \n$\n12,009 \nCommercial paper and certificates of deposit\nLevel 2\n \n5,992 \nCash and cash equivalents\n2,195 \n18,001 \nShort-term investments:\nU.S. government securities\nLevel 1\n57,696 \n56,835 \nU.S. agency securities\nLevel 2\n29,049 \n9,530 \nCommercial paper and certificates of deposit\nLevel 2\n4,561 \n4,466 \nCorporate bonds\nLevel 2\n416,420 \n213,875 \nShort-term investments\n507,726 \n284,706 \nTotal debt investments\n$\n509,921 \n$\n302,707"
+      }
+    ],
+    "bucket": "C_lookup",
+    "expected_formula": null,
+    "expected_inputs": [
+      "Corporate bonds amount (in thousands)",
+      "U.S. government securities amount (in thousands)",
+      "U.S. agency securities amount (in thousands)",
+      "Commercial paper and certificates of deposit amount (in thousands)"
+    ],
+    "predicted_baseline_failure": false,
+    "answer_verifiable_from_evidence": true,
+    "unit_or_period_ambiguity": false,
+    "demo_candidate": false,
+    "human_reviewed": false,
+    "tolerance": {
+      "relative": 0.01,
+      "absolute": null
+    }
+  },
+  {
+    "item_id": "mgm_resorts_03",
+    "question_id": "financebench_id_01254",
+    "company": "MGM Resorts",
+    "question": "Has MGM Resorts paid dividends to common shareholders in FY2022?",
+    "gold_answer": "Yes. MGM maintained 0.01$ per share annual dividend through out FY 2022.",
+    "gold_value": null,
+    "gold_unit": "text",
+    "gold_evidence": [
+      {
+        "doc_id": "MGMRESORTS_2022_10K",
+        "doc_name": "MGMRESORTS_2022_10K",
+        "doc_type": "10k",
+        "filing_period": "FY2022",
+        "pdf_page": 32,
+        "page_label": "32",
+        "evidence_text": ". We maintained an annual\ndividend of $0.01 per share throughout 2022."
+      }
+    ],
+    "bucket": "C_lookup",
+    "expected_formula": null,
+    "expected_inputs": [
+      "$0.01 per share"
+    ],
+    "predicted_baseline_failure": false,
+    "answer_verifiable_from_evidence": true,
+    "unit_or_period_ambiguity": false,
+    "demo_candidate": false,
+    "human_reviewed": false,
+    "tolerance": {
+      "relative": 0.01,
+      "absolute": null
+    }
+  },
+  {
+    "item_id": "mgm_resorts_04",
+    "question_id": "financebench_id_04171",
+    "company": "MGM Resorts",
+    "question": "Basing your judgments off of the balance sheet, what is the year end FY2018 amount of accounts payable for MGM Resorts? Answer in USD millions.",
+    "gold_answer": "$303.00",
+    "gold_value": 303.0,
+    "gold_unit": "USD millions",
+    "gold_evidence": [
+      {
+        "doc_id": "MGMRESORTS_2018_10K",
+        "doc_name": "MGMRESORTS_2018_10K",
+        "doc_type": "10k",
+        "filing_period": "FY2018",
+        "pdf_page": 57,
+        "page_label": "57",
+        "evidence_text": "MGMRESORTSINTERNATIONALANDSUBSIDIARIES\nCONSOLIDATEDBALANCESHEETS\n(Inthousands,exceptsharedata)\n \n \n\nDecember31,\n\n\n\n2018\n\n\n2017\n\nASSETS\n\nCurrentassets\n \n \n \n \nCash and cash equivalents\n $\n1,526,762 \n $\n1,499,995 \nAccounts receivable, net\n \n657,206 \n \n542,273 \nInventories\n \n110,831 \n \n102,292 \nIncome tax receivable\n \n28,431 \n \n42,551 \nPrepaid expenses and other\n \n203,548 \n \n189,244 \nTotal current assets\n \n2,526,778 \n \n2,376,355 \n \n \n \n \n \nPropertyandequipment,net\n \n20,729,888 \n \n19,635,459 \n \n \n \n \n \nOtherassets\n \n \n \n \nInvestments in and advances to unconsolidated affiliates\n \n732,867 \n \n1,033,297 \nGoodwill\n \n1,821,392 \n \n1,806,531 \nOther intangible assets, net\n \n3,944,463 \n \n3,877,960 \nOther long-term assets, net\n \n455,318 \n \n430,440 \nTotal other assets\n \n6,954,040 \n \n7,148,228 \n \n $\n30,210,706 \n $\n29,160,042 \nLIABILITIESANDSTOCKHOLDERS'EQUITY\n\nCurrentliabilities\n \n \n \n \nAccounts payable\n $\n302,578 \n $\n255,028 \nConstruction payable\n \n311,793 \n \n474,807 \nCurrent portion of long-term debt\n \n43,411 \n \n158,042 \nAccrued interest on long-term debt\n \n140,046 \n \n135,785 \nOther accrued liabilities\n \n2,151,054 \n \n2,114,635 \nTotal current liabilities\n \n2,948,882 \n \n3,138,297 \n \n \n \n \n \nDeferredincometaxes,net\n \n1,342,538 \n \n1,295,375 \nLong-termdebt,net\n \n15,088,005 \n \n12,751,052 \nOtherlong-termobligations\n \n259,240 \n \n284,416 \nCommitmentsandcontingencies(Note11)\n \n \n \n \nRedeemablenoncontrollinginterests\n \n102,250 \n \n79,778 \nStockholders'equity\n \n \n \n \nCommon stock, $.01 par value: authorized 1,000,000,000 shares, issued and\n outstanding 527,479,528 and 566,275,789 shares\n \n5,275 \n \n5,663 \nCapital in excess of par value\n \n4,092,085 \n \n5,357,709 \nRetained earnings\n \n2,423,479 \n \n2,217,299 \nAccumulated other comprehensive loss\n \n(8,556)\n \n(3,610)\nTotal MGM Resorts International stockholders' equity\n \n6,512,283 \n \n7,577,061 \nNoncontrolling interests\n \n3,957,508 \n \n4,034,063 \nTotal stockholders' equity\n \n10,469,791 \n \n11,611,124 \n \n $\n30,210,706 \n $\n29,160,042\n \n \nTheaccompanyingnotesareanintegralpartoftheseconsolidatedfinancialstatements.\n \n \n55"
+      }
+    ],
+    "bucket": "C_lookup",
+    "expected_formula": null,
+    "expected_inputs": [
+      "Accounts payable (2018) = 302,578 (in thousands)"
+    ],
+    "predicted_baseline_failure": false,
+    "answer_verifiable_from_evidence": true,
+    "unit_or_period_ambiguity": false,
+    "demo_candidate": false,
+    "human_reviewed": false,
+    "tolerance": {
+      "relative": 0.01,
+      "absolute": null
+    }
+  },
+  {
+    "item_id": "mgm_resorts_05",
+    "question_id": "financebench_id_00382",
+    "company": "MGM Resorts",
+    "question": "Which region had the Highest EBITDAR Contribution for MGM during FY2022?",
+    "gold_answer": "Las Vegas resorts contributed ~90% of company level EBITDAR during FY2022.",
+    "gold_value": null,
+    "gold_unit": "text",
+    "gold_evidence": [
+      {
+        "doc_id": "MGMRESORTS_2022Q4_EARNINGS",
+        "doc_name": "MGMRESORTS_2022Q4_EARNINGS",
+        "doc_type": "other",
+        "filing_period": "2022Q4",
+        "pdf_page": 13,
+        "page_label": "13",
+        "evidence_text": "dited) \n \nThree months ended \n \nTwelve months ended \n \nDecember 31, \n2022 \n \nDecember 31, \n2021 \n \nDecember 31, \n2022 \n \nDecember 31, \n2021 \nLas Vegas Strip Resorts \n$ \n877,052 $ \n698,739 $ \n3,142,308 $ \n1,738,211 \nRegional Operations \n \n319,517 \n309,250 \n1,294,630 \n1,217,814 \nMGM China \n \n(54,979) \n5,015 \n(203,136) \n25,367 \nUnconsolidated affiliates(1) \n \n(43,029) \n(49,698) \n(222,079) \n(131,590) \nManagement and other operations \n \n(3,037) \n2,087 \n \n(11,934) \n15,766 \nStock compensation \n \n(25,159) \n(26,494) \n(71,297) \n(63,984) \nCorporate(2) \n \n(113,058) \n(117,491) \n(431,238) \n(380,501) \n \n$ \n957,307 \n $ \n3,497,254"
+      }
+    ],
+    "bucket": "B_judgment",
+    "expected_formula": "max(EBITDAR by region)",
+    "expected_inputs": [
+      "Las Vegas Strip Resorts EBITDAR FY2022",
+      "Regional Operations EBITDAR FY2022",
+      "MGM China EBITDAR FY2022",
+      "Unconsolidated affiliates EBITDAR FY2022",
+      "Management and other operations EBITDAR FY2022",
+      "Corporate EBITDAR FY2022"
+    ],
+    "predicted_baseline_failure": true,
+    "answer_verifiable_from_evidence": true,
+    "unit_or_period_ambiguity": false,
+    "demo_candidate": false,
+    "human_reviewed": false,
+    "tolerance": {
+      "relative": 0.01,
+      "absolute": null
+    }
+  },
+  {
+    "item_id": "mgm_resorts_06",
+    "question_id": "financebench_id_01912",
+    "company": "MGM Resorts",
+    "question": "Which region had the worst topline performance for MGM during FY2022?",
+    "gold_answer": "MGM China experienced the worst topline performance amongst the other regions presented. Its revenue declined 44% in FY2022 whereas the other regions presented increased their revenues.",
+    "gold_value": null,
+    "gold_unit": "text",
+    "gold_evidence": [
+      {
+        "doc_id": "MGMRESORTS_2022Q4_EARNINGS",
+        "doc_name": "MGMRESORTS_2022Q4_EARNINGS",
+        "doc_type": "other",
+        "filing_period": "2022Q4",
+        "pdf_page": 3,
+        "page_label": "3",
+        "evidence_text": "Las Vegas Strip Resorts \n \n \nNet revenues of $8.4 billion in the current year compared to $4.7 billion in the prior year, an \nincrease of 77%;"
+      },
+      {
+        "doc_id": "MGMRESORTS_2022Q4_EARNINGS",
+        "doc_name": "MGMRESORTS_2022Q4_EARNINGS",
+        "doc_type": "other",
+        "filing_period": "2022Q4",
+        "pdf_page": 4,
+        "page_label": "4",
+        "evidence_text": "Regional Operations \n \n \nNet revenues of $3.8 billion in the current year compared to $3.4 billion in the prior year, an \nincrease of 12%;"
+      },
+      {
+        "doc_id": "MGMRESORTS_2022Q4_EARNINGS",
+        "doc_name": "MGMRESORTS_2022Q4_EARNINGS",
+        "doc_type": "other",
+        "filing_period": "2022Q4",
+        "pdf_page": 4,
+        "page_label": "4",
+        "evidence_text": "MGM China \n \n \nNet revenues of $674 million in the current year compared to $1.2 billion in the prior year, a \ndecrease of 44%;"
+      }
+    ],
+    "bucket": "B_judgment",
+    "expected_formula": "compare revenue change percentages across regions and select the one with the largest negative change",
+    "expected_inputs": [
+      "Las Vegas Strip Resorts revenue change",
+      "Regional Operations revenue change",
+      "MGM China revenue change"
+    ],
+    "predicted_baseline_failure": true,
+    "answer_verifiable_from_evidence": true,
+    "unit_or_period_ambiguity": false,
+    "demo_candidate": false,
+    "human_reviewed": false,
+    "tolerance": {
+      "relative": 0.01,
+      "absolute": null
+    }
+  },
+  {
+    "item_id": "adobe_01",
+    "question_id": "financebench_id_00438",
+    "company": "Adobe",
+    "question": "Does Adobe have an improving operating margin profile as of FY2022? If operating margin is not a useful metric for a company like this, then state that and explain why.",
+    "gold_answer": "No the operating margins of Adobe have recently declined from 36.8% in FY 2021 to 34.6% in FY2022. A drop by 2.2% in a year.",
+    "gold_value": null,
+    "gold_unit": "text",
+    "gold_evidence": [
+      {
+        "doc_id": "ADOBE_2022_10K",
+        "doc_name": "ADOBE_2022_10K",
+        "doc_type": "10k",
+        "filing_period": "FY2022",
+        "pdf_page": 54,
+        "page_label": "54",
+        "evidence_text": "ADOBE INC.\nCONSOLIDATED STATEMENTS OF INCOME\n(In millions, except per share data)\n \nYears Ended\n \nDecember 2,\n2022\nDecember 3,\n2021\nNovember 27,\n2020\nRevenue:\n \nSubscription\n$ \n16,388 $ \n14,573 $ \n11,626 \nProduct\n \n532 \n555 \n507 \nServices and other\n \n686 \n657 \n735 \nTotal revenue\n \n17,606 \n15,785 \n12,868 \n \nCost of revenue:\nSubscription\n \n1,646 \n1,374 \n1,108 \nProduct\n \n35 \n41 \n36 \nServices and other\n \n484 \n450 \n578 \nTotal cost of revenue\n \n2,165 \n1,865 \n1,722 \n \nGross profit\n \n15,441 \n13,920 \n11,146 \n \nOperating expenses:\nResearch and development\n \n2,987 \n2,540 \n2,188 \nSales and marketing\n \n4,968 \n4,321 \n3,591 \nGeneral and administrative\n \n1,219 \n1,085 \n968 \nAmortization of intangibles\n \n169 \n172 \n162 \nTotal operating expenses\n \n9,343 \n8,118 \n6,909 \n \nOperating income\n \n6,098 \n5,802 \n4,237"
+      }
+    ],
+    "bucket": "A_multi_input",
+    "expected_formula": "Operating margin = Operating income \u00f7 Total revenue; compute for FY2022 and FY2021 and compare.",
+    "expected_inputs": [
+      "Operating income FY2022",
+      "Total revenue FY2022",
+      "Operating income FY2021",
+      "Total revenue FY2021"
+    ],
+    "predicted_baseline_failure": true,
+    "answer_verifiable_from_evidence": true,
+    "unit_or_period_ambiguity": false,
+    "demo_candidate": true,
+    "human_reviewed": false,
+    "tolerance": {
+      "relative": 0.01,
+      "absolute": null
+    }
+  },
+  {
+    "item_id": "adobe_02",
+    "question_id": "financebench_id_00591",
+    "company": "Adobe",
+    "question": "Does Adobe have an improving Free cashflow conversion as of FY2022?",
+    "gold_answer": "Yes, the FCF conversion (using net income as the denominator) for Adobe has improved by ~13% from 143% in 2021 to 156% in 2022",
+    "gold_value": null,
+    "gold_unit": "text",
+    "gold_evidence": [
+      {
+        "doc_id": "ADOBE_2022_10K",
+        "doc_name": "ADOBE_2022_10K",
+        "doc_type": "10k",
+        "filing_period": "FY2022",
+        "pdf_page": 57,
+        "page_label": "57",
+        "evidence_text": "ADOBE INC.\n CONSOLIDATED STATEMENTS OF CASH FLOWS\n(In millions)\n \nYears Ended\n \nDecember 2,\n2022\nDecember 3,\n2021\nNovember 27,\n2020\nCash flows from operating activities:\n \n \nNet income\n$ \n4,756 \n$ \n4,822 \n$ \n5,260 \nAdjustments to reconcile net income to net cash provided by operating activities:\nDepreciation, amortization and accretion\n \n856 \n \n788 \n \n757 \nStock-based compensation\n \n1,440 \n \n1,069 \n \n909 \nReduction of operating lease right-of-use assets\n \n83 \n \n73 \n \n87 \nDeferred income taxes\n \n328 \n \n183 \n \n(1,501) \nUnrealized losses (gains) on investments, net\n \n29 \n \n(4) \n(11) \nOther non-cash items\n \n10 \n \n7 \n \n40 \nChanges in operating assets and liabilities, net of acquired assets and \n assumed liabilities:\nTrade receivables, net\n \n(198) \n(430) \n106 \nPrepaid expenses and other assets\n \n(94) \n(475) \n(288) \nTrade payables\n \n66 \n \n(20) \n96 \nAccrued expenses and other liabilities\n \n7 \n \n162 \n \n86 \nIncome taxes payable\n \n19 \n \n2 \n \n(72) \nDeferred revenue\n \n536 \n \n1,053 \n \n258 \nNet cash provided by operating activities\n \n7,838 \n \n7,230 \n \n5,727 \nCash flows from investing activities:\n \n \nPurchases of short-term investments\n \n(909) \n(1,533) \n(1,071) \nMaturities of short-term investments\n \n683 \n \n877 \n \n915 \nProceeds from sales of short-term investments\n \n270 \n \n191 \n \n167 \nAcquisitions, net of cash acquired\n \n(126) \n(2,682) \n \nPurchases of property and equipment\n \n(442) \n(348) \n(419) \nPurchases of long-term investments, intangibles and other assets\n \n(46) \n(42) \n(15) \nProceeds from sales of long-term investments and other assets\n \n \n \n \n \n9 \nNet cash used for investing activities\n \n(570) \n(3,537) \n(414)"
+      }
+    ],
+    "bucket": "A_multi_input",
+    "expected_formula": "FCF = operating cash flow - capex; conversion = FCF / net income; compare 2022 vs 2021",
+    "expected_inputs": [
+      "Operating cash flow 2022",
+      "Operating cash flow 2021",
+      "Capex 2022",
+      "Capex 2021",
+      "Net income 2022",
+      "Net income 2021"
+    ],
+    "predicted_baseline_failure": true,
+    "answer_verifiable_from_evidence": true,
+    "unit_or_period_ambiguity": false,
+    "demo_candidate": true,
+    "human_reviewed": false,
+    "tolerance": {
+      "relative": 0.01,
+      "absolute": null
+    }
+  },
+  {
+    "item_id": "adobe_03",
+    "question_id": "financebench_id_03856",
+    "company": "Adobe",
+    "question": "What is the FY2017 operating cash flow ratio for Adobe? Operating cash flow ratio is defined as: cash from operations / total current liabilities. Round your answer to two decimal places. Please utilize information provided primarily within the balance sheet and the cash flow statement.",
+    "gold_answer": "0.83",
+    "gold_value": 0.83,
+    "gold_unit": "ratio",
+    "gold_evidence": [
+      {
+        "doc_id": "ADOBE_2017_10K",
+        "doc_name": "ADOBE_2017_10K",
+        "doc_type": "10k",
+        "filing_period": "FY2017",
+        "pdf_page": 57,
+        "page_label": "57",
+        "evidence_text": "Table of Contents\n57\n ADOBE SYSTEMS INCORPORATED\n CONSOLIDATED BALANCE SHEETS\n(In thousands, except par value)\n \nDecember 1,\n2017\nDecember 2,\n2016\nASSETS\nCurrent assets:\n \n \nCash and cash equivalents\n$\n2,306,072\n$\n1,011,315\nShort-term investments\n3,513,702\n3,749,985\nTrade receivables, net of allowances for doubtful accounts of $9,151 and $6,214, respectively\n1,217,968\n833,033\nPrepaid expenses and other current assets\n210,071\n245,441\nTotal current assets\n7,247,813\n5,839,774\nProperty and equipment, net\n936,976\n816,264\nGoodwill\n5,821,561\n5,406,474\nPurchased and other intangibles, net\n385,658\n414,405\nInvestment in lease receivable\n\n80,439\nOther assets\n143,548\n139,890\nTotal assets\n$\n14,535,556\n$\n12,697,246\nLIABILITIES AND STOCKHOLDERS EQUITY\nCurrent liabilities:\n \n \nTrade payables\n$\n113,538\n$\n88,024\nAccrued expenses\n993,773\n739,630\nIncome taxes payable\n14,196\n38,362\nDeferred revenue\n2,405,950\n1,945,619\nTotal current liabilities\n3,527,457\n2,811,635\nLong-term liabilities:\nDebt and capital lease obligations\n1,881,421\n1,892,200\nDeferred revenue\n88,592\n69,131\nIncome taxes payable\n173,088\n184,381\nDeferred income taxes\n279,941\n217,660\nOther liabilities\n125,188\n97,404\nTotal liabilities\n6,075,687\n5,272,411\nCommitments and contingencies\nStockholders equity:\n \n \nPreferred stock, $0.0001 par value; 2,000 shares authorized; none issued\n\n\nCommon stock, $0.0001 par value; 900,000 shares authorized; 600,834 shares issued; \n 491,262 and 494,254 shares outstanding, respectively\n61\n61\nAdditional paid-in-capital\n5,082,195\n4,616,331\nRetained earnings\n9,573,870\n8,114,517\nAccumulated other comprehensive income (loss)\n(111,821)\n(173,602)\nTreasury stock, at cost (109,572 and 106,580 shares, respectively), net of reissuances\n(6,084,436)\n(5,132,472)\nTotal stockholders equity\n8,459,869\n7,424,835\nTotal liabilities and stockholders equity\n$\n14,535,556\n$\n12,697,246\nSee accompanying Notes to Consolidated Financial Statements."
+      },
+      {
+        "doc_id": "ADOBE_2017_10K",
+        "doc_name": "ADOBE_2017_10K",
+        "doc_type": "10k",
+        "filing_period": "FY2017",
+        "pdf_page": 61,
+        "page_label": "61",
+        "evidence_text": "Table of Contents\n61\nADOBE SYSTEMS INCORPORATED\n CONSOLIDATED STATEMENTS OF CASH FLOWS\n(In thousands)\n \nYears Ended\n \nDecember 1,\n2017\nDecember 2,\n2016\nNovember 27,\n2015\nCash flows from operating activities:\n \n \nNet income\n$\n1,693,954\n$\n1,168,782\n$\n629,551\nAdjustments to reconcile net income to net cash provided by operating activities:\nDepreciation, amortization and accretion\n325,997\n331,535\n339,473\nStock-based compensation\n451,451\n349,912\n335,859\nDeferred income taxes\n51,605\n24,222\n(69,657)\nGain on the sale of property\n\n\n(21,415)\nUnrealized (gains) losses on investments\n(5,494)\n3,145\n(9,210)\nExcess tax benefits from stock-based compensation\n\n(75,105)\n(68,153)\nOther non-cash items\n4,625\n2,022\n1,216\nChanges in operating assets and liabilities, net of acquired assets and\n assumed liabilities:\nTrade receivables, net\n(187,173)\n(160,416)\n(79,502)\nPrepaid expenses and other current assets\n28,040\n(71,021)\n(7,701)\nTrade payables\n(45,186)\n(6,281)\n22,870\nAccrued expenses\n154,125\n64,978\n(22,564)\nIncome taxes payable\n(34,493)\n43,115\n97,934\nDeferred revenue\n475,402\n524,840\n320,801\nNet cash provided by operating activities\n2,912,853\n2,199,728\n1,469,502\nCash flows from investing activities:\n \n \nPurchases of short-term investments\n(1,931,011)\n(2,285,222)\n(2,064,833)\nMaturities of short-term investments\n759,737\n769,228\n371,790\nProceeds from sales of short-term investments\n1,393,929\n860,849\n1,176,476\nAcquisitions, net of cash acquired\n(459,626)\n(48,427)\n(826,004)\nPurchases of property and equipment\n(178,122)\n(203,805)\n(184,936)\nProceeds from sale of property\n\n\n57,779\nPurchases of long-term investments, intangibles and other assets\n(29,918)\n(58,433)\n(22,779)\nProceeds from sale of long-term investments\n2,134\n5,777\n4,149\nNet cash used for investing activities\n(442,877)\n(960,033)\n(1,488,358)\nCash flows from financing activities:\n \n \nPurchases of treasury stock\n(1,100,000)\n(1,075,000)\n(625,000)\nProceeds from issuance of treasury stock\n158,351\n145,697\n164,270\nTaxes paid related to net share settlement of equity awards\n(240,126)\n(236,400)\n(186,373)\nExcess tax benefits from stock-based compensation\n\n75,105\n68,153\nProceeds from debt issuance\n\n\n989,280\nRepayment of debt and capital lease obligations\n(1,960)\n(108)\n(602,189)\nDebt issuance costs\n\n\n(8,828)\nNet cash used for financing activities\n(1,183,735)\n(1,090,706)\n(200,687)\nEffect of foreign currency exchange rates on cash and cash equivalents\n8,516\n(14,234)\n(21,297)\nNet increase (decrease) in cash and cash equivalents\n1,294,757\n134,755\n(240,840)\nCash and cash equivalents at beginning of year\n1,011,315\n876,560\n1,117,400\nCash and cash equivalents at end of year\n$\n2,306,072\n$\n1,011,315\n$\n876,560\nSupplemental disclosures:\n \nCash paid for income taxes, net of refunds\n$\n396,668\n$\n249,884\n$\n203,010\nCash paid for interest\n$\n69,430\n$\n66,193\n$\n56,014\nNon-cash investing activities:\nInvestment in lease receivable applied to building purchase\n$\n80,439\n$\n\n$\n\nIssuance of common stock and stock awards assumed in business acquisitions\n$\n10,348\n$\n\n$\n677\nSee accompanying Notes to Consolidated Financial Statements."
+      }
+    ],
+    "bucket": "A_multi_input",
+    "expected_formula": "cash from operations / total current liabilities",
+    "expected_inputs": [
+      "cash from operations",
+      "total current liabilities"
+    ],
+    "predicted_baseline_failure": true,
+    "answer_verifiable_from_evidence": true,
+    "unit_or_period_ambiguity": false,
+    "demo_candidate": true,
+    "human_reviewed": false,
+    "tolerance": {
+      "relative": 0.01,
+      "absolute": null
+    }
+  },
+  {
+    "item_id": "adobe_04",
+    "question_id": "financebench_id_04735",
+    "company": "Adobe",
+    "question": "You are an investment banker and your only resource(s) to answer the following question is (are): the statement of financial position and the cash flow statement. Here's the question: what is the FY2015 operating cash flow ratio for Adobe? Operating cash flow ratio is defined as: cash from operations / total current liabilities. Round your answer to two decimal places.",
+    "gold_answer": "0.66",
+    "gold_value": 0.66,
+    "gold_unit": "ratio",
+    "gold_evidence": [
+      {
+        "doc_id": "ADOBE_2015_10K",
+        "doc_name": "ADOBE_2015_10K",
+        "doc_type": "10k",
+        "filing_period": "FY2015",
+        "pdf_page": 59,
+        "page_label": "59",
+        "evidence_text": "59\n ADOBE SYSTEMS INCORPORATED\n CONSOLIDATED BALANCE SHEETS\n(In thousands, except par value)\n \nNovember 27,\n2015\nNovember 28,\n2014\nASSETS\nCurrent assets:\n \n \nCash and cash equivalents.................................................................................................................... $\n876,560\n$\n1,117,400\nShort-term investments ........................................................................................................................\n3,111,524\n2,622,091\nTrade receivables, net of allowances for doubtful accounts of $7,293 and $7,867, respectively........\n672,006\n591,800\nDeferred income taxes..........................................................................................................................\n\n95,279\nPrepaid expenses and other current assets ...........................................................................................\n161,802\n175,758\nTotal current assets..........................................................................................................................\n4,821,892\n4,602,328\nProperty and equipment, net...................................................................................................................\n787,421\n785,123\nGoodwill .................................................................................................................................................\n5,366,881\n4,721,962\nPurchased and other intangibles, net.......................................................................................................\n510,007\n469,662\nInvestment in lease receivable................................................................................................................\n80,439\n80,439\nOther assets.............................................................................................................................................\n159,832\n126,315\nTotal assets...................................................................................................................................... $\n11,726,472\n$\n10,785,829\nLIABILITIES AND STOCKHOLDERS EQUITY\nCurrent liabilities:\n \n \nTrade payables...................................................................................................................................... $\n93,307\n$\n68,377\nAccrued expenses.................................................................................................................................\n678,364\n683,866\nDebt and capital lease obligations........................................................................................................\n\n603,229\nAccrued restructuring...........................................................................................................................\n1,520\n17,120\nIncome taxes payable...........................................................................................................................\n6,165\n23,920\nDeferred revenue..................................................................................................................................\n1,434,200\n1,097,923\nTotal current liabilities....................................................................................................................\n2,213,556\n2,494,435\nLong-term liabilities:\n \n \nDebt and capital lease obligations........................................................................................................\n1,907,231\n911,086\nDeferred revenue..................................................................................................................................\n51,094\n57,401\nAccrued restructuring...........................................................................................................................\n3,214\n5,194\nIncome taxes payable...........................................................................................................................\n256,129\n125,746\nDeferred income taxes..........................................................................................................................\n208,209\n342,315\nOther liabilities.....................................................................................................................................\n85,459\n73,747\nTotal liabilities................................................................................................................................\n4,724,892\n4,009,924\nCommitments and contingencies\nStockholders equity:\n \n \nPreferred stock, $0.0001 par value; 2,000 shares authorized; none issued..........................................\n\n\nCommon stock, $0.0001 par value; 900,000 shares authorized; 600,834 shares issued; \n 497,809 and 497,484 shares outstanding, respectively......................................................................\n61\n61\nAdditional paid-in-capital ....................................................................................................................\n4,184,883\n3,778,495\nRetained earnings.................................................................................................................................\n7,253,431\n6,924,294\nAccumulated other comprehensive income (loss) ...............................................................................\n(169,080)\n(8,094)\nTreasury stock, at cost (103,025 and 103,350 shares, respectively), net of reissuances......................\n(4,267,715)\n(3,918,851)\nTotal stockholders equity...............................................................................................................\n7,001,580\n6,775,905\nTotal liabilities and stockholders equity........................................................................................ $\n11,726,472\n$\n10,785,829\nSee accompanying Notes to Consolidated Financial Statements."
+      },
+      {
+        "doc_id": "ADOBE_2015_10K",
+        "doc_name": "ADOBE_2015_10K",
+        "doc_type": "10k",
+        "filing_period": "FY2015",
+        "pdf_page": 63,
+        "page_label": "63",
+        "evidence_text": "63\nADOBE SYSTEMS INCORPORATED\n CONSOLIDATED STATEMENTS OF CASH FLOWS\n(In thousands)\n \nYears Ended\n \nNovember 27,\n2015\nNovember 28,\n2014\nNovember 29,\n2013\nCash flows from operating activities:\n \n \nNet income..................................................................................................................... $\n629,551\n$\n268,395\n$\n289,985\nAdjustments to reconcile net income to net cash provided by operating activities:\nDepreciation, amortization and accretion.................................................................\n339,473\n313,590\n321,227\nStock-based compensation .......................................................................................\n335,859\n333,701\n328,987\nDeferred income taxes..............................................................................................\n(69,657)\n(26,089)\n29,704\nGain on the sale of property .....................................................................................\n(21,415)\n\n\nWrite down of assets held for sale............................................................................\n\n\n23,151\nUnrealized (gains) losses on investments.................................................................\n(9,210)\n(74)\n5,665\nTax benefit from stock-based compensation............................................................\n68,133\n53,225\n25,290\nExcess tax benefits from stock-based compensation................................................\n(68,153)\n(53,235)\n(40,619)\nOther non-cash items................................................................................................\n1,216\n1,889\n5,654\nChanges in operating assets and liabilities, net of acquired assets and\n assumed liabilities:\nTrade receivables, net ............................................................................................\n(79,502)\n7,928\n33,649\nPrepaid expenses and other current assets .............................................................\n(7,701)\n(1,918)\n(55,509)\nTrade payables .......................................................................................................\n22,870\n6,211\n7,132\nAccrued expenses...................................................................................................\n(5,944)\n37,544\n41,828\nAccrued restructuring.............................................................................................\n(16,620)\n8,871\n(6,949)\nIncome taxes payable.............................................................................................\n29,801\n11,006\n(58,875)\nDeferred revenue....................................................................................................\n320,801\n326,438\n201,366\nNet cash provided by operating activities.........................................................\n1,469,502\n1,287,482\n1,151,686\nCash flows from investing activities:\n \n \nPurchases of short-term investments .............................................................................\n(2,064,833)\n(2,014,186)\n(2,058,058)\nMaturities of short-term investments.............................................................................\n371,790\n272,076\n360,485\nProceeds from sales of short-term investments .............................................................\n1,176,476\n1,443,577\n1,449,961\nAcquisitions, net of cash acquired .................................................................................\n(826,004)\n(29,802)\n(704,589)\nPurchases of property and equipment............................................................................\n(184,936)\n(148,332)\n(188,358)\nProceeds from sale of property ......................................................................................\n57,779\n\n24,260\nPurchases of long-term investments, intangibles and other assets ................................\n(22,779)\n(17,572)\n(67,737)\nProceeds from sale of long-term investments................................................................\n4,149\n3,532\n6,233\nNet cash used for investing activities ...............................................................\n(1,488,358)\n(490,707)\n(1,177,803)\nCash flows from financing activities:\n \n \nPurchases of treasury stock............................................................................................\n(625,000)\n(600,000)\n(1,100,000)\nProceeds from issuance of treasury stock......................................................................\n164,270\n227,841\n598,194\nCost of issuance of treasury stock..................................................................................\n(186,373)\n(173,675)\n(97,418)\nExcess tax benefits from stock-based compensation.....................................................\n68,153\n53,235\n40,619\nProceeds from debt and capital lease obligations ..........................................................\n989,280\n\n25,703\nRepayment of debt and capital lease obligations...........................................................\n(602,189)\n(14,684)\n(25,879)\nDebt issuance costs ........................................................................................................\n(8,828)\n\n(357)\nNet cash used for financing activities...............................................................\n(200,687)\n(507,283)\n(559,138)\nEffect of foreign currency exchange rates on cash and cash equivalents.........................\n(21,297)\n(6,648)\n(5,241)\nNet increase (decrease) in cash and cash equivalents.......................................................\n(240,840)\n282,844\n(590,496)\nCash and cash equivalents at beginning of year...............................................................\n1,117,400\n834,556\n1,425,052\nCash and cash equivalents at end of year ......................................................................... $\n876,560\n$\n1,117,400\n$\n834,556\nSupplemental disclosures:\n \nCash paid for income taxes, net of refunds.................................................................... $\n203,010\n$\n20,140\n$\n129,701\nCash paid for interest ..................................................................................................... $\n56,014\n$\n68,886\n$\n64,843\nNon-cash investing activities:\nInvestment in lease receivable applied to building purchase......................................... $\n\n$\n126,800\n$\n\nIssuance of common stock and stock awards assumed in business acquisitions........... $\n677\n$\n21\n$\n1,160\nSee accompanying Notes to Consolidated Financial Statements."
+      }
+    ],
+    "bucket": "A_multi_input",
+    "expected_formula": "cash from operations / total current liabilities",
+    "expected_inputs": [
+      "1,469,502",
+      "2,213,556"
+    ],
+    "predicted_baseline_failure": true,
+    "answer_verifiable_from_evidence": true,
+    "unit_or_period_ambiguity": false,
+    "demo_candidate": true,
+    "human_reviewed": false,
+    "tolerance": {
+      "relative": 0.01,
+      "absolute": null
+    }
+  },
+  {
+    "item_id": "adobe_05",
+    "question_id": "financebench_id_07507",
+    "company": "Adobe",
+    "question": "What is Adobe's year-over-year change in unadjusted operating income from FY2015 to FY2016 (in units of percents and round to one decimal place)? Give a solution to the question by using the income statement.",
+    "gold_answer": "65.4%",
+    "gold_value": 65.4,
+    "gold_unit": "percent",
+    "gold_evidence": [
+      {
+        "doc_id": "ADOBE_2016_10K",
+        "doc_name": "ADOBE_2016_10K",
+        "doc_type": "10k",
+        "filing_period": "FY2016",
+        "pdf_page": 62,
+        "page_label": "62",
+        "evidence_text": "Table of Contents\n62\nADOBE SYSTEMS INCORPORATED\nCONSOLIDATED STATEMENTS OF INCOME\n(In thousands, except per share data)\n \nYears Ended\n \nDecember 2,\n2016\nNovember 27,\n2015\nNovember 28,\n2014\nRevenue:\n \nSubscription\n$\n4,584,833\n$\n3,223,904\n$\n2,076,584\nProduct\n800,498\n1,125,146\n1,627,803\nServices and support\n469,099\n446,461\n442,678\nTotal revenue\n5,854,430\n4,795,511\n4,147,065\n \nCost of revenue:\nSubscription\n461,860\n409,194\n335,432\nProduct\n68,917\n90,035\n97,099\nServices and support\n289,131\n245,088\n189,549\nTotal cost of revenue\n819,908\n744,317\n622,080\n \nGross profit\n5,034,522\n4,051,194\n3,524,985\n \nOperating expenses:\nResearch and development\n975,987\n862,730\n844,353\nSales and marketing\n1,910,197\n1,683,242\n1,652,308\nGeneral and administrative\n577,710\n531,919\n543,332\nRestructuring and other charges\n(1,508)\n1,559\n19,883\nAmortization of purchased intangibles\n78,534\n68,649\n52,424\nTotal operating expenses\n3,540,920\n3,148,099\n3,112,300\n \nOperating income\n1,493,602\n903,095\n412,685\n \nNon-operating income (expense):\nInterest and other income (expense), net\n13,548\n33,909\n7,267\nInterest expense\n(70,442)\n(64,184)\n(59,732)\nInvestment gains (losses), net\n(1,570)\n961\n1,156\nTotal non-operating income (expense), net\n(58,464)\n(29,314)\n(51,309)\nIncome before income taxes\n1,435,138\n873,781\n361,376\nProvision for income taxes\n266,356\n244,230\n92,981\nNet income\n$\n1,168,782\n$\n629,551\n$\n268,395\nBasic net income per share\n$\n2.35\n$\n1.26\n$\n0.54\nShares used to compute basic net income per share\n498,345\n498,764\n497,867\nDiluted net income per share\n$\n2.32\n$\n1.24\n$\n0.53\nShares used to compute diluted net income per share\n504,299\n507,164\n508,480\n See accompanying Notes to Consolidated Financial Statements."
+      }
+    ],
+    "bucket": "A_multi_input",
+    "expected_formula": "(OperatingIncome2016 - OperatingIncome2015) / OperatingIncome2015 * 100",
+    "expected_inputs": [
+      "Operating income FY2016",
+      "Operating income FY2015"
+    ],
+    "predicted_baseline_failure": true,
+    "answer_verifiable_from_evidence": true,
+    "unit_or_period_ambiguity": false,
+    "demo_candidate": true,
+    "human_reviewed": false,
+    "tolerance": {
+      "relative": 0.01,
+      "absolute": null
+    }
+  },
+  {
+    "item_id": "verizon_01",
+    "question_id": "financebench_id_00215",
+    "company": "Verizon",
+    "question": "Is Verizon a capital intensive business based on FY 2022 data?",
+    "gold_answer": "Yes. Verizon's capital intensity ratio was approximately 2.774729. This means that it took approximately $2.77 of assets to generate $1 of revenue and thus, Verizon can be considered capital intensive.",
+    "gold_value": null,
+    "gold_unit": "text",
+    "gold_evidence": [
+      {
+        "doc_id": "VERIZON_2022_10K",
+        "doc_name": "VERIZON_2022_10K",
+        "doc_type": "10k",
+        "filing_period": "FY2022",
+        "pdf_page": 56,
+        "page_label": "56",
+        "evidence_text": "Consolidated Balance Sheets \nVerizon Communications Inc. and Subsidiaries \n(dollars in millions, except per share amounts) \nAt December 31,\n2022\n2021 \nAssets \nCurrent assets \nCash and cash equivalents\n$ \n2,605 \n$ \n2,921 \nAccounts receivable\n \n25,332 \n \n24,742 \nLess Allowance for credit losses\n \n826 \n \n896 \nAccounts receivable, net \n \n24,506 \n \n23,846 \nInventories\n \n2,388 \n \n3,055 \nPrepaid expenses and other\n \n8,358 \n \n6,906 \nTotal current assets\n \n37,857 \n \n36,728 \nProperty, plant and equipment\n \n307,689 \n \n289,897 \nLess Accumulated depreciation\n \n200,255 \n \n190,201 \nProperty, plant and equipment, net\n \n107,434 \n \n99,696 \nInvestments in unconsolidated businesses\n \n1,071 \n \n1,061 \nWireless licenses\n \n149,796 \n \n147,619 \nGoodwill\n \n28,671 \n \n28,603 \nOther intangible assets, net\n \n11,461 \n \n11,677 \nOperating lease right-of-use assets\n \n26,130 \n \n27,883 \nOther assets\n \n17,260 \n \n13,329 \nTotal assets\n$ \n379,680 \n$ \n366,596"
+      },
+      {
+        "doc_id": "VERIZON_2022_10K",
+        "doc_name": "VERIZON_2022_10K",
+        "doc_type": "10k",
+        "filing_period": "FY2022",
+        "pdf_page": 23,
+        "page_label": "23",
+        "evidence_text": "Consolidated Operating Revenues \n(dollars in millions) \nIncrease/(Decrease) \nYears Ended December 31,\n2022\n2021 \n2022 vs. 2021 \nConsumer\n$ 103,506 \n$ 95,300 $ \n8,206 \n 8.6 % \nBusiness\n31,072 \n31,042 \n30 \n 0.1 \nCorporate and other\n2,510 \n7,722 \n(5,212) \n (67.5) \nEliminations\n(253)\n(451)\n198 \n 43.9 \nConsolidated Operating Revenues\n$ 136,835 \n$ 133,613 $ \n3,222 \n 2.4"
+      }
+    ],
+    "bucket": "A_multi_input",
+    "expected_formula": "total assets / consolidated operating revenues",
+    "expected_inputs": [
+      "Total assets",
+      "Consolidated operating revenues"
+    ],
+    "predicted_baseline_failure": true,
+    "answer_verifiable_from_evidence": true,
+    "unit_or_period_ambiguity": false,
+    "demo_candidate": true,
+    "human_reviewed": false,
+    "tolerance": {
+      "relative": 0.01,
+      "absolute": null
+    }
   }
 ]

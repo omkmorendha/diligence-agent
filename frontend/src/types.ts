@@ -145,6 +145,92 @@ export interface Comparison {
   systems: Record<string, SystemMetrics>;
 }
 
+// --- iterative eval analytics ---
+export interface IterationTiming {
+  total_seconds: number;
+  stage_seconds: Record<string, number>;
+  started_at?: string | null;
+  completed_at?: string | null;
+}
+
+export interface IterationBehavior {
+  answer_coverage?: number | null;
+  abstention_rate?: number | null;
+  citations_per_answered_item?: number | null;
+  retrieval_events: number;
+  tool_calls: number;
+  calculate_calls: number;
+  error_events: number;
+  c_lookup_over_retrieval_items: string[];
+}
+
+export interface IterationRunSummary {
+  run_id: string;
+  company: string;
+  status: string;
+  num_items_scored: number;
+  timing: IterationTiming;
+  item_timing: Record<string, Record<string, unknown>>;
+  behavior: IterationBehavior;
+}
+
+export interface IterationSummary {
+  iteration: number;
+  run_ids: string[];
+  status: string;
+  started_at?: string | null;
+  completed_at?: string | null;
+  metrics: Record<string, unknown>;
+  duration_seconds: number;
+  stage_seconds: Record<string, number>;
+  behavior: Record<string, unknown>;
+}
+
+export interface IterationRegressionDelta {
+  metric: string;
+  previous: number;
+  current: number;
+  delta: number;
+  direction: "improvement" | "regression" | "flat";
+}
+
+export interface IterationRegression {
+  from_iteration: number;
+  to_iteration: number;
+  deltas: IterationRegressionDelta[];
+}
+
+export interface MissingMetric {
+  metric: string;
+  status: "missing" | "partial";
+  reason: string;
+  needed_instrumentation: string;
+}
+
+export interface IterativeEvalReport {
+  schema_version: string;
+  experiment_id: string;
+  created_at: string;
+  system: string;
+  model?: string | null;
+  tool_protocol?: string | null;
+  run_selection: Record<string, unknown>;
+  subset: Comparison["subset"];
+  iterations: IterationSummary[];
+  cumulative: { through_iteration: number; metrics: Record<string, unknown> }[];
+  overall: Record<string, unknown>;
+  regressions: IterationRegression[];
+  bottlenecks: {
+    repeated_failure_items?: { item_id: string; question: string; metric: string; failures: number }[];
+    failures_by_company?: Record<string, number>;
+    failures_by_bucket?: Record<string, number>;
+    slowest_runs?: { run_id: string; company: string; duration_seconds: number }[];
+  };
+  missing_metrics: MissingMetric[];
+  per_run: IterationRunSummary[];
+  per_item_scores: Record<string, unknown>[];
+}
+
 // --- section 8: agent-visible checklist item (gold fields stripped) ---
 export interface AgentVisibleItem {
   item_id: string;

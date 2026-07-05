@@ -2,16 +2,18 @@ import { useEffect, useState } from "react";
 import { RunTab } from "./components/RunTab";
 import { MemoTab } from "./components/MemoTab";
 import { EvalsTab } from "./components/EvalsTab";
+import { IterationAnalyticsTab } from "./components/IterationAnalyticsTab";
 
 // Three tabs (spec section 24): Run, Memo, Evals. No router needed.
 // Ledger redesign: sticky top bar, tab nav, theme toggle (auto/light/dark).
-type Tab = "run" | "memo" | "evals";
+type Tab = "run" | "memo" | "evals" | "iterations";
 type Theme = "auto" | "light" | "dark";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "run", label: "Run" },
   { id: "memo", label: "Memo" },
   { id: "evals", label: "Evals" },
+  { id: "iterations", label: "Iterations" },
 ];
 
 const THEME_GLYPH: Record<Theme, string> = { auto: "◐", light: "○", dark: "◑" };
@@ -140,6 +142,7 @@ export function App() {
         {tab === "run" && <RunTab onOpenMemo={openMemo} />}
         {tab === "memo" && <MemoTab runId={memoRunId} onSelectRun={setMemoRunId} />}
         {tab === "evals" && <EvalsTab />}
+        {tab === "iterations" && <IterationAnalyticsTab />}
       </main>
     </div>
   );

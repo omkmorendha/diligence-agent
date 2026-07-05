@@ -1,6 +1,6 @@
 """D5 — Stratified subset selection (spec section 6 D5, Step 8).
 
-Target: ~4 companies x ~8 questions = ~32  (composition ~16 A / ~8 B / ~8 C).
+Target: 40 questions across ranked companies  (composition target ~20 A / ~10 B / ~10 C).
 Per company: >=2 predicted-baseline-failure questions; prefer recognizable
 companies, clean evidence pages, strong parse quality, good live-trace potential.
 
@@ -18,8 +18,8 @@ Output:
 NOTE: characterize.py -> data/dataset_profile.json already confirmed the ideal
 target is FEASIBLE (7 companies have >=8 usable questions) using D3's *heuristic
 preview*. This script is deterministic over data/verified.jsonl (D3+D4, authoritative)
-instead, which is stricter — see SELECTION POLICY below for why the final subset is
-~28-32 rather than exactly 32.
+instead, which is stricter. The iterative eval workflow uses a larger 40-question
+subset so repeated runs have enough signal to expose regressions and variance.
 
 PAGE-NUMBER CONVENTION (decided; see AMBIGUITIES.md section 3):
     FinanceBench `evidence_page_num` is 0-indexed into the PDF. The spec's
@@ -44,12 +44,10 @@ SELECTION POLICY (deterministic given data/verified.jsonl):
        proxy: FinanceBench's companies are all large, well-known public issuers,
        so "prefer recognizable companies" is satisfied by construction, and more
        eligible/failure-prone questions means a richer, more demonstrable checklist.
-    3. Walk the fallback tiers (4 companies/8 each -> 3/8 -> 2/8) in order; a tier
-       is accepted once every candidate company in it has >=2 baseline-failure
-       eligible questions (the spec's explicit per-company floor) and >=4 eligible
-       questions total (a sanity floor so no company contributes a token question).
-       On this corpus tier 1 (4 companies) is accepted: PepsiCo, Boeing,
-       Johnson & Johnson, AMD all clear both floors.
+    3. Walk ranked companies until exactly 40 selected questions are available.
+       Each fully included company must clear >=2 baseline-failure eligible
+       questions and >=4 eligible questions total; the final company may be
+       partially included to hit the 40-question target exactly.
     4. Per selected company, cap at 8 questions. If a company has more than 8
        eligible, drop the excess starting from B_judgment (least prioritized per
        the fallback policy's "prioritize A_multi_input and C_lookup over
@@ -97,12 +95,12 @@ BUCKETS = ("A_multi_input", "B_judgment", "C_lookup")
 # over B_judgment").
 DROP_PRIORITY = ("B_judgment", "C_lookup", "A_multi_input")
 
+TARGET_QUESTIONS = 40
 MIN_BASELINE_FAILURE_PER_COMPANY = 2
 MIN_ELIGIBLE_PER_COMPANY = 4
 PER_COMPANY_CAP = 8
-FALLBACK_TIERS = [4, 3, 2]  # number of companies to try, in order
 
-# Per-8-slot target composition, proportional to the spec's ~16A/~8B/~8C ideal.
+# Per-8-slot target composition, proportional to the original 4:2:2 ideal.
 TARGET_COMPOSITION = {"A_multi_input": 4, "C_lookup": 2, "B_judgment": 2}
 FILL_PRIORITY = ("A_multi_input", "C_lookup", "B_judgment")  # for redistributing shortfall
 
@@ -218,23 +216,6 @@ def _rank_companies(eligible: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return stats
 
 
-def _choose_tier(ranked: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], int]:
-    """Walk FALLBACK_TIERS, accept the first tier whose candidate companies all
-    clear the baseline-failure and eligible-count floors. Returns (companies, tier_n).
-    """
-    for n in FALLBACK_TIERS:
-        candidates = ranked[:n]
-        if len(candidates) < n:
-            continue
-        if all(
-            c["baseline_failures"] >= MIN_BASELINE_FAILURE_PER_COMPANY and c["n_eligible"] >= MIN_ELIGIBLE_PER_COMPANY
-            for c in candidates
-        ):
-            return candidates, n
-    # Nothing clears the floors at any tier -- take whatever is available (best effort).
-    return ranked[: FALLBACK_TIERS[-1]], FALLBACK_TIERS[-1]
-
-
 def _select_company_rows(rows: list[dict[str, Any]], doc_by_id_getter) -> list[dict[str, Any]]:
     """Pick <=PER_COMPANY_CAP rows for one company, targeting TARGET_COMPOSITION
     and preferring baseline-failure + clean-evidence items within a bucket.
@@ -271,6 +252,15 @@ def _select_company_rows(rows: list[dict[str, Any]], doc_by_id_getter) -> list[d
     return selected
 
 
+def _eligible_company_stats(ranked: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        stat
+        for stat in ranked
+        if stat["baseline_failures"] >= MIN_BASELINE_FAILURE_PER_COMPANY
+        and stat["n_eligible"] >= MIN_ELIGIBLE_PER_COMPANY
+    ]
+
+
 def build_subset() -> tuple[list[dict[str, Any]], dict[str, Any]]:
     if not VERIFIED_PATH.exists():
         raise SystemExit(f"missing {VERIFIED_PATH} -- run d4_verify.py first")
@@ -289,17 +279,20 @@ def build_subset() -> tuple[list[dict[str, Any]], dict[str, Any]]:
         raw = raw_by_qid[r["question_id"]]
         r["_clean_evidence"] = _evidence_clean(raw["evidence"], doc_by_id)
 
-    ranked = _rank_companies(eligible)
-    chosen_companies, tier_n = _choose_tier(ranked)
+    ranked = _eligible_company_stats(_rank_companies(eligible))
 
     items: list[dict[str, Any]] = []
     company_report = []
-    for company_stat in chosen_companies:
+    for company_stat in ranked:
+        if len(items) >= TARGET_QUESTIONS:
+            break
         company = company_stat["company"]
         selected_rows = _select_company_rows(company_stat["rows"], doc_by_id)
         # Deterministic within-company order: bucket priority (A, C, B), then question_id.
         order = {"A_multi_input": 0, "C_lookup": 1, "B_judgment": 2}
         selected_rows.sort(key=lambda r: (order[r["bucket_d3"]], r["question_id"]))
+        remaining = TARGET_QUESTIONS - len(items)
+        selected_rows = selected_rows[:remaining]
 
         slug = slugify(company)
         bucket_counts = {"A_multi_input": 0, "B_judgment": 0, "C_lookup": 0}
@@ -368,8 +361,13 @@ def build_subset() -> tuple[list[dict[str, Any]], dict[str, Any]]:
             }
         )
 
+    if len(items) != TARGET_QUESTIONS:
+        raise SystemExit(
+            f"strict verified pool produced {len(items)} selected items, expected {TARGET_QUESTIONS}"
+        )
+
     meta = {
-        "tier_n_companies": tier_n,
+        "target_questions": TARGET_QUESTIONS,
         "total_items": len(items),
         "companies": company_report,
         "bucket_totals": {
@@ -384,18 +382,18 @@ def _write_report(meta: dict[str, Any]) -> None:
         "# D5 subset selection report",
         "",
         f"Selected **{meta['total_items']}** questions across "
-        f"**{meta['tier_n_companies']}** companies (fallback tier: "
-        f"{meta['tier_n_companies']} companies x <=8 each).",
+        f"**{len(meta['companies'])}** companies (target: "
+        f"{meta['target_questions']} questions, <=8 per company).",
         "",
         "## Bucket composition",
         "",
-        f"- A_multi_input: {meta['bucket_totals']['A_multi_input']} (ideal ~16)",
-        f"- B_judgment: {meta['bucket_totals']['B_judgment']} (ideal ~8)",
-        f"- C_lookup: {meta['bucket_totals']['C_lookup']} (ideal ~8)",
+        f"- A_multi_input: {meta['bucket_totals']['A_multi_input']} (ideal ~20)",
+        f"- B_judgment: {meta['bucket_totals']['B_judgment']} (ideal ~10)",
+        f"- C_lookup: {meta['bucket_totals']['C_lookup']} (ideal ~10)",
         "",
         "C_lookup questions are scarce in the D3/D4-verified pool for the "
         "highest-eligible-count companies on this corpus, so the achieved "
-        "composition undershoots the ideal 16/8/8 split on A and C in favor of "
+        "composition may undershoot the ideal 20/10/10 split on scarce buckets in favor of "
         "B; this is the actual FinanceBench distribution, not a selection bug "
         "(see AMBIGUITIES.md section 6 and data/verified.jsonl bucket_d3 counts).",
         "",
@@ -418,14 +416,15 @@ def _write_report(meta: dict[str, Any]) -> None:
         "`disagreement=false` (i.e. excludes everything in `data/disputes.jsonl` "
         "-- those require `human_reviewed: true` per the fallback policy, which "
         "is D6's job and has not happened yet). Companies ranked by "
-        "(eligible count desc, baseline-failure count desc, name asc); the "
-        "4-companies-x-8 tier is accepted once every candidate clears "
-        f">= {MIN_BASELINE_FAILURE_PER_COMPANY} baseline-failure questions and "
-        f">= {MIN_ELIGIBLE_PER_COMPANY} eligible questions. Per-company selection "
-        "targets a 4:2:2 (A:C:B) split of the 8-slot cap, falls back to filling "
-        "remaining slots in A, then C, then B order when a bucket is short, and "
-        "drops down from B, then C, then A when a company has more than 8 "
-        "eligible questions.",
+        "(eligible count desc, baseline-failure count desc, name asc), then "
+        f"included until the global target of {TARGET_QUESTIONS} questions is "
+        f"reached. Fully included companies clear >= {MIN_BASELINE_FAILURE_PER_COMPANY} "
+        f"baseline-failure questions and >= {MIN_ELIGIBLE_PER_COMPANY} eligible "
+        "questions; the final company may be partially included to hit exactly "
+        "40. Per-company selection targets a 4:2:2 (A:C:B) split of the 8-slot "
+        "cap, falls back to filling remaining slots in A, then C, then B order "
+        "when a bucket is short, and drops down from B, then C, then A when a "
+        "company has more than 8 eligible questions.",
         "",
     ]
     REPORT_PATH.write_text("\n".join(lines) + "\n")

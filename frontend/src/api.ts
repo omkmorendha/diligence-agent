@@ -7,6 +7,7 @@ import type {
   CompanyChecklist,
   CreateRunRequest,
   CreateRunResponse,
+  IterativeEvalReport,
   Memo,
   PageResponse,
   RunCard,
@@ -85,6 +86,28 @@ export function getPage(company: string, docId: string, page: number): Promise<P
 
 export function getEvalResults(): Promise<Comparison> {
   return getJson<Comparison>("/evals/results");
+}
+
+export function listEvalIterations(): Promise<
+  {
+    experiment_id: string;
+    status: string;
+    created_at?: string | null;
+    completed_at?: string | null;
+    model?: string | null;
+    tool_protocol?: string | null;
+    run_selection: Record<string, unknown>;
+  }[]
+> {
+  return getJson("/evals/iterations");
+}
+
+export function getLatestEvalIteration(): Promise<IterativeEvalReport> {
+  return getJson<IterativeEvalReport>("/evals/iterations/latest");
+}
+
+export function getEvalIteration(experimentId: string): Promise<IterativeEvalReport> {
+  return getJson<IterativeEvalReport>(`/evals/iterations/${encodeURIComponent(experimentId)}`);
 }
 
 /** GET /runs/{id}/events (SSE): live queue while running, replay-with-sleeps once
