@@ -1191,7 +1191,7 @@ def run_agent(run_id: str, company: str, item_ids: list[str] | None, trace: Trac
     """Execute the agent over a company's checklist, streaming events into `trace`."""
     created_at = _now_iso()
     llm.set_usage_sink(llm.jsonl_usage_sink(trace.run_dir / "llm_calls.jsonl"))
-    llm.set_call_context(run_id=run_id, system="agent")
+    llm.set_run_context(run_id=run_id, system="agent")
     try:
         items = _load_checklist(company, item_ids)
         if not items:
