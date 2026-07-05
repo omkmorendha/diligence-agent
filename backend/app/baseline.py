@@ -341,7 +341,7 @@ def run_baseline(run_id: str, company: str, item_ids: list[str] | None, trace: T
     """Single retrieve-then-answer pass per checklist item, streaming events into `trace`."""
     created_at = datetime.now(timezone.utc).isoformat()
     llm.set_usage_sink(llm.jsonl_usage_sink(trace.run_dir / "llm_calls.jsonl"))
-    llm.set_call_context(run_id=run_id, system="baseline")
+    llm.set_run_context(run_id=run_id, system="baseline")
     try:
         items = _load_company_items(company, item_ids)
 

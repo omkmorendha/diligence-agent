@@ -9,7 +9,9 @@ Uses the OpenAI Python SDK against the OpenAI-compatible NVIDIA endpoint.
 
 from __future__ import annotations
 
+import contextvars
 import json
+import threading
 import time
 from datetime import datetime, timezone
 from functools import lru_cache
@@ -30,13 +32,30 @@ def _client() -> OpenAI:
 # --- usage/latency capture ---------------------------------------------------
 # Every non-streaming call through chat() can be recorded to a "usage sink" --
 # a callable taking one dict per LLM call (latency, token usage, and whatever
-# run-scoped context the caller registered via set_call_context). Run drivers
-# (agent.run_agent / baseline.run_baseline) point the sink at
-# runs/{run_id}/llm_calls.jsonl; when no sink is set (judges, dataset builder,
-# smoke test) nothing is recorded. Module-global state: one run per process --
-# the CLI drivers guarantee that; not safe for concurrent runs in one process.
+# context the caller registered). Run drivers (agent.run_agent /
+# baseline.run_baseline) point the sink at runs/{run_id}/llm_calls.jsonl; when no
+# sink is set (judges, dataset builder, smoke test) nothing is recorded.
+#
+# Concurrency model (spec sections 1.7 / 13): a v1 review fans verification agents
+# out across a ThreadPoolExecutor, so several worker threads emit usage records
+# through the one run-scoped sink at once. Two invariants keep that safe:
+#   * The sink is shared (one per process/run) but its file write is serialized
+#     by a per-sink lock, so concurrent lines never interleave or corrupt.
+#   * Context is split in two layers. Run-wide fields (run_id, system) live in a
+#     lock-guarded module dict shared by every worker (set once via
+#     set_run_context). Per-call fields (purpose, item_id) live in a ContextVar
+#     that is naturally isolated per thread, so one worker's item_id never leaks
+#     into another worker's record. Each record merges {**run, **per_call}.
 _usage_sink: Optional[Callable[[dict[str, Any]], None]] = None
-_call_context: dict[str, Any] = {}
+
+_run_context: dict[str, Any] = {}
+_run_context_lock = threading.Lock()
+
+# Per-thread overlay. Stored as an immutable dict and replaced wholesale on every
+# mutation so concurrent readers/writers never share a mutable object.
+_call_context_var: contextvars.ContextVar[dict[str, Any]] = contextvars.ContextVar(
+    "llm_call_context", default={}
+)
 
 
 def set_usage_sink(sink: Optional[Callable[[dict[str, Any]], None]]) -> None:
@@ -44,26 +63,61 @@ def set_usage_sink(sink: Optional[Callable[[dict[str, Any]], None]]) -> None:
     _usage_sink = sink
 
 
+def set_run_context(**fields: Any) -> None:
+    """Merge run-wide fields (run_id, system) shared across every worker thread of
+    a run into subsequent usage records. A value of None removes the field."""
+    with _run_context_lock:
+        for key, value in fields.items():
+            if value is None:
+                _run_context.pop(key, None)
+            else:
+                _run_context[key] = value
+
+
 def set_call_context(**fields: Any) -> None:
-    """Merge run-scoped fields (purpose, item_id, run_id, ...) into every
-    subsequent usage record. A value of None removes the field."""
+    """Merge per-call fields (purpose, item_id, ...) into subsequent usage records
+    for the current thread only. A value of None removes the field. Thread-scoped
+    so concurrent verification workers do not clobber each other's context."""
+    current = _call_context_var.get()
+    updated = dict(current)
     for key, value in fields.items():
         if value is None:
-            _call_context.pop(key, None)
+            updated.pop(key, None)
         else:
-            _call_context[key] = value
+            updated[key] = value
+    _call_context_var.set(updated)
 
 
 def clear_call_context() -> None:
-    _call_context.clear()
+    """Reset per-call context for the current thread and the shared run context.
+
+    Called by run drivers in their finally block to leave a clean slate for the
+    next run in the same process. Workers that only want to drop their own
+    per-call fields should use set_call_context(field=None) instead."""
+    _call_context_var.set({})
+    with _run_context_lock:
+        _run_context.clear()
+
+
+def _current_context() -> dict[str, Any]:
+    with _run_context_lock:
+        merged = dict(_run_context)
+    merged.update(_call_context_var.get())
+    return merged
 
 
 def jsonl_usage_sink(path: Path) -> Callable[[dict[str, Any]], None]:
-    """A sink that appends one JSON line per LLM call to `path`."""
+    """A sink that appends one JSON line per LLM call to `path`.
+
+    The write is serialized by a per-sink lock so that concurrent verification
+    workers sharing one run's sink cannot interleave partial lines."""
+    lock = threading.Lock()
 
     def sink(record: dict[str, Any]) -> None:
-        with path.open("a") as f:
-            f.write(json.dumps(record) + "\n")
+        line = json.dumps(record) + "\n"
+        with lock:
+            with path.open("a") as f:
+                f.write(line)
 
     return sink
 
@@ -93,7 +147,7 @@ def _record_usage(
         "prompt_tokens": getattr(usage, "prompt_tokens", None),
         "completion_tokens": getattr(usage, "completion_tokens", None),
         "total_tokens": getattr(usage, "total_tokens", None),
-        **_call_context,
+        **_current_context(),
     }
     if error is not None:
         record["error"] = error
