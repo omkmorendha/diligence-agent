@@ -115,6 +115,11 @@ time about a company, grounded strictly in its SEC filings. Follow every rule:
     * Current ratio = current assets / current liabilities.
     * Gross margin = (revenue - cost of revenue) / revenue.
     * Effective tax rate = income tax expense / pre-tax income.
+    * EBITDA less capital expenditures = operating profit + depreciation and
+      amortization - capital expenditures/capital spending. Retrieve operating
+      profit from the income statement and retrieve depreciation/amortization
+      plus capital expenditures/capital spending from the statement of cash
+      flows or the division capital-spending table before calculating.
 15. Sign conventions -- PRESERVE the natural sign of every figure through the
     computation; never silently take an absolute value.
     * Effective tax rate: when pre-tax income is NEGATIVE (a pre-tax loss) the
@@ -189,6 +194,8 @@ def _heuristic_strategy(question: str) -> str:
         "increase",
         "decrease",
         "change in",
+        "less",
+        "plus",
         "margin",
         "ratio",
         "growth",
@@ -196,6 +203,12 @@ def _heuristic_strategy(question: str) -> str:
         "difference between",
         "percentage",
         "%",
+        "ebitda",
+        "depreciation",
+        "amortization",
+        "capital expenditure",
+        "capital expenditures",
+        "capital spending",
     )
     judgment_markers = ("why", "explain", "assess", "discuss", "risk", "outlook", "strategy")
     if any(m in q for m in calc_markers):
@@ -253,9 +266,12 @@ def _build_plan(company: str, visible_items: list[AgentVisibleItem]) -> list[dic
     plan_items: list[dict[str, Any]] = []
     for v in visible_items:
         entry = by_id.get(v.item_id) or {}
+        heuristic_strategy = _heuristic_strategy(v.question)
         strategy = entry.get("strategy")
         if strategy not in VALID_STRATEGIES:
-            strategy = _heuristic_strategy(v.question)
+            strategy = heuristic_strategy
+        elif heuristic_strategy == "multi_input_computation" and strategy == "single_lookup":
+            strategy = heuristic_strategy
         planned_inputs = entry.get("planned_inputs")
         if not isinstance(planned_inputs, list):
             planned_inputs = []
@@ -473,6 +489,9 @@ def _normalize_citation(raw: dict[str, Any], state: _ItemState, *, require_verba
     if chunk is None and chunk_id:
         chunk = state.fetched_pages.get(chunk_id)
         from_fetched_page = chunk is not None
+    if chunk is None and chunk_id:
+        chunk = _resolve_fetched_page_by_printed_label(chunk_id, state)
+        from_fetched_page = chunk is not None
     if chunk is None:
         raise ValueError(
             f"citation references chunk_id {chunk_id!r}, which was not returned by any "
@@ -503,7 +522,7 @@ def _normalize_citation(raw: dict[str, Any], state: _ItemState, *, require_verba
     # evidence) -> the page is now a genuine citable span, so promote it into
     # chunk_registry (IMP3-2). Pages that are fetched but never quoted stay out.
     if from_fetched_page:
-        state.chunk_registry[chunk_id] = chunk
+        state.chunk_registry[chunk.chunk_id] = chunk
 
     citation_id = str(raw.get("citation_id") or f"citation_{len(state.emitted_citation_ids) + 1:03d}")
     return Citation(
@@ -520,6 +539,26 @@ def _normalize_citation(raw: dict[str, Any], state: _ItemState, *, require_verba
         char_start=char_start,
         char_end=char_end,
     )
+
+
+def _resolve_fetched_page_by_printed_label(chunk_id: str, state: _ItemState) -> Optional[Chunk]:
+    match = re.fullmatch(r"page:(?P<doc_id>.+):(?P<label>\d+)", chunk_id)
+    if not match:
+        return None
+    doc_id = match.group("doc_id")
+    label = match.group("label")
+    for page in state.fetched_pages.values():
+        if page.doc_id == doc_id and _printed_page_label(page.text) == label:
+            return page
+    return None
+
+
+def _printed_page_label(text: str) -> Optional[str]:
+    for line in reversed((text or "").splitlines()):
+        stripped = line.strip()
+        if stripped:
+            return stripped if stripped.isdigit() else None
+    return None
 
 
 def _extract_numbers(text: str) -> list[float]:
@@ -923,14 +962,21 @@ def _dispatch(
         # validation so a rejected/retried attempt still counts as "the model tried".
         state.record_answer_attempts += 1
         item_answer_raw = _maybe_parse_json(args.get("item_answer"))
-        if not isinstance(item_answer_raw, dict):
+        if isinstance(item_answer_raw, str):
+            item_answer_raw = {
+                key: value
+                for key, value in args.items()
+                if key not in {"item_answer", "tool", "name"}
+            }
+            item_answer_raw.setdefault("answer", args["item_answer"])
+        elif not isinstance(item_answer_raw, dict):
             raise ValueError(
                 f"record_answer: 'item_answer' must be a JSON object, got {type(item_answer_raw).__name__}"
             )
         raw_answer = dict(item_answer_raw)
         raw_answer["item_id"] = item_id
         raw_answer["question"] = visible.question
-        raw_answer.setdefault("status", "answered")
+        raw_answer["status"] = "answered"
 
         raw_citations = _maybe_parse_json(raw_answer.get("citations")) or []
         if not isinstance(raw_citations, list):

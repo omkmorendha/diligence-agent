@@ -236,6 +236,26 @@ def _map_item_answer(
             confidence="high",
         )
 
+    polarity = _answer_polarity(answer.answer)
+    if claim.claim_type == "factual" and polarity in ("yes", "no"):
+        verdict = "SUPPORTED" if polarity == "yes" else "CONTRADICTED"
+        explanation = (
+            "The corpus answer directly supports the factual claim."
+            if verdict == "SUPPORTED"
+            else "The corpus answer directly contradicts the factual claim."
+        )
+        return VerificationResult(
+            claim_id=claim.claim_id,
+            verdict=verdict,
+            doc_value=doc_value,
+            corpus_value=corpus_value,
+            explanation=explanation,
+            citations=answer.citations,
+            calculation=calculation,
+            queries_tried=queries_tried,
+            confidence="high",
+        )
+
     return VerificationResult(
         claim_id=claim.claim_id,
         verdict="PARTIALLY_SUPPORTED",
@@ -250,6 +270,7 @@ def _map_item_answer(
 
 
 def _extract_claim_value(text: str) -> Optional[ClaimValue]:
+    candidates: list[ClaimValue] = []
     for match in _NUMBER_RE.finditer(text or ""):
         raw_number = match.group("number")
         if not raw_number:
@@ -258,10 +279,14 @@ def _extract_claim_value(text: str) -> Optional[ClaimValue]:
             value = float(raw_number.replace(",", ""))
         except ValueError:
             continue
-        if _is_standalone_year(value, match.group(0)):
+        if _is_date_component(text, match.start(), match.end(), value) or _is_standalone_year(
+            value, match.group(0)
+        ):
             continue
 
         suffix = (match.group("suffix") or "").lower()
+        if suffix in ("b", "m") and match.end() < len(text) and text[match.end()].isalpha():
+            suffix = ""
         prefix = match.group("prefix")
         unit: Optional[str] = None
         if suffix in ("%", "percent", "percentage"):
@@ -274,13 +299,45 @@ def _extract_claim_value(text: str) -> Optional[ClaimValue]:
         elif prefix or _has_currency_context(text):
             unit = "USD millions"
 
-        return ClaimValue(value=value, unit=unit)
+        candidates.append(ClaimValue(value=value, unit=unit))
+
+    for candidate in candidates:
+        if candidate.unit is not None:
+            return candidate
+    return candidates[0] if candidates else None
+
+
+def _answer_polarity(text: str) -> Optional[str]:
+    lowered = (text or "").lstrip().lower()
+    if lowered.startswith("yes."):
+        return "yes"
+    if lowered.startswith("no."):
+        return "no"
     return None
+
+
+def _is_date_component(text: str, start: int, end: int, value: float) -> bool:
+    if float(int(value)) != value:
+        return False
+    number = int(value)
+    if not (1 <= number <= 31):
+        return False
+
+    before = text[max(0, start - 16) : start].lower()
+    after = text[end : min(len(text), end + 8)]
+    month_before = re.search(
+        r"(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|"
+        r"jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|"
+        r"nov(?:ember)?|dec(?:ember)?)\s+$",
+        before,
+    )
+    year_after = re.match(r",?\s*(?:19|20)\d{2}\b", after)
+    return bool(month_before and year_after)
 
 
 def _is_standalone_year(value: float, raw: str) -> bool:
     return (
-        raw.strip().isdigit()
+        raw.strip(" ,.;:()[]").isdigit()
         and float(int(value)) == value
         and 1900 <= value <= 2100
     )

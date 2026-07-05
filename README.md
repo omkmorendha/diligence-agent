@@ -209,10 +209,10 @@ two files plus `data/subset.json` and is pure aggregation (no LLM calls). The
 one-shot per-company path (`scripts/run_baseline.py`, `python -m app.agent
 --company "<Company>"`) still works for a single ad-hoc run.
 
-### Demo trace
+### Replay trace
 
-`runs/agent-pepsico-full/trace.jsonl` is the suggested replay for the demo
-script (spec §27): a full 8-item PepsiCo run with multi-retrieval, `calculate`
+`runs/agent-pepsico-full/trace.jsonl` is the suggested replay trace
+(spec §27): a full 8-item PepsiCo run with multi-retrieval, `calculate`
 tool calls, document-aware citations, and a rendered memo (5/8 items
 answered with citations, 3 abstained). Replay it via
 `GET /runs/agent-pepsico-full/events` (the Run tab can't tell live from
@@ -268,9 +268,9 @@ See "How to reproduce" above.
 
 ---
 
-### Docker Compose (serving/demo stack only)
+### Docker Compose (serving stack only)
 
-One-command bring-up of the whole demo stack against the local dataset and
+One-command bring-up of the serving stack against the local dataset and
 whatever runs already exist under `runs/`. This never ingests, builds the
 dataset, or executes eval runs — that stays host-side via `uv run --project
 backend ...` (see above).

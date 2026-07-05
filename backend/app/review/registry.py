@@ -258,7 +258,9 @@ def scope_verdict(claim: Claim, registry: Optional[dict] = None) -> tuple[Option
     # Judgment/opinion claims are not factual statements the corpus can confirm
     # or contradict (spec §1.6, §8). Extraction tags these as claim_type
     # 'judgment'; there is no separate opinion boolean on the frozen Claim schema.
-    if claim.claim_type == "judgment":
+    # Smaller models can mislabel historical numeric checks (for example a past
+    # guidance increase) as judgment, so let concrete numeric checks proceed.
+    if claim.claim_type == "judgment" and not _has_concrete_numeric_check(claim):
         return (
             "UNVERIFIABLE",
             "Judgment or forward-looking opinion; not a factual claim the corpus "
@@ -275,6 +277,29 @@ def scope_verdict(claim: Claim, registry: Optional[dict] = None) -> tuple[Option
         )
 
     return (None, "")
+
+
+def _has_concrete_numeric_check(claim: Claim) -> bool:
+    text = f"{claim.quote or ''} {claim.question or ''}".lower()
+    return bool(re.search(r"\d", text)) and any(
+        marker in text
+        for marker in (
+            "$",
+            "%",
+            "percent",
+            "percentage",
+            "point",
+            "points",
+            "million",
+            "billion",
+            "increase",
+            "decrease",
+            "raised",
+            "lowered",
+            "repurchased",
+            "amounted",
+        )
+    )
 
 
 def scope_check(claims: list[Claim]) -> list[Claim]:

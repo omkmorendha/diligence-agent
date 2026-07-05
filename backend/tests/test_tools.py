@@ -125,6 +125,27 @@ def test_calculate_emits_events_and_matches_pure_computation(trace):
     assert trace.events[1].payload["output"]["value"] == pytest.approx(40.0)
 
 
+def test_calculate_normalizes_raw_dollar_literals_for_usd_millions(trace):
+    inputs = {
+        "new_agreement": FinancialInput(
+            value=4_200_000_000.0, unit="USD millions", period="FY2023", citation_id="c1"
+        ),
+        "old_agreement": FinancialInput(
+            value=3_800_000_000.0, unit="USD millions", period="FY2023", citation_id="c2"
+        ),
+    }
+    result = calculate(
+        trace,
+        expression="4200000000 - 3800000000",
+        inputs=inputs,
+        item_id="it-3",
+    )
+
+    assert result.value == pytest.approx(400.0)
+    assert result.inputs["new_agreement"].value == pytest.approx(4200.0)
+    assert result.inputs["old_agreement"].value == pytest.approx(3800.0)
+
+
 def test_calculate_rejects_ungrounded_input(trace):
     inputs = {"x": {"value": 1.0, "unit": "USD millions", "period": "FY2023", "citation_id": ""}}
     with pytest.raises(ValueError):

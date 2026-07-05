@@ -20,7 +20,7 @@ Measured over the 150-question open subset:
 
 **Caveat on bucket targets (§5 wants ~16 A / ~8 B / ~8 C):** A is abundant, but
 `C_lookup` is the scarcest bucket (31 total), so per-company C availability drives
-selection. Recommended demo companies (good A+C mix, recognizable names):
+selection. Recommended replay companies (good A+C mix, recognizable names):
 
 | Company | A_multi_input | C_lookup | B_judgment |
 |---------|---------------|----------|------------|
@@ -94,7 +94,7 @@ FinanceBench provides `doc_name` (e.g. `3M_2018_10K`), `doc_type`, and
   `10k: 112, 10q: 15, 8k: 9, Earnings: 14`. The `Earnings` type (press-release /
   earnings PDFs) is **not** in the spec enum. Map `Earnings → other` (or extend the
   enum). Note ~14 questions ride on earnings docs, so decide before D5 selection;
-  the safe demo path prefers 10-K/10-Q evidence and avoids `Earnings` docs.
+  the safe replay path prefers 10-K/10-Q evidence and avoids `Earnings` docs.
 
 ---
 

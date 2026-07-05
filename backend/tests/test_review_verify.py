@@ -27,7 +27,10 @@ class FakeTrace:
 
 def _registry() -> dict:
     return {
-        "PepsiCo": {"doc_ids": ["PEP_2022_10K"], "periods": ["FY2022"]},
+        "PepsiCo": {
+            "doc_ids": ["PEP_2022_10K", "PEP_2023_8K", "PEP_2023Q1_EARNINGS"],
+            "periods": ["FY2022", "FY2023", "Q1 FY2023", "May 26, 2023"],
+        },
         "Boeing": {"doc_ids": ["BA_2022_10K"], "periods": ["FY2022"]},
     }
 
@@ -129,6 +132,85 @@ def test_numeric_claim_maps_to_contradicted_and_preserves_queries(monkeypatch) -
     assert claim.status == "VERIFIED"
 
 
+def test_numeric_claim_value_skips_date_prefix(monkeypatch) -> None:
+    trace = FakeTrace()
+    claim = _claim(
+        quote=(
+            "On May 26, 2023, PepsiCo increased its unsecured five-year "
+            "revolving credit agreement by $600 million."
+        ),
+        period="May 26, 2023",
+    )
+    monkeypatch.setattr(verify_module.registry, "corpus_registry", _registry)
+
+    def fake_agent(trace_arg, company, visible, **kwargs):
+        return ItemAnswer(
+            item_id=visible.item_id,
+            question=visible.question,
+            answer="PepsiCo increased the agreement by $400 million.",
+            value=400.0,
+            unit="USD millions",
+        )
+
+    monkeypatch.setattr(verify_module.agent, "run_agent_item", fake_agent)
+    results = verify_claims("review_date_value", [claim], trace, workers=1)
+
+    assert results[0].verdict == "CONTRADICTED"
+    assert results[0].doc_value.value == 600.0
+    assert results[0].doc_value.unit == "USD millions"
+
+
+def test_numeric_claim_value_prefers_amount_over_date_and_period(monkeypatch) -> None:
+    trace = FakeTrace()
+    claims = [
+        _claim(
+            "capacity",
+            quote=(
+                "As of May 26, 2023, PepsiCo may borrow a total of $8.4 billion "
+                "under its unsecured revolving credit agreements."
+            ),
+            period="May 26, 2023",
+        ),
+        _claim(
+            "guidance",
+            quote=(
+                "In Q1 FY2023, management raised full-year guidance for core "
+                "constant currency EPS growth by 2 percentage points."
+            ),
+            period="Q1 FY2023",
+        ),
+    ]
+    monkeypatch.setattr(verify_module.registry, "corpus_registry", _registry)
+
+    def fake_agent(trace_arg, company, visible, **kwargs):
+        if visible.item_id == "capacity":
+            return ItemAnswer(
+                item_id=visible.item_id,
+                question=visible.question,
+                answer="PepsiCo may borrow $8.4 billion.",
+                value=8400.0,
+                unit="USD millions",
+            )
+        return ItemAnswer(
+            item_id=visible.item_id,
+            question=visible.question,
+            answer="PepsiCo raised guidance by 1 percentage point.",
+            value=1.0,
+            unit="percent",
+        )
+
+    monkeypatch.setattr(verify_module.agent, "run_agent_item", fake_agent)
+    results = verify_claims("review_value_precedence", claims, trace, workers=2)
+    by_id = {result.claim_id: result for result in results}
+
+    assert by_id["capacity"].verdict == "SUPPORTED"
+    assert by_id["capacity"].doc_value.value == 8400.0
+    assert by_id["capacity"].doc_value.unit == "USD millions"
+    assert by_id["guidance"].verdict == "CONTRADICTED"
+    assert by_id["guidance"].doc_value.value == 2.0
+    assert by_id["guidance"].doc_value.unit == "percent"
+
+
 def test_abstention_becomes_not_in_corpus_after_distinct_query_budget(monkeypatch) -> None:
     trace = FakeTrace()
     claim = _claim(claim_id="c_abs", quote="PepsiCo disclosed a new Mars settlement.")
@@ -150,6 +232,45 @@ def test_abstention_becomes_not_in_corpus_after_distinct_query_budget(monkeypatc
     assert results[0].verdict == "NOT_IN_CORPUS"
     assert results[0].queries_tried == ["mars settlement", "legal contingency", "new settlement"]
     assert results[0].confidence == "low"
+
+
+def test_factual_yes_no_answer_maps_to_supported_or_contradicted(monkeypatch) -> None:
+    trace = FakeTrace()
+    supported = _claim(
+        "supported_fact",
+        quote="PepsiCo operates across North America and Latin America.",
+        claim_type="factual",
+        period="FY2022",
+    )
+    contradicted = _claim(
+        "contradicted_fact",
+        quote="The shareholder proposal was approved by shareholders.",
+        claim_type="factual",
+        period="May 26, 2023",
+    )
+    monkeypatch.setattr(verify_module.registry, "corpus_registry", _registry)
+
+    def fake_agent(trace_arg, company, visible, **kwargs):
+        if visible.item_id == "supported_fact":
+            return ItemAnswer(
+                item_id=visible.item_id,
+                question=visible.question,
+                answer="Yes. The filing supports the stated operating geographies.",
+                unit="text",
+            )
+        return ItemAnswer(
+            item_id=visible.item_id,
+            question=visible.question,
+            answer="No. The voting results show the proposal was defeated.",
+            unit="text",
+        )
+
+    monkeypatch.setattr(verify_module.agent, "run_agent_item", fake_agent)
+    results = verify_claims("review_factual_polarity", [supported, contradicted], trace, workers=2)
+    by_id = {result.claim_id: result for result in results}
+
+    assert by_id["supported_fact"].verdict == "SUPPORTED"
+    assert by_id["contradicted_fact"].verdict == "CONTRADICTED"
 
 
 def test_transient_agent_failure_retries_one_claim(monkeypatch) -> None:

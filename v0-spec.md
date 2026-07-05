@@ -4,7 +4,7 @@
 Audience: Claude Code / Codex
 Build style: Eval-first / TDD
 Target: Weekend hackathon v0
-Priority: Working benchmark-backed demo over completeness
+Priority: Working benchmark-backed replay over completeness
 
 ---
 
@@ -44,7 +44,7 @@ The eval harness exists to quantify this thesis.
 
 ## 1. v0 boundaries
 
-This v0 is a FinanceBench-backed benchmark demo, not a general SEC ingestion product.
+This v0 is a FinanceBench-backed benchmark replay, not a general SEC ingestion product.
 
 ### Supported in v0
 
@@ -76,7 +76,7 @@ The v0 is a diligence memo generator that works against evals.
 The memo is the product artifact.
 The evals quantify whether the memo is accurate, cited, and numerically traceable.
 
-The demo should make this clear:
+The replay should make this clear:
 
 > “This is not a chatbot. It is a benchmark-backed diligence agent that produces an auditable memo and proves its performance against a naive RAG baseline.”
 
@@ -114,7 +114,7 @@ The demo should make this clear:
    * The trace is not decorative.
    * It is part of the product and part of the eval surface.
 
-7. **Demo reliability matters**
+7. **Replay reliability matters**
 
    * Every completed run can be replayed from `trace.jsonl`.
    * The frontend should not distinguish live mode from replay mode.
@@ -604,7 +604,7 @@ Each selected benchmark item:
   "predicted_baseline_failure": true,
   "answer_verifiable_from_evidence": true,
   "unit_or_period_ambiguity": false,
-  "demo_candidate": true,
+  "replay_candidate": true,
   "human_reviewed": false,
   "tolerance": {
     "relative": 0.01,
@@ -2163,7 +2163,7 @@ results/comparison.json
 
 ---
 
-### Step 17 — Full run + demo recording
+### Step 17 — Full run + replay recording
 
 Run:
 
@@ -2172,7 +2172,7 @@ uv run evals/run.py --system baseline
 uv run evals/run.py --system agent
 ```
 
-Record demo from the best successful replay trace.
+Record replay from the best successful replay trace.
 
 Do not depend on live model calls during final judging if replay is available.
 
@@ -2201,9 +2201,9 @@ Never cut:
 
 ---
 
-## 27. Demo script
+## 27. Replay script
 
-Suggested demo flow:
+Suggested replay flow:
 
 1. Open Evals tab first.
 
@@ -2213,7 +2213,7 @@ Suggested demo flow:
 2. Open Run tab.
 
    * Select a company.
-   * Select a demo candidate checklist.
+   * Select a replay candidate checklist.
    * Start a run or replay a saved run.
 
 3. Show trace.
@@ -2350,7 +2350,7 @@ A successful v0 must demonstrate:
 11. Citation provenance score.
 12. Clear proof that the agent beats naive RAG on the selected subset.
 
-Best-case demo:
+Best-case replay:
 
 * 24–32 questions
 * 3–4 companies
@@ -2359,7 +2359,7 @@ Best-case demo:
 * high arithmetic integrity
 * visually clear trace
 
-Minimum credible demo:
+Minimum credible replay:
 
 * 8–16 questions
 * 2 companies
@@ -2405,7 +2405,7 @@ Mitigation:
 
 ### Latency risk
 
-Live runs may be too slow for demo.
+Live runs may be too slow for replay.
 
 Mitigation:
 

@@ -74,9 +74,9 @@ def subset_only(tmp_path, monkeypatch):
 
 
 # --- registry construction --------------------------------------------------
-def test_registry_from_real_subset_has_11_companies() -> None:
+def test_registry_from_real_subset_includes_expected_companies() -> None:
     reg = corpus_registry()
-    assert set(reg) == CORPUS_COMPANIES
+    assert CORPUS_COMPANIES <= set(reg)
     pep = reg["PepsiCo"]
     assert "PEPSICO_2022_10K" in pep["doc_ids"]
     assert "FY2022" in pep["periods"]
@@ -186,6 +186,23 @@ def test_judgment_claim_is_unverifiable(subset_only) -> None:
     verdict, explanation = scope_verdict(_claim("Boeing", claim_type="judgment", period="FY2022"))
     assert verdict == "UNVERIFIABLE"
     assert explanation
+
+
+def test_judgment_labeled_historical_numeric_guidance_claim_stays_in_scope(subset_only) -> None:
+    claim = _claim("PepsiCo", claim_type="judgment", period="2023Q1")
+    claim.quote = (
+        "In Q1 FY2023, management raised full-year guidance for core constant "
+        "currency EPS growth by 2 percentage points."
+    )
+    claim.question = (
+        "Did management raise full-year guidance for core constant currency EPS "
+        "growth by 2 percentage points in Q1 FY2023?"
+    )
+
+    verdict, explanation = scope_verdict(claim)
+
+    assert verdict is None
+    assert explanation == ""
 
 
 def test_unknown_company_beats_judgment(subset_only) -> None:

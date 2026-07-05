@@ -7,7 +7,7 @@ LLM) so the invariants the plan relies on are pinned without an endpoint call.
 from __future__ import annotations
 
 from app import config
-from app.agent import _ItemState, _commit_nudge_notice, _jaccard, _search_stall_notice
+from app.agent import _ItemState, _commit_nudge_notice, _heuristic_strategy, _jaccard, _search_stall_notice
 from app.retrieval import _build_bm25_stats, _bm25_score
 
 
@@ -42,6 +42,16 @@ def test_bm25_idf_never_negative_for_majority_term():
     ]
     stats = _build_bm25_stats(rows)
     assert stats.idf["revenue"] >= 0.0
+
+
+# --- planning heuristic ------------------------------------------------------
+def test_heuristic_treats_ebitda_less_capex_as_computation():
+    question = (
+        "Was FY2022 unadjusted EBITDA less capital expenditures approximately "
+        "$10,342 million, with EBITDA defined as operating income plus "
+        "depreciation and amortization?"
+    )
+    assert _heuristic_strategy(question) == "multi_input_computation"
 
 
 # --- search stall guard ------------------------------------------------------

@@ -13,11 +13,14 @@ import pytest
 
 from app.agent import (
     _ItemState,
+    _dispatch,
     _match_quote_offsets,
     _minimal_citation_set,
     _normalize_citation,
 )
-from app.schemas import Chunk, Citation
+from app.schemas import AgentVisibleItem, Chunk, Citation
+from app.tool_protocol import ToolAction
+from app.trace import TraceWriter
 
 
 def _chunk(text: str, *, char_start: int = 100) -> Chunk:
@@ -131,6 +134,22 @@ def test_fetched_page_becomes_citable_only_when_quote_anchors():
     assert page.chunk_id in state.chunk_registry
 
 
+def test_fetched_page_can_resolve_by_printed_page_label():
+    page = _page_chunk(
+        "page:ACME_2023_10K:64",
+        "Statement of cash flows\nCapital spending\n(5,207)\n62\n",
+    )
+    state = _ItemState(fetched_pages={page.chunk_id: page})
+
+    citation = _normalize_citation(
+        {"chunk_id": "page:ACME_2023_10K:62", "quote": "Capital spending\n(5,207)"},
+        state,
+    )
+
+    assert citation.chunk_id == page.chunk_id
+    assert page.chunk_id in state.chunk_registry
+
+
 def test_fetched_page_with_absent_quote_is_rejected_and_not_promoted():
     page = _page_chunk("page:ACME_2023_10K:61", "Total revenue was $39,403 million in fiscal 2023.")
     state = _ItemState(fetched_pages={page.chunk_id: page})
@@ -183,3 +202,37 @@ def test_minimal_citation_set_untouched_for_calculated_and_text_answers():
 
     text_answer = {"status": "answered", "value": None, "answer": "The proposal was Defeated."}
     assert _minimal_citation_set([a, b], text_answer, _ItemState()) == [a, b]
+
+
+def test_record_answer_dispatch_accepts_string_item_answer_with_sibling_fields(tmp_path, monkeypatch):
+    from app import config
+
+    monkeypatch.setattr(config, "RUNS_DIR", tmp_path)
+    trace = TraceWriter("string-answer-run")
+    text = "The shareholder proposal was not approved."
+    chunk = _page_chunk("page:ACME_2023_8K:4", text)
+    state = _ItemState(chunk_registry={chunk.chunk_id: chunk})
+    visible = AgentVisibleItem(item_id="it-1", company="Acme", question="Was the proposal approved?")
+    action = ToolAction(
+        name="record_answer",
+        arguments={
+            "item_answer": "No. The shareholder proposal was not approved.",
+            "value": None,
+            "unit": "text",
+            "citations": [
+                {
+                    "citation_id": "citation_001",
+                    "chunk_id": chunk.chunk_id,
+                    "quote": text,
+                    "claim": "The proposal was not approved.",
+                }
+            ],
+            "confidence": {"grounded_inputs": 1, "assumed_inputs": 0},
+        },
+    )
+
+    output = _dispatch(action, trace, "Acme", "it-1", visible, state)
+
+    assert output == {"ok": True}
+    answers = [event for event in trace.events if event.type == "item_answer"]
+    assert answers[0].payload["answer"].startswith("No.")

@@ -229,6 +229,7 @@ _BIN_OPS = {
     ast.Div: operator.truediv,
 }
 _UNARY_OPS = {ast.UAdd: operator.pos, ast.USub: operator.neg}
+_RAW_DOLLAR_LITERAL_THRESHOLD = 1_000_000
 
 
 def _safe_eval(node: ast.AST, names: dict[str, float]) -> float:
@@ -245,6 +246,21 @@ def _safe_eval(node: ast.AST, names: dict[str, float]) -> float:
             raise ValueError(f"ungrounded input value: '{node.id}'")
         return names[node.id]
     raise ValueError(f"disallowed expression node: {type(node).__name__}")
+
+
+class _UsdMillionsLiteralNormalizer(ast.NodeTransformer):
+    """Convert obvious raw-dollar numeric literals into USD millions.
+
+    Some smaller local models emit expressions like ``4200000000 - 3800000000``
+    while the cited inputs are declared as ``USD millions``. Keeping the
+    normalization here preserves strict answer validation while making the
+    arithmetic tool tolerant of that unit-scale mismatch.
+    """
+
+    def visit_Constant(self, node: ast.Constant) -> ast.AST:
+        if isinstance(node.value, (int, float)) and abs(float(node.value)) >= _RAW_DOLLAR_LITERAL_THRESHOLD:
+            return ast.copy_location(ast.Constant(value=float(node.value) / 1_000_000.0), node)
+        return node
 
 
 def _round(value: float, rounding: Optional[str]) -> float:
@@ -275,8 +291,13 @@ def compute_calculation(
     for name, fin in parsed.items():
         if not fin.citation_id:
             raise ValueError(f"input '{name}' is missing citation_id (ungrounded)")
+        if fin.unit == "USD millions" and abs(float(fin.value)) >= _RAW_DOLLAR_LITERAL_THRESHOLD:
+            parsed[name] = fin.model_copy(update={"value": float(fin.value) / 1_000_000.0})
     names = {k: float(v.value) for k, v in parsed.items()}
     tree = ast.parse(expression, mode="eval")
+    if parsed and all(fin.unit == "USD millions" for fin in parsed.values()):
+        tree = _UsdMillionsLiteralNormalizer().visit(tree)
+        ast.fix_missing_locations(tree)
     value = _round(_safe_eval(tree, names), rounding)
     return CalculationResult(expression=expression, inputs=parsed, value=value, rounding=rounding)
 
