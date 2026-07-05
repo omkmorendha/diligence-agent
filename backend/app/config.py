@@ -24,6 +24,7 @@ PAGES_DIR = DATA_DIR / "pages"
 RAW_DIR = DATA_DIR / "raw"
 INDEX_DIR = DATA_DIR / "index"  # embedded chunk index (ingest.py), gitignored
 RUNS_DIR = ROOT / "runs"
+REVIEWS_DIR = RUNS_DIR / "reviews"  # v1 review artifacts (spec section 5)
 RESULTS_DIR = ROOT / "results"
 SUBSET_PATH = DATA_DIR / "subset.json"
 SMOKE_RESULT_PATH = DATA_DIR / "smoke_llm_result.json"
@@ -98,6 +99,16 @@ SEARCH_STALL_DOC_REPEATS = int(os.environ.get("SEARCH_STALL_DOC_REPEATS", "4"))
 # commit-nudge on the tool-result-hint channel (never an abstain suggestion) so
 # the model drafts its answer from evidence in hand instead of hunting forever.
 SEARCH_COMMIT_NUDGE_THRESHOLD = int(os.environ.get("SEARCH_COMMIT_NUDGE_THRESHOLD", "6"))
+
+# --- v1 review pipeline (spec section 13) ---
+MAX_CLAIMS_PER_REVIEW = int(os.environ.get("MAX_CLAIMS_PER_REVIEW", "30"))
+PILOT_CLAIMS = int(os.environ.get("PILOT_CLAIMS", "8"))
+REVIEW_WORKERS = int(os.environ.get("REVIEW_WORKERS", "3"))
+REVIEW_TIMEOUT_S = int(os.environ.get("REVIEW_TIMEOUT_S", "1800"))
+MAX_UPLOAD_MB = int(os.environ.get("MAX_UPLOAD_MB", "20"))
+# NOT_IN_CORPUS is an earned verdict: the verifier must try at least this many
+# distinct queries before it may return it (spec section 1.5).
+NOT_IN_CORPUS_MIN_QUERIES = int(os.environ.get("NOT_IN_CORPUS_MIN_QUERIES", "3"))
 
 # --- eval tolerances (spec section 20) ---
 DEFAULT_RELATIVE_TOLERANCE = 0.01

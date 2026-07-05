@@ -12,7 +12,9 @@ from __future__ import annotations
 
 import json
 import queue
+import threading
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Optional
 
 from . import config
@@ -28,16 +30,40 @@ class TraceWriter:
 
     Event ordering rules (spec section 12) are the caller's responsibility; this
     class only guarantees strictly increasing `seq` and immediate persistence.
+
+    Concurrency (spec section 1.7): a v1 review emits from several verification
+    worker threads at once. `emit` holds a lock across seq allocation, file
+    append, in-memory append, and SSE enqueue, so seq stays strictly monotonic in
+    both `events` and `trace.jsonl` and lines never interleave. Single-threaded v0
+    runs are unaffected (uncontended lock, identical output).
     """
 
-    def __init__(self, run_id: str) -> None:
+    def __init__(self, run_id: str, run_dir: Optional[str | Path] = None) -> None:
         self.run_id = run_id
-        self._seq = 0
+        self._lock = threading.Lock()
         self.events: list[TraceEvent] = []
         self.sse_queue: "queue.Queue[Optional[TraceEvent]]" = queue.Queue()
-        self.run_dir = config.RUNS_DIR / run_id
+        self.run_dir = Path(run_dir) if run_dir is not None else config.RUNS_DIR / run_id
         self.run_dir.mkdir(parents=True, exist_ok=True)
         self.trace_path = self.run_dir / "trace.jsonl"
+        self._seq = self._last_persisted_seq()
+
+    def _last_persisted_seq(self) -> int:
+        """Continue seq when appending to an existing trace, e.g. full promotion."""
+        if not self.trace_path.exists():
+            return 0
+        last_seq = 0
+        for line in self.trace_path.read_text().splitlines():
+            if not line.strip():
+                continue
+            try:
+                raw = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            seq = raw.get("seq")
+            if isinstance(seq, int) and seq > last_seq:
+                last_seq = seq
+        return last_seq
 
     def emit(
         self,
@@ -47,26 +73,27 @@ class TraceWriter:
         item_id: Optional[str] = None,
         payload: Optional[dict[str, Any]] = None,
     ) -> TraceEvent:
-        self._seq += 1
-        event = TraceEvent(
-            schema_version=config.SCHEMA_VERSION,
-            run_id=self.run_id,
-            seq=self._seq,
-            ts=_now_iso(),
-            type=type,
-            title=title,
-            detail=detail,
-            item_id=item_id,
-            payload=payload or {},
-        )
-        # 1. persist immediately
-        with self.trace_path.open("a") as f:
-            f.write(event.model_dump_json() + "\n")
-        # 2. in-memory
-        self.events.append(event)
-        # 3. SSE
-        self.sse_queue.put(event)
-        return event
+        with self._lock:
+            self._seq += 1
+            event = TraceEvent(
+                schema_version=config.SCHEMA_VERSION,
+                run_id=self.run_id,
+                seq=self._seq,
+                ts=_now_iso(),
+                type=type,
+                title=title,
+                detail=detail,
+                item_id=item_id,
+                payload=payload or {},
+            )
+            # 1. persist immediately
+            with self.trace_path.open("a") as f:
+                f.write(event.model_dump_json() + "\n")
+            # 2. in-memory
+            self.events.append(event)
+            # 3. SSE
+            self.sse_queue.put(event)
+            return event
 
     def close(self) -> None:
         """Signal end-of-stream to any live SSE consumer."""
@@ -74,15 +101,17 @@ class TraceWriter:
 
     def last_event_of_type(self, type: TraceEventType) -> Optional[TraceEvent]:
         """Return the most recent event of a given type, if any."""
-        for event in reversed(self.events):
-            if event.type == type:
-                return event
+        with self._lock:
+            for event in reversed(self.events):
+                if event.type == type:
+                    return event
         return None
 
     @staticmethod
-    def read(run_id: str) -> list[TraceEvent]:
+    def read(run_id: str, run_dir: Optional[str | Path] = None) -> list[TraceEvent]:
         """Load a completed trace from disk (for replay mode)."""
-        path = config.RUNS_DIR / run_id / "trace.jsonl"
+        base = Path(run_dir) if run_dir is not None else config.RUNS_DIR / run_id
+        path = base / "trace.jsonl"
         if not path.exists():
             return []
         return [TraceEvent(**json.loads(line)) for line in path.read_text().splitlines() if line.strip()]

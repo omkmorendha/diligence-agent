@@ -1150,6 +1150,40 @@ def _run_item(
     return result_answer
 
 
+def run_agent_item(
+    trace: TraceWriter,
+    company: str,
+    visible: AgentVisibleItem,
+    plan_entry: Optional[dict[str, Any]] = None,
+    *,
+    protocol: Optional[ToolProtocol] = None,
+    protocol_name: Optional[str] = None,
+    call_purpose: str = "item_loop",
+    manage_call_context: bool = True,
+) -> ItemAnswer:
+    """Run the existing v0 per-item loop for a visible/ad-hoc item.
+
+    This is intentionally a thin wrapper around `_run_item`: `run_agent` still
+    builds the same plan and uses the same protocol, while v1 review verification
+    can pass an `AgentVisibleItem` that did not come from `subset.json`.
+    """
+    resolved_protocol_name = protocol_name or config.selected_tool_protocol()
+    resolved_protocol = protocol or tool_protocol.get_protocol(resolved_protocol_name)
+    resolved_plan = plan_entry or {
+        "item_id": visible.item_id,
+        "question": visible.question,
+        "strategy": _heuristic_strategy(visible.question),
+        "planned_inputs": [],
+    }
+    if manage_call_context:
+        llm.set_call_context(purpose=call_purpose, item_id=visible.item_id)
+    try:
+        return _run_item(resolved_protocol, trace, company, visible, resolved_plan, resolved_protocol_name)
+    finally:
+        if manage_call_context:
+            llm.set_call_context(purpose=None, item_id=None)
+
+
 # --- memo assembly (deterministic -- restates recorded answers only) -------
 def _render_memo_markdown(memo: Memo) -> str:
     lines = [
@@ -1191,7 +1225,7 @@ def run_agent(run_id: str, company: str, item_ids: list[str] | None, trace: Trac
     """Execute the agent over a company's checklist, streaming events into `trace`."""
     created_at = _now_iso()
     llm.set_usage_sink(llm.jsonl_usage_sink(trace.run_dir / "llm_calls.jsonl"))
-    llm.set_call_context(run_id=run_id, system="agent")
+    llm.set_run_context(run_id=run_id, system="agent")
     try:
         items = _load_checklist(company, item_ids)
         if not items:
@@ -1219,7 +1253,17 @@ def run_agent(run_id: str, company: str, item_ids: list[str] | None, trace: Trac
         for visible in visible_items:
             plan_entry = plan_by_id.get(visible.item_id, {"strategy": "single_lookup", "planned_inputs": []})
             llm.set_call_context(purpose="item_loop", item_id=visible.item_id)
-            item_answers.append(_run_item(protocol, trace, company, visible, plan_entry, protocol_name))
+            item_answers.append(
+                run_agent_item(
+                    trace,
+                    company,
+                    visible,
+                    plan_entry,
+                    protocol=protocol,
+                    protocol_name=protocol_name,
+                    manage_call_context=False,
+                )
+            )
         llm.set_call_context(purpose=None, item_id=None)
 
         memo_items = [
