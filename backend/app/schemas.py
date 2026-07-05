@@ -13,7 +13,7 @@ CRITICAL — no hidden gold leakage (spec section 2.2):
 
 from __future__ import annotations
 
-from typing import Any, Literal, Optional
+from typing import Any, Literal, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -59,6 +59,16 @@ class SubsetItem(BaseModel):
     gold_answer: str
     gold_value: Optional[float] = None
     gold_unit: Unit = "text"
+    # --- IMP3-1 (results/iterations/iter2/improvement_plan.json): human-reviewable
+    # CANONICAL gold annotations, sourced from data/gold_annotations.json and merged in
+    # by d5_select_subset.py. Derived from question + gold_answer TEXT ONLY (never from
+    # any agent output). They ONLY ADD pass opportunities in scorers.answer_accuracy
+    # (gated on presence, above the exact-string fallback); gold_answer stays canonical.
+    #   gold_polarity   -> the yes/no answer to an unambiguous yes/no question.
+    #   gold_canonical  -> canonical entity/category (str), entity list (str[]), or one
+    #                      of {operating,investing,financing} for cash-flow-source choices.
+    gold_polarity: Optional[Literal["yes", "no"]] = None
+    gold_canonical: Optional[Union[str, list[str]]] = None
     gold_evidence: list[GoldEvidence] = Field(default_factory=list)
     bucket: Bucket = "C_lookup"
     expected_formula: Optional[str] = None

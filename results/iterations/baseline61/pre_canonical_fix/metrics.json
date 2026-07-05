@@ -1,0 +1,3075 @@
+{
+  "iteration": 0,
+  "label": "baseline61 rescored under IMP-2 golds",
+  "generated_at": "2026-07-05T05:36:44.569061+05:30",
+  "aggregate": {
+    "answer_accuracy": 0.2759,
+    "citation_precision": 0.4138,
+    "citation_provenance": 1.0,
+    "arithmetic_integrity": 0.6897,
+    "trace_shape": 0.4426,
+    "abstention_correct_rate": 0.0,
+    "n_items": 61,
+    "answered": 29,
+    "abstained": 32
+  },
+  "by_bucket": {
+    "A_multi_input": {
+      "answer_accuracy": 0.3333,
+      "citation_precision": 0.3333,
+      "citation_provenance": 1.0,
+      "arithmetic_integrity": 0.6667,
+      "trace_shape": 0.0,
+      "n_items": 34,
+      "answered": 15
+    },
+    "B_judgment": {
+      "answer_accuracy": 0.0,
+      "citation_precision": 0.3333,
+      "citation_provenance": 1.0,
+      "arithmetic_integrity": 0.8333,
+      "trace_shape": 1.0,
+      "n_items": 14,
+      "answered": 6
+    },
+    "C_lookup": {
+      "answer_accuracy": 0.375,
+      "citation_precision": 0.625,
+      "citation_provenance": 1.0,
+      "arithmetic_integrity": 0.625,
+      "trace_shape": 1.0,
+      "n_items": 13,
+      "answered": 8
+    }
+  },
+  "timing": {
+    "item_wall_p50_s": 23.84,
+    "item_wall_p95_s": 77.26,
+    "item_wall_mean_s": 31.29,
+    "mean_llm_call_s": 25.9,
+    "total_llm_s": 1727.6,
+    "run_wall_max_s": 320.89,
+    "slowest_items": [
+      {
+        "item_id": "adobe_01",
+        "wall_s": 132.73,
+        "llm_calls": 2
+      },
+      {
+        "item_id": "boeing_06",
+        "wall_s": 98.2,
+        "llm_calls": 2
+      },
+      {
+        "item_id": "johnson_johnson_06",
+        "wall_s": 87.93,
+        "llm_calls": 2
+      },
+      {
+        "item_id": "pepsico_01",
+        "wall_s": 77.26,
+        "llm_calls": 1
+      },
+      {
+        "item_id": "pepsico_02",
+        "wall_s": 62.3,
+        "llm_calls": 1
+      },
+      {
+        "item_id": "boeing_01",
+        "wall_s": 58.73,
+        "llm_calls": 1
+      },
+      {
+        "item_id": "boeing_02",
+        "wall_s": 56.75,
+        "llm_calls": 1
+      },
+      {
+        "item_id": "johnson_johnson_02",
+        "wall_s": 55.17,
+        "llm_calls": 1
+      }
+    ]
+  },
+  "tokens": {
+    "prompt_total": 133546,
+    "completion_total": 197920,
+    "by_purpose": {
+      "baseline_answer": {
+        "prompt": 133546,
+        "completion": 197920,
+        "calls": 64,
+        "seconds": 1727.5
+      }
+    },
+    "mean_prompt_per_item": 2189.0
+  },
+  "behavior": {
+    "tool_totals": {
+      "search_filing": 61,
+      "record_answer": 29,
+      "flag_outstanding": 32
+    },
+    "rejection_totals": {},
+    "mean_tool_calls_per_item": 2,
+    "budget_exhausted_items": [],
+    "llm_error_total": 0
+  },
+  "failure_taxonomy": {
+    "abstained_answerable/model_choice": [
+      "adobe_02",
+      "adobe_03",
+      "adobe_04",
+      "adobe_05",
+      "amd_01",
+      "amd_03",
+      "amd_04",
+      "amd_05",
+      "amd_06",
+      "best_buy_04",
+      "best_buy_05",
+      "boeing_04",
+      "general_mills_01",
+      "general_mills_02",
+      "general_mills_03",
+      "johnson_johnson_01",
+      "johnson_johnson_07",
+      "mgm_resorts_01",
+      "mgm_resorts_04",
+      "mgm_resorts_05",
+      "mgm_resorts_06",
+      "nike_01",
+      "nike_02",
+      "nike_03",
+      "nike_04",
+      "pepsico_03",
+      "pepsico_05",
+      "pfizer_01",
+      "pfizer_02",
+      "pfizer_03",
+      "verizon_02",
+      "verizon_05"
+    ],
+    "correct": [
+      "amd_02",
+      "best_buy_03",
+      "boeing_03",
+      "johnson_johnson_04",
+      "johnson_johnson_05",
+      "pepsico_01",
+      "pepsico_02",
+      "pepsico_04"
+    ],
+    "wrong_text": [
+      "adobe_01",
+      "best_buy_01",
+      "best_buy_02",
+      "boeing_01",
+      "boeing_02",
+      "boeing_05",
+      "boeing_06",
+      "boeing_07",
+      "johnson_johnson_02",
+      "johnson_johnson_03",
+      "johnson_johnson_06",
+      "mgm_resorts_02",
+      "mgm_resorts_03",
+      "pepsico_07",
+      "pepsico_08",
+      "pfizer_04",
+      "verizon_01",
+      "verizon_03",
+      "verizon_04"
+    ],
+    "wrong_value": [
+      "general_mills_04",
+      "pepsico_06"
+    ]
+  },
+  "per_run": [
+    {
+      "run_id": "iter0-baseline-adobe",
+      "company": "Adobe",
+      "wall_s": 196.06,
+      "plan_s": 0,
+      "n_items": 5,
+      "llm_calls": 6,
+      "llm_errors": 0,
+      "prompt_tokens": 12156,
+      "completion_tokens": 22960
+    },
+    {
+      "run_id": "iter0-baseline-amd",
+      "company": "AMD",
+      "wall_s": 151.98,
+      "plan_s": 0,
+      "n_items": 6,
+      "llm_calls": 6,
+      "llm_errors": 0,
+      "prompt_tokens": 10390,
+      "completion_tokens": 7701
+    },
+    {
+      "run_id": "iter0-baseline-best_buy",
+      "company": "Best Buy",
+      "wall_s": 130.82,
+      "plan_s": 0,
+      "n_items": 5,
+      "llm_calls": 5,
+      "llm_errors": 0,
+      "prompt_tokens": 12652,
+      "completion_tokens": 13886
+    },
+    {
+      "run_id": "iter0-baseline-boeing",
+      "company": "Boeing",
+      "wall_s": 320.89,
+      "plan_s": 0,
+      "n_items": 7,
+      "llm_calls": 8,
+      "llm_errors": 0,
+      "prompt_tokens": 16886,
+      "completion_tokens": 38995
+    },
+    {
+      "run_id": "iter0-baseline-general_mills",
+      "company": "General Mills",
+      "wall_s": 107.7,
+      "plan_s": 0,
+      "n_items": 4,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 10113,
+      "completion_tokens": 9514
+    },
+    {
+      "run_id": "iter0-baseline-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "wall_s": 280.85,
+      "plan_s": 0,
+      "n_items": 7,
+      "llm_calls": 8,
+      "llm_errors": 0,
+      "prompt_tokens": 17933,
+      "completion_tokens": 32263
+    },
+    {
+      "run_id": "iter0-baseline-mgm_resorts",
+      "company": "MGM Resorts",
+      "wall_s": 161.11,
+      "plan_s": 0,
+      "n_items": 6,
+      "llm_calls": 6,
+      "llm_errors": 0,
+      "prompt_tokens": 14718,
+      "completion_tokens": 12790
+    },
+    {
+      "run_id": "iter0-baseline-nike",
+      "company": "Nike",
+      "wall_s": 70.7,
+      "plan_s": 0,
+      "n_items": 4,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 7364,
+      "completion_tokens": 7851
+    },
+    {
+      "run_id": "iter0-baseline-pepsico",
+      "company": "PepsiCo",
+      "wall_s": 277.55,
+      "plan_s": 0,
+      "n_items": 8,
+      "llm_calls": 8,
+      "llm_errors": 0,
+      "prompt_tokens": 15528,
+      "completion_tokens": 26596
+    },
+    {
+      "run_id": "iter0-baseline-pfizer",
+      "company": "Pfizer",
+      "wall_s": 81.88,
+      "plan_s": 0,
+      "n_items": 4,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 7521,
+      "completion_tokens": 10218
+    },
+    {
+      "run_id": "iter0-baseline-verizon",
+      "company": "Verizon",
+      "wall_s": 129.03,
+      "plan_s": 0,
+      "n_items": 5,
+      "llm_calls": 5,
+      "llm_errors": 0,
+      "prompt_tokens": 8285,
+      "completion_tokens": 15146
+    }
+  ],
+  "per_item": [
+    {
+      "item_id": "adobe_01",
+      "run_id": "iter0-baseline-adobe",
+      "company": "Adobe",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 132.73,
+      "llm_s": 109.43,
+      "llm_calls": 2,
+      "llm_errors": 0,
+      "prompt_tokens": 3857,
+      "completion_tokens": 14731,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 0.0,
+          "t1": 23.3
+        },
+        {
+          "kind": "llm",
+          "t0": 23.3,
+          "t1": 88.74
+        },
+        {
+          "kind": "llm",
+          "t0": 88.74,
+          "t1": 132.72
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 132.73,
+          "t1": 132.73
+        }
+      ]
+    },
+    {
+      "item_id": "adobe_02",
+      "run_id": "iter0-baseline-adobe",
+      "company": "Adobe",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 17.43,
+      "llm_s": 17.21,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1788,
+      "completion_tokens": 2136,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 132.73,
+          "t1": 132.94
+        },
+        {
+          "kind": "llm",
+          "t0": 132.94,
+          "t1": 150.15
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 150.16,
+          "t1": 150.16
+        }
+      ]
+    },
+    {
+      "item_id": "adobe_03",
+      "run_id": "iter0-baseline-adobe",
+      "company": "Adobe",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 17.51,
+      "llm_s": 17.3,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2127,
+      "completion_tokens": 2727,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 150.16,
+          "t1": 150.37
+        },
+        {
+          "kind": "llm",
+          "t0": 150.37,
+          "t1": 167.66
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 167.67,
+          "t1": 167.67
+        }
+      ]
+    },
+    {
+      "item_id": "adobe_04",
+      "run_id": "iter0-baseline-adobe",
+      "company": "Adobe",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 14.58,
+      "llm_s": 14.37,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2135,
+      "completion_tokens": 2203,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 167.67,
+          "t1": 167.87
+        },
+        {
+          "kind": "llm",
+          "t0": 167.87,
+          "t1": 182.24
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 182.25,
+          "t1": 182.25
+        }
+      ]
+    },
+    {
+      "item_id": "adobe_05",
+      "run_id": "iter0-baseline-adobe",
+      "company": "Adobe",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 13.81,
+      "llm_s": 13.72,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2249,
+      "completion_tokens": 1163,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 182.25,
+          "t1": 182.33
+        },
+        {
+          "kind": "llm",
+          "t0": 182.33,
+          "t1": 196.05
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 196.06,
+          "t1": 196.06
+        }
+      ]
+    },
+    {
+      "item_id": "amd_01",
+      "run_id": "iter0-baseline-amd",
+      "company": "AMD",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 44.36,
+      "llm_s": 24.21,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1627,
+      "completion_tokens": 679,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 0.0,
+          "t1": 20.15
+        },
+        {
+          "kind": "llm",
+          "t0": 20.15,
+          "t1": 44.36
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 44.36,
+          "t1": 44.36
+        }
+      ]
+    },
+    {
+      "item_id": "amd_02",
+      "run_id": "iter0-baseline-amd",
+      "company": "AMD",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 26.45,
+      "llm_s": 26.3,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1768,
+      "completion_tokens": 2226,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 44.36,
+          "t1": 44.51
+        },
+        {
+          "kind": "llm",
+          "t0": 44.51,
+          "t1": 70.81
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 70.81,
+          "t1": 70.81
+        }
+      ]
+    },
+    {
+      "item_id": "amd_03",
+      "run_id": "iter0-baseline-amd",
+      "company": "AMD",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 27.51,
+      "llm_s": 27.4,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1971,
+      "completion_tokens": 1630,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 70.81,
+          "t1": 70.91
+        },
+        {
+          "kind": "llm",
+          "t0": 70.91,
+          "t1": 98.31
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 98.32,
+          "t1": 98.32
+        }
+      ]
+    },
+    {
+      "item_id": "amd_04",
+      "run_id": "iter0-baseline-amd",
+      "company": "AMD",
+      "bucket": "C_lookup",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "pass",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 26.71,
+      "llm_s": 26.49,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1661,
+      "completion_tokens": 1653,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 98.32,
+          "t1": 98.53
+        },
+        {
+          "kind": "llm",
+          "t0": 98.53,
+          "t1": 125.02
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 125.02,
+          "t1": 125.03
+        }
+      ]
+    },
+    {
+      "item_id": "amd_05",
+      "run_id": "iter0-baseline-amd",
+      "company": "AMD",
+      "bucket": "B_judgment",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "pass",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 12.6,
+      "llm_s": 12.51,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1689,
+      "completion_tokens": 860,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 125.03,
+          "t1": 125.11
+        },
+        {
+          "kind": "llm",
+          "t0": 125.11,
+          "t1": 137.62
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 137.63,
+          "t1": 137.63
+        }
+      ]
+    },
+    {
+      "item_id": "amd_06",
+      "run_id": "iter0-baseline-amd",
+      "company": "AMD",
+      "bucket": "B_judgment",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "pass",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 14.35,
+      "llm_s": 14.25,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1674,
+      "completion_tokens": 653,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 137.63,
+          "t1": 137.73
+        },
+        {
+          "kind": "llm",
+          "t0": 137.73,
+          "t1": 151.98
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 151.98,
+          "t1": 151.98
+        }
+      ]
+    },
+    {
+      "item_id": "best_buy_01",
+      "run_id": "iter0-baseline-best_buy",
+      "company": "Best Buy",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "fail",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 53.45,
+      "llm_s": 46.14,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2359,
+      "completion_tokens": 5660,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 0.0,
+          "t1": 7.3
+        },
+        {
+          "kind": "llm",
+          "t0": 7.3,
+          "t1": 53.44
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 53.45,
+          "t1": 53.45
+        }
+      ]
+    },
+    {
+      "item_id": "best_buy_02",
+      "run_id": "iter0-baseline-best_buy",
+      "company": "Best Buy",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 33.8,
+      "llm_s": 33.63,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2428,
+      "completion_tokens": 2841,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 53.45,
+          "t1": 53.62
+        },
+        {
+          "kind": "llm",
+          "t0": 53.62,
+          "t1": 87.25
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 87.25,
+          "t1": 87.25
+        }
+      ]
+    },
+    {
+      "item_id": "best_buy_03",
+      "run_id": "iter0-baseline-best_buy",
+      "company": "Best Buy",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "fail",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 25.56,
+      "llm_s": 25.43,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 3037,
+      "completion_tokens": 3016,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 87.25,
+          "t1": 87.37
+        },
+        {
+          "kind": "llm",
+          "t0": 87.37,
+          "t1": 112.8
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 112.81,
+          "t1": 112.81
+        }
+      ]
+    },
+    {
+      "item_id": "best_buy_04",
+      "run_id": "iter0-baseline-best_buy",
+      "company": "Best Buy",
+      "bucket": "C_lookup",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "pass",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 9.36,
+      "llm_s": 9.25,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2393,
+      "completion_tokens": 1127,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 112.81,
+          "t1": 112.91
+        },
+        {
+          "kind": "llm",
+          "t0": 112.91,
+          "t1": 122.16
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 122.16,
+          "t1": 122.16
+        }
+      ]
+    },
+    {
+      "item_id": "best_buy_05",
+      "run_id": "iter0-baseline-best_buy",
+      "company": "Best Buy",
+      "bucket": "B_judgment",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "pass",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 8.65,
+      "llm_s": 8.56,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2435,
+      "completion_tokens": 1242,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 122.16,
+          "t1": 122.26
+        },
+        {
+          "kind": "llm",
+          "t0": 122.26,
+          "t1": 130.82
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 130.82,
+          "t1": 130.82
+        }
+      ]
+    },
+    {
+      "item_id": "boeing_01",
+      "run_id": "iter0-baseline-boeing",
+      "company": "Boeing",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 58.73,
+      "llm_s": 37.83,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2773,
+      "completion_tokens": 5167,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 0.0,
+          "t1": 20.9
+        },
+        {
+          "kind": "llm",
+          "t0": 20.9,
+          "t1": 58.73
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 58.73,
+          "t1": 58.73
+        }
+      ]
+    },
+    {
+      "item_id": "boeing_02",
+      "run_id": "iter0-baseline-boeing",
+      "company": "Boeing",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 56.75,
+      "llm_s": 56.55,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2272,
+      "completion_tokens": 6592,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 58.73,
+          "t1": 58.93
+        },
+        {
+          "kind": "llm",
+          "t0": 58.93,
+          "t1": 115.48
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 115.48,
+          "t1": 115.48
+        }
+      ]
+    },
+    {
+      "item_id": "boeing_03",
+      "run_id": "iter0-baseline-boeing",
+      "company": "Boeing",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 17.96,
+      "llm_s": 17.75,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2611,
+      "completion_tokens": 1522,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 115.48,
+          "t1": 115.69
+        },
+        {
+          "kind": "llm",
+          "t0": 115.69,
+          "t1": 133.44
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 133.44,
+          "t1": 133.44
+        }
+      ]
+    },
+    {
+      "item_id": "boeing_04",
+      "run_id": "iter0-baseline-boeing",
+      "company": "Boeing",
+      "bucket": "B_judgment",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "pass",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 22.09,
+      "llm_s": 21.91,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1840,
+      "completion_tokens": 2597,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 133.44,
+          "t1": 133.62
+        },
+        {
+          "kind": "llm",
+          "t0": 133.62,
+          "t1": 155.53
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 155.53,
+          "t1": 155.53
+        }
+      ]
+    },
+    {
+      "item_id": "boeing_05",
+      "run_id": "iter0-baseline-boeing",
+      "company": "Boeing",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 23.12,
+      "llm_s": 22.96,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1711,
+      "completion_tokens": 3158,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 155.53,
+          "t1": 155.69
+        },
+        {
+          "kind": "llm",
+          "t0": 155.69,
+          "t1": 178.65
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 178.66,
+          "t1": 178.66
+        }
+      ]
+    },
+    {
+      "item_id": "boeing_06",
+      "run_id": "iter0-baseline-boeing",
+      "company": "Boeing",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "fail",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 98.2,
+      "llm_s": 98.02,
+      "llm_calls": 2,
+      "llm_errors": 0,
+      "prompt_tokens": 3997,
+      "completion_tokens": 13741,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 178.66,
+          "t1": 178.83
+        },
+        {
+          "kind": "llm",
+          "t0": 178.83,
+          "t1": 232.5
+        },
+        {
+          "kind": "llm",
+          "t0": 232.5,
+          "t1": 276.86
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 276.86,
+          "t1": 276.86
+        }
+      ]
+    },
+    {
+      "item_id": "boeing_07",
+      "run_id": "iter0-baseline-boeing",
+      "company": "Boeing",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 44.03,
+      "llm_s": 43.87,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1682,
+      "completion_tokens": 6218,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 276.86,
+          "t1": 277.01
+        },
+        {
+          "kind": "llm",
+          "t0": 277.01,
+          "t1": 320.88
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 320.89,
+          "t1": 320.89
+        }
+      ]
+    },
+    {
+      "item_id": "general_mills_01",
+      "run_id": "iter0-baseline-general_mills",
+      "company": "General Mills",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 23.64,
+      "llm_s": 15.62,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2041,
+      "completion_tokens": 1050,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 0.0,
+          "t1": 8.02
+        },
+        {
+          "kind": "llm",
+          "t0": 8.02,
+          "t1": 23.64
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 23.64,
+          "t1": 23.64
+        }
+      ]
+    },
+    {
+      "item_id": "general_mills_02",
+      "run_id": "iter0-baseline-general_mills",
+      "company": "General Mills",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 25.46,
+      "llm_s": 25.17,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2781,
+      "completion_tokens": 1926,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 23.64,
+          "t1": 23.94
+        },
+        {
+          "kind": "llm",
+          "t0": 23.94,
+          "t1": 49.11
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 49.11,
+          "t1": 49.11
+        }
+      ]
+    },
+    {
+      "item_id": "general_mills_03",
+      "run_id": "iter0-baseline-general_mills",
+      "company": "General Mills",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 14.15,
+      "llm_s": 14.04,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2581,
+      "completion_tokens": 1713,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 49.11,
+          "t1": 49.22
+        },
+        {
+          "kind": "llm",
+          "t0": 49.22,
+          "t1": 63.26
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 63.26,
+          "t1": 63.26
+        }
+      ]
+    },
+    {
+      "item_id": "general_mills_04",
+      "run_id": "iter0-baseline-general_mills",
+      "company": "General Mills",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "wrong_value",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "fail",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 44.43,
+      "llm_s": 44.22,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2710,
+      "completion_tokens": 4825,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 63.26,
+          "t1": 63.47
+        },
+        {
+          "kind": "llm",
+          "t0": 63.47,
+          "t1": 107.69
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 107.7,
+          "t1": 107.7
+        }
+      ]
+    },
+    {
+      "item_id": "johnson_johnson_01",
+      "run_id": "iter0-baseline-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 40.53,
+      "llm_s": 18.89,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2425,
+      "completion_tokens": 1465,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 0.0,
+          "t1": 21.63
+        },
+        {
+          "kind": "llm",
+          "t0": 21.63,
+          "t1": 40.53
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 40.53,
+          "t1": 40.53
+        }
+      ]
+    },
+    {
+      "item_id": "johnson_johnson_02",
+      "run_id": "iter0-baseline-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 55.17,
+      "llm_s": 54.9,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2730,
+      "completion_tokens": 7064,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 40.53,
+          "t1": 40.8
+        },
+        {
+          "kind": "llm",
+          "t0": 40.8,
+          "t1": 95.69
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 95.69,
+          "t1": 95.69
+        }
+      ]
+    },
+    {
+      "item_id": "johnson_johnson_03",
+      "run_id": "iter0-baseline-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 22.16,
+      "llm_s": 21.91,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1883,
+      "completion_tokens": 1373,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 95.69,
+          "t1": 95.93
+        },
+        {
+          "kind": "llm",
+          "t0": 95.93,
+          "t1": 117.84
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 117.85,
+          "t1": 117.85
+        }
+      ]
+    },
+    {
+      "item_id": "johnson_johnson_04",
+      "run_id": "iter0-baseline-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "fail",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 30.5,
+      "llm_s": 30.4,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1901,
+      "completion_tokens": 3644,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 117.85,
+          "t1": 117.94
+        },
+        {
+          "kind": "llm",
+          "t0": 117.94,
+          "t1": 148.34
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 148.35,
+          "t1": 148.35
+        }
+      ]
+    },
+    {
+      "item_id": "johnson_johnson_05",
+      "run_id": "iter0-baseline-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "fail",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 14.03,
+      "llm_s": 13.82,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1987,
+      "completion_tokens": 1928,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 148.35,
+          "t1": 148.56
+        },
+        {
+          "kind": "llm",
+          "t0": 148.56,
+          "t1": 162.38
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 162.38,
+          "t1": 162.38
+        }
+      ]
+    },
+    {
+      "item_id": "johnson_johnson_06",
+      "run_id": "iter0-baseline-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 87.93,
+      "llm_s": 87.85,
+      "llm_calls": 2,
+      "llm_errors": 0,
+      "prompt_tokens": 4741,
+      "completion_tokens": 13464,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 162.38,
+          "t1": 162.45
+        },
+        {
+          "kind": "llm",
+          "t0": 162.45,
+          "t1": 214.86
+        },
+        {
+          "kind": "llm",
+          "t0": 214.86,
+          "t1": 250.3
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 250.31,
+          "t1": 250.31
+        }
+      ]
+    },
+    {
+      "item_id": "johnson_johnson_07",
+      "run_id": "iter0-baseline-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "bucket": "B_judgment",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "pass",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 30.54,
+      "llm_s": 30.37,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2266,
+      "completion_tokens": 3325,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 250.31,
+          "t1": 250.47
+        },
+        {
+          "kind": "llm",
+          "t0": 250.47,
+          "t1": 280.84
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 280.85,
+          "t1": 280.85
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_01",
+      "run_id": "iter0-baseline-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 51.58,
+      "llm_s": 27.38,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2361,
+      "completion_tokens": 1136,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 0.0,
+          "t1": 24.2
+        },
+        {
+          "kind": "llm",
+          "t0": 24.2,
+          "t1": 51.58
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 51.58,
+          "t1": 51.58
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_02",
+      "run_id": "iter0-baseline-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 42.15,
+      "llm_s": 41.92,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2621,
+      "completion_tokens": 3855,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 51.58,
+          "t1": 51.81
+        },
+        {
+          "kind": "llm",
+          "t0": 51.81,
+          "t1": 93.73
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 93.73,
+          "t1": 93.73
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_03",
+      "run_id": "iter0-baseline-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 16.63,
+      "llm_s": 16.46,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2467,
+      "completion_tokens": 2041,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 93.73,
+          "t1": 93.9
+        },
+        {
+          "kind": "llm",
+          "t0": 93.9,
+          "t1": 110.36
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 110.36,
+          "t1": 110.36
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_04",
+      "run_id": "iter0-baseline-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "C_lookup",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "pass",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 16.32,
+      "llm_s": 16.17,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2525,
+      "completion_tokens": 1538,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 110.36,
+          "t1": 110.51
+        },
+        {
+          "kind": "llm",
+          "t0": 110.51,
+          "t1": 126.68
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 126.68,
+          "t1": 126.68
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_05",
+      "run_id": "iter0-baseline-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "B_judgment",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "pass",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 25.34,
+      "llm_s": 25.21,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1995,
+      "completion_tokens": 3218,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 126.68,
+          "t1": 126.82
+        },
+        {
+          "kind": "llm",
+          "t0": 126.82,
+          "t1": 152.03
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 152.03,
+          "t1": 152.03
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_06",
+      "run_id": "iter0-baseline-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "B_judgment",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "pass",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 9.08,
+      "llm_s": 8.88,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2749,
+      "completion_tokens": 1002,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 152.03,
+          "t1": 152.22
+        },
+        {
+          "kind": "llm",
+          "t0": 152.22,
+          "t1": 161.1
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 161.11,
+          "t1": 161.11
+        }
+      ]
+    },
+    {
+      "item_id": "nike_01",
+      "run_id": "iter0-baseline-nike",
+      "company": "Nike",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 15.84,
+      "llm_s": 8.48,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1931,
+      "completion_tokens": 1117,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 0.0,
+          "t1": 7.35
+        },
+        {
+          "kind": "llm",
+          "t0": 7.35,
+          "t1": 15.84
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 15.84,
+          "t1": 15.84
+        }
+      ]
+    },
+    {
+      "item_id": "nike_02",
+      "run_id": "iter0-baseline-nike",
+      "company": "Nike",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 17.0,
+      "llm_s": 16.91,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1929,
+      "completion_tokens": 1950,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 15.84,
+          "t1": 15.93
+        },
+        {
+          "kind": "llm",
+          "t0": 15.93,
+          "t1": 32.84
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 32.84,
+          "t1": 32.84
+        }
+      ]
+    },
+    {
+      "item_id": "nike_03",
+      "run_id": "iter0-baseline-nike",
+      "company": "Nike",
+      "bucket": "C_lookup",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "pass",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 5.84,
+      "llm_s": 5.74,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1560,
+      "completion_tokens": 615,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 32.84,
+          "t1": 32.94
+        },
+        {
+          "kind": "llm",
+          "t0": 32.94,
+          "t1": 38.68
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 38.68,
+          "t1": 38.68
+        }
+      ]
+    },
+    {
+      "item_id": "nike_04",
+      "run_id": "iter0-baseline-nike",
+      "company": "Nike",
+      "bucket": "B_judgment",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "pass",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 32.02,
+      "llm_s": 31.89,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1944,
+      "completion_tokens": 4169,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 38.68,
+          "t1": 38.81
+        },
+        {
+          "kind": "llm",
+          "t0": 38.81,
+          "t1": 70.7
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 70.7,
+          "t1": 70.7
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_01",
+      "run_id": "iter0-baseline-pepsico",
+      "company": "PepsiCo",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "fail",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 77.26,
+      "llm_s": 51.75,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1986,
+      "completion_tokens": 4588,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 0.0,
+          "t1": 25.51
+        },
+        {
+          "kind": "llm",
+          "t0": 25.51,
+          "t1": 77.26
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 77.26,
+          "t1": 77.26
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_02",
+      "run_id": "iter0-baseline-pepsico",
+      "company": "PepsiCo",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "fail",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 62.3,
+      "llm_s": 62.06,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2072,
+      "completion_tokens": 8174,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 77.26,
+          "t1": 77.5
+        },
+        {
+          "kind": "llm",
+          "t0": 77.5,
+          "t1": 139.56
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 139.56,
+          "t1": 139.56
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_03",
+      "run_id": "iter0-baseline-pepsico",
+      "company": "PepsiCo",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 29.31,
+      "llm_s": 29.07,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1902,
+      "completion_tokens": 3149,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 139.56,
+          "t1": 139.8
+        },
+        {
+          "kind": "llm",
+          "t0": 139.8,
+          "t1": 168.87
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 168.87,
+          "t1": 168.87
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_04",
+      "run_id": "iter0-baseline-pepsico",
+      "company": "PepsiCo",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 17.87,
+      "llm_s": 17.42,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1669,
+      "completion_tokens": 1551,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 168.87,
+          "t1": 169.32
+        },
+        {
+          "kind": "llm",
+          "t0": 169.32,
+          "t1": 186.74
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 186.75,
+          "t1": 186.75
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_05",
+      "run_id": "iter0-baseline-pepsico",
+      "company": "PepsiCo",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 16.43,
+      "llm_s": 16.2,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2043,
+      "completion_tokens": 1279,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 186.75,
+          "t1": 186.97
+        },
+        {
+          "kind": "llm",
+          "t0": 186.97,
+          "t1": 203.18
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 203.18,
+          "t1": 203.18
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_06",
+      "run_id": "iter0-baseline-pepsico",
+      "company": "PepsiCo",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "wrong_value",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "fail",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 31.68,
+      "llm_s": 31.51,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2004,
+      "completion_tokens": 4469,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 203.18,
+          "t1": 203.35
+        },
+        {
+          "kind": "llm",
+          "t0": 203.35,
+          "t1": 234.86
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 234.86,
+          "t1": 234.87
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_07",
+      "run_id": "iter0-baseline-pepsico",
+      "company": "PepsiCo",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 21.87,
+      "llm_s": 21.74,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1851,
+      "completion_tokens": 1845,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 234.87,
+          "t1": 234.99
+        },
+        {
+          "kind": "llm",
+          "t0": 234.99,
+          "t1": 256.73
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 256.73,
+          "t1": 256.73
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_08",
+      "run_id": "iter0-baseline-pepsico",
+      "company": "PepsiCo",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 20.82,
+      "llm_s": 20.6,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2001,
+      "completion_tokens": 1541,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 256.73,
+          "t1": 256.95
+        },
+        {
+          "kind": "llm",
+          "t0": 256.95,
+          "t1": 277.55
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 277.55,
+          "t1": 277.55
+        }
+      ]
+    },
+    {
+      "item_id": "pfizer_01",
+      "run_id": "iter0-baseline-pfizer",
+      "company": "Pfizer",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 22.2,
+      "llm_s": 15.32,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1513,
+      "completion_tokens": 1751,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 0.0,
+          "t1": 6.88
+        },
+        {
+          "kind": "llm",
+          "t0": 6.88,
+          "t1": 22.2
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 22.2,
+          "t1": 22.2
+        }
+      ]
+    },
+    {
+      "item_id": "pfizer_02",
+      "run_id": "iter0-baseline-pfizer",
+      "company": "Pfizer",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 9.04,
+      "llm_s": 8.9,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2189,
+      "completion_tokens": 1153,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 22.2,
+          "t1": 22.34
+        },
+        {
+          "kind": "llm",
+          "t0": 22.34,
+          "t1": 31.24
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 31.24,
+          "t1": 31.24
+        }
+      ]
+    },
+    {
+      "item_id": "pfizer_03",
+      "run_id": "iter0-baseline-pfizer",
+      "company": "Pfizer",
+      "bucket": "C_lookup",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "pass",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 22.49,
+      "llm_s": 22.41,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1965,
+      "completion_tokens": 2833,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 31.24,
+          "t1": 31.32
+        },
+        {
+          "kind": "llm",
+          "t0": 31.32,
+          "t1": 53.74
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 53.74,
+          "t1": 53.74
+        }
+      ]
+    },
+    {
+      "item_id": "pfizer_04",
+      "run_id": "iter0-baseline-pfizer",
+      "company": "Pfizer",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 28.15,
+      "llm_s": 28.07,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1854,
+      "completion_tokens": 4481,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 53.74,
+          "t1": 53.81
+        },
+        {
+          "kind": "llm",
+          "t0": 53.82,
+          "t1": 81.88
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 81.88,
+          "t1": 81.88
+        }
+      ]
+    },
+    {
+      "item_id": "verizon_01",
+      "run_id": "iter0-baseline-verizon",
+      "company": "Verizon",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 36.68,
+      "llm_s": 29.34,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1562,
+      "completion_tokens": 4724,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 0.0,
+          "t1": 7.34
+        },
+        {
+          "kind": "llm",
+          "t0": 7.34,
+          "t1": 36.68
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 36.68,
+          "t1": 36.68
+        }
+      ]
+    },
+    {
+      "item_id": "verizon_02",
+      "run_id": "iter0-baseline-verizon",
+      "company": "Verizon",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 18.94,
+      "llm_s": 18.75,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1631,
+      "completion_tokens": 921,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 36.68,
+          "t1": 36.86
+        },
+        {
+          "kind": "llm",
+          "t0": 36.86,
+          "t1": 55.61
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 55.62,
+          "t1": 55.62
+        }
+      ]
+    },
+    {
+      "item_id": "verizon_03",
+      "run_id": "iter0-baseline-verizon",
+      "company": "Verizon",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 36.56,
+      "llm_s": 36.48,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 2007,
+      "completion_tokens": 5131,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 55.62,
+          "t1": 55.7
+        },
+        {
+          "kind": "llm",
+          "t0": 55.7,
+          "t1": 92.17
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 92.18,
+          "t1": 92.18
+        }
+      ]
+    },
+    {
+      "item_id": "verizon_04",
+      "run_id": "iter0-baseline-verizon",
+      "company": "Verizon",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 23.84,
+      "llm_s": 23.77,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1754,
+      "completion_tokens": 3492,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 92.18,
+          "t1": 92.25
+        },
+        {
+          "kind": "llm",
+          "t0": 92.25,
+          "t1": 116.02
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 116.02,
+          "t1": 116.02
+        }
+      ]
+    },
+    {
+      "item_id": "verizon_05",
+      "run_id": "iter0-baseline-verizon",
+      "company": "Verizon",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "model_choice",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 13.01,
+      "llm_s": 12.86,
+      "llm_calls": 1,
+      "llm_errors": 0,
+      "prompt_tokens": 1331,
+      "completion_tokens": 878,
+      "tool_counts": {
+        "search_filing": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "tool:search_filing",
+          "t0": 116.02,
+          "t1": 116.17
+        },
+        {
+          "kind": "llm",
+          "t0": 116.17,
+          "t1": 129.03
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 129.03,
+          "t1": 129.03
+        }
+      ]
+    }
+  ]
+}

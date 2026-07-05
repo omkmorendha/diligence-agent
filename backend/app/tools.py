@@ -2,7 +2,7 @@
 
 Five tools, all emitting trace events per spec sections 9-12:
     search_filing     tool_call -> retrieval -> tool_result
-    get_pages         tool_call -> tool_result
+    get_pages         tool_call -> retrieval -> tool_result
     calculate         tool_call -> tool_result
     record_answer     tool_call -> item_answer -> tool_result
     flag_outstanding  decision -> tool_call -> item_answer -> tool_result
@@ -33,6 +33,7 @@ from __future__ import annotations
 import ast
 import json
 import operator
+import re
 from pathlib import Path
 from typing import Any, Optional
 
@@ -51,6 +52,7 @@ __all__ = [
     "get_pages",
     "calculate",
     "compute_calculation",
+    "recompute_check",
     "record_answer",
     "flag_outstanding",
 ]
@@ -151,7 +153,10 @@ def get_pages(
     """Return raw page text for targeted reads (spec section 13).
 
     Used after `search_filing` localizes a relevant page or table. Emits
-    `tool_call` -> `tool_result` (no retrieval -- this is a direct page read).
+    `tool_call` -> `retrieval` -> `tool_result`: each fetched page is surfaced as
+    a citable synthetic chunk ("page:<doc_id>:<page>") in the `retrieval` event so
+    a quote copied from a full-page read can be cited with valid provenance
+    (IMP-1), not just the narrower search_filing chunks.
     """
     trace.emit(
         type="tool_call",
@@ -173,9 +178,39 @@ def get_pages(
         raise FileNotFoundError(message)
 
     doc = json.loads(path.read_text())
+    doc_name = doc.get("doc_name") or doc_id
     text_by_page = {p["page"]: (p.get("text") or "") for p in doc.get("pages", [])}
-    result_pages = [{"page": p, "text": text_by_page.get(p, "")} for p in pages]
-    output = {"doc_id": doc_id, "pages": result_pages}
+    # Each fetched page is exposed with a synthetic, citable `chunk_id`
+    # ("page:<doc_id>:<page>") so a quote copied from a full-page read can be
+    # cited just like a search chunk (IMP-1). We emit a `retrieval` event
+    # carrying those chunk_ids -- evals/scorers.py::_retrieval_chunk_ids only
+    # scans `retrieval` events, so this is what keeps citation_provenance passing
+    # for page-sourced citations. The agent loop resolves the offsets against the
+    # full page text it registers in item state.
+    result_pages = [
+        {"chunk_id": f"page:{doc_id}:{p}", "page": p, "text": text_by_page.get(p, "")}
+        for p in pages
+    ]
+    chunk_payloads = [
+        {
+            "chunk_id": rp["chunk_id"],
+            "company": company,
+            "doc_id": doc_id,
+            "doc_name": doc_name,
+            "page": rp["page"],
+            "score": 0.0,
+            "snippet": _snippet(rp["text"]),
+        }
+        for rp in result_pages
+    ]
+    trace.emit(
+        type="retrieval",
+        title="Page read results",
+        detail=f"Read {len(result_pages)} page(s) of {doc_id} as citable chunk(s).",
+        item_id=item_id,
+        payload={"query": f"get_pages:{doc_id}", "k": len(result_pages), "chunks": chunk_payloads},
+    )
+    output = {"doc_id": doc_id, "doc_name": doc_name, "pages": result_pages}
     trace.emit(
         type="tool_result",
         title="get_pages result",
@@ -287,6 +322,95 @@ def calculate(
         payload={"tool": "calculate", "output": result.model_dump()},
     )
     return result
+
+
+# --- derivation self-check (IMP3-4) -----------------------------------------
+# Terms the acid-test / quick-ratio numerator explicitly EXCLUDES. amd_01's
+# repeatable defect was computing the quick ratio as (current_assets -
+# inventory)/current_liabilities; the canonical numerator is cash + short-term
+# investments + receivables and never subtracts inventory/prepaids inside it.
+_ACID_TEST_EXCLUDED_TERMS = ("inventor", "prepaid")
+
+
+def recompute_check(
+    expression: str,
+    input_values: dict[str, float],
+    recorded_value: Optional[float],
+    unit: Optional[str],
+    *,
+    relative_tol: float = 0.02,
+) -> list[str]:
+    """Re-derive a recorded ratio/percentage from the model's OWN calculate
+    expression + SIGNED inputs and return human-readable warnings on
+    disagreement (IMP3-4 change 5).
+
+    Pure (no trace emission) so it is unit-testable standalone, matching this
+    module's "each tool callable standalone" philosophy. The agent loop surfaces
+    each warning as a soft trace note and STILL records the answer: the plan's
+    risk guard mandates flag, not hard-reject, so a heuristic mismatch can never
+    manufacture a false abstention. It targets the two confirmed-repeatable iter2
+    derivation defects:
+
+      * wrong quick/acid-test numerator (amd_01, verizon_02) -- the acid test is
+        (cash + short-term investments + receivables)/current_liabilities and
+        EXCLUDES inventory/prepaids, so an inventory/prepaid input SUBTRACTED
+        inside a ratio numerator is the (current_assets - inventory)/CL form,
+        which overstates the ratio (amd_01: 1.77 vs gold 1.57).
+      * sign-flip on a signed rate (boeing_06) -- FY2021 effective tax rate is
+        gold -14.76% because pretax income was negative; re-evaluating the
+        division over the signed inputs yields a negative value whose sign
+        disagrees with a recorded +14.7%.
+    """
+    warnings: list[str] = []
+    if unit not in ("ratio", "percent"):
+        return warnings
+
+    # (a) canonical-numerator check -- a subtracted inventory/prepaid input inside
+    # a ratio is the (current_assets - inventory)/CL anti-pattern, not the
+    # acid-test numerator. Static on the expression string, so it fires even when
+    # the arithmetic itself is internally consistent.
+    for name in input_values:
+        if any(term in name.lower() for term in _ACID_TEST_EXCLUDED_TERMS) and re.search(
+            rf"-\s*{re.escape(name)}\b", expression
+        ):
+            warnings.append(
+                f"input '{name}' is subtracted inside a ratio numerator; the quick/acid-test "
+                "ratio is (cash + short-term investments + receivables)/current_liabilities and "
+                "EXCLUDES inventory/prepaids -- it is NOT (current_assets - inventory)/CL. "
+                "Confirm the numerator matches the canonical definition."
+            )
+            break
+
+    # (b) sign / magnitude re-derivation over the SIGNED inputs.
+    if recorded_value is None:
+        return warnings
+    try:
+        recomputed = _safe_eval(
+            ast.parse(expression, mode="eval"), {k: float(v) for k, v in input_values.items()}
+        )
+    except (ValueError, SyntaxError, TypeError):
+        return warnings  # unparseable/ungrounded -> nothing to compare against
+    if recomputed == 0 or recorded_value == 0:
+        return warnings
+    if (recomputed > 0) != (recorded_value > 0):
+        warnings.append(
+            f"recorded value {recorded_value} disagrees in SIGN with the value re-derived from the "
+            f"calculate expression over the signed inputs ({recomputed:g}); when pretax income (or "
+            "another denominator) is negative the ratio/rate must PRESERVE that sign -- do not flip "
+            "it to positive."
+        )
+    else:
+        # A percent answer may legitimately be recorded as a percentage (fraction
+        # * 100) or as a fraction; accept either scale for the magnitude check.
+        # The sign check above still applies -- ×100 preserves sign.
+        scales = (recomputed, recomputed * 100.0, recomputed / 100.0)
+        if not any(abs(recorded_value - s) / (abs(s) or 1.0) <= relative_tol for s in scales):
+            warnings.append(
+                f"recorded value {recorded_value} does not match the value re-derived from the "
+                f"calculate expression over its inputs ({recomputed:g}); recompute or confirm the "
+                "reported figure is drawn from that calculation."
+            )
+    return warnings
 
 
 # --- record_answer -----------------------------------------------------------

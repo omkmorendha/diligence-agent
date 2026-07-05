@@ -1,0 +1,13 @@
+{
+  "fixture": "polarity_fail",
+  "scorer_under_test": "answer_accuracy",
+  "expected_scores": {
+    "answer_accuracy": "fail",
+    "citation_precision": "pass",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "pass",
+    "abstention": null,
+    "trace_shape": "pass"
+  },
+  "notes": "IMP3-1 polarity branch, real-defect case: gold_polarity='no' but the agent leads with 'Yes', so the polarity branch correctly FAILS. This mirrors johnson_johnson_06 -- the branch separates format artifacts from genuine polarity errors instead of masking them. Every other scorer still passes, isolating the wrong-polarity answer as the sole defect."
+}

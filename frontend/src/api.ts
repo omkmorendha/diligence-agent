@@ -7,6 +7,7 @@ import type {
   CompanyChecklist,
   CreateRunRequest,
   CreateRunResponse,
+  IterationsReport,
   Memo,
   PageResponse,
   RunCard,
@@ -85,6 +86,12 @@ export function getPage(company: string, docId: string, page: number): Promise<P
 
 export function getEvalResults(): Promise<Comparison> {
   return getJson<Comparison>("/evals/results");
+}
+
+/** Cumulative improvement-loop dataset (baseline61 + iter1..iter5), all rescored
+ * under the final scorer. 404 when the analysis pipeline hasn't built it yet. */
+export function getEvalIterations(): Promise<IterationsReport> {
+  return getJson<IterationsReport>("/evals/iterations");
 }
 
 /** GET /runs/{id}/events (SSE): live queue while running, replay-with-sleeps once

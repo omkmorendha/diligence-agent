@@ -90,6 +90,10 @@ VERIFIED_PATH = ROOT / "data" / "verified.jsonl"
 PARSE_REPORT_PATH = ROOT / "data" / "parse_report.json"
 SUBSET_PATH = ROOT / "data" / "subset.json"
 REPORT_PATH = ROOT / "data" / "subset_report.md"
+# IMP3-1: sidecar of human-reviewable canonical gold annotations (gold_polarity /
+# gold_canonical), keyed by question_id. Merged in additively below; gold_answer and
+# gold_evidence are never touched. See data/gold_annotations.json's _README.
+GOLD_ANNOTATIONS_PATH = ROOT / "data" / "gold_annotations.json"
 
 BUCKETS = ("A_multi_input", "B_judgment", "C_lookup")
 # Drop order when a company has more than the per-company cap: least-prioritized
@@ -142,29 +146,146 @@ def gold_evidence_from_raw(
 
 _NUMERIC_RE = re.compile(r"^\$?-?[\d,]+(\.\d+)?%?$")
 
+# --- IMP-2 (iter1 improvement_plan.json): numeric-text gold parsing -----------
+# Iter1's headline accuracy was depressed by a measurement artifact: 37 golds with
+# gold_value=null contained digits, so numeric answers were graded by normalized
+# STRING match (scorers.answer_accuracy falls back to string match when gold_value
+# is None) instead of the numeric +/-1% scorer. We conservatively lift the PRIMARY
+# magnitude out of prose golds that reduce to a single number, leaving genuinely
+# qualitative / comparative / multi-number / entity answers as text so the string /
+# judge scorer still applies (task step 2: "when in doubt, leave it text").
+#
+# CANONICAL SCALE: scorers.answer_accuracy compares gold_value vs the memo's numeric
+# `value` numerically and UNIT-AGNOSTICALLY, so the parsed value must match the scale
+# the agent reports, which is USD millions (agent memos state e.g. "$13.2 billion
+# (13,200 USD millions)"). Hence: absolute "$X,XXX,XXX" -> /1e6; "$X billion" -> x1000;
+# "$X million" -> as-is; all consistent with the existing 6 "$NNNN.00" USD-millions golds.
 
-def parse_gold_value(gold_answer: str) -> tuple[float | None, str]:
-    """Parse `gold_value`/`gold_unit` from a clean numeric answer string only
-    (AMBIGUITIES.md section 5). Prose / mixed-text answers stay text/null and
-    are scored by normalized string match (spec section 20).
+# A magnitude token: currency/percent/decimal literal, possibly comma-grouped.
+_NUM_TOKEN_RE = re.compile(r"[-+]?\$?\d[\d,]*(?:\.\d+)?%?")
+
+# Cue words that demote a lone number to a supporting detail behind a categorical /
+# yes-no / comparison / ranking answer (the number is NOT what the question wants, so
+# +/-1% grading would be meaningless). Examples this guards: mgm_resorts_06 "...revenue
+# declined 44%..." (answer is a region), verizon_04 "Cross currency swaps. Its notional
+# value was $32,502 million." (answer is the instrument), best_buy_05 "...the most cash
+# flow from operating activities ($1.8 bn)" (answer is the activity), verizon_03 "...debt
+# decreased by $229 million." (a signed change behind a yes/no). Kept deliberately
+# specific ("increased by", not bare "increase") so genuine magnitude answers survive
+# (pepsico_01 "$400,000,000 increase.").
+_QUALITATIVE_CUES = (
+    "decreased by", "increased by", "increase of", "decrease of",
+    "decline of", "declined", "improved", "grew by",
+    "most", "least", "highest", "largest", "biggest", "lowest", "worst",
+    "notional value", "per share", "compared", "consistent", "high growth",
+    "cash flow from",
+)
+
+_PCT_POINT_RE = re.compile(r"([-+]?\d+(?:\.\d+)?)\s*percentage points?", re.IGNORECASE)
+_DOLLAR_BILLION_RE = re.compile(r"\$\s?([\d,]+(?:\.\d+)?)\s*(?:billion|bn)\b", re.IGNORECASE)
+_DOLLAR_MILLION_RE = re.compile(r"\$\s?([\d,]+(?:\.\d+)?)\s*(?:million|mn)\b", re.IGNORECASE)
+_DOLLAR_ABS_RE = re.compile(r"\$\s?([\d,]+(?:\.\d+)?)")
+_DECIMAL_TOKEN_RE = re.compile(r"^[-+]?\d+\.\d+$")
+
+
+def _is_year_like(raw: str) -> bool:
+    """A bare 4-digit integer in [1900, 2100] is a fiscal-year/date marker (FY2022,
+    "in 2023"), not a financial magnitude -- mirrors scorers._extract_numbers so the
+    magnitude count here matches how the scorer reads numbers.
+    """
+    if any(c in raw for c in "$%,."):
+        return False
+    try:
+        val = float(raw)
+    except ValueError:
+        return False
+    return 1900.0 <= val <= 2100.0
+
+
+def _magnitude_tokens(s: str) -> list[str]:
+    """Financial-magnitude tokens in `s`, excluding fiscal-year/date markers."""
+    return [m.group() for m in _NUM_TOKEN_RE.finditer(s) if not _is_year_like(m.group())]
+
+
+def _parse_prose_gold(gold_answer: str) -> tuple[float | None, str]:
+    """Lift the primary magnitude+unit out of a prose gold, but ONLY when the answer
+    reduces to exactly ONE magnitude and no cue marks that number as a supporting
+    detail. Multiple magnitudes (ranges/comparisons), zero magnitudes (pure prose),
+    or a cue-guarded lone number all stay text/null (task step 2, conservative).
     """
     s = gold_answer.strip()
-    if not _NUMERIC_RE.match(s):
+    lower = s.lower()
+
+    # Multiple / no magnitudes -> not a single-number answer.
+    tokens = _magnitude_tokens(s)
+    if len(tokens) != 1:
         return None, "text"
-    is_pct = s.endswith("%")
-    is_usd = s.startswith("$")
-    core = s[:-1] if is_pct else s
-    core = core[1:] if is_usd else core
-    core = core.replace(",", "")
-    try:
-        value = float(core)
-    except ValueError:
+
+    # The lone number is a supporting stat behind a categorical/comparison answer.
+    if any(cue in lower for cue in _QUALITATIVE_CUES):
         return None, "text"
-    if is_pct:
-        return value, "percent"
-    if is_usd:
-        return value, "USD millions"
-    return value, "ratio"
+
+    # "X percentage point(s)" -> percent (e.g. pepsico_04 guidance raise).
+    m = _PCT_POINT_RE.search(s)
+    if m:
+        return float(m.group(1)), "percent"
+
+    # Bare embedded "X%" (e.g. "accounted for 16%") is left as text: among the iter1
+    # golds every such answer is a yes-no/entity judgment, not a "the value is X%" answer.
+    if tokens[0].endswith("%"):
+        return None, "text"
+
+    # Dollar magnitudes, normalized to USD millions to match the agent's report scale.
+    m = _DOLLAR_BILLION_RE.search(s)
+    if m:
+        return float(m.group(1).replace(",", "")) * 1000.0, "USD millions"
+    m = _DOLLAR_MILLION_RE.search(s)
+    if m:
+        return float(m.group(1).replace(",", "")), "USD millions"
+    m = _DOLLAR_ABS_RE.search(s)
+    if m:
+        absolute = float(m.group(1).replace(",", ""))
+        # Only treat a scale-word-less "$X" as absolute dollars when it is clearly a
+        # raw figure (>= $1,000,000); smaller bare "$X" would collide with the existing
+        # "$NNNN.00 == NNNN millions" convention, so leave those alone (none in subset).
+        if absolute >= 1_000_000:
+            return absolute / 1_000_000.0, "USD millions"
+        return None, "text"
+
+    # Plain decimal ("quick ratio is 1.57", "sold inventory 2.7 times") -> ratio.
+    if _DECIMAL_TOKEN_RE.match(tokens[0]):
+        return float(tokens[0]), "ratio"
+
+    return None, "text"
+
+
+def parse_gold_value(gold_answer: str) -> tuple[float | None, str]:
+    """Parse `gold_value`/`gold_unit` from a gold answer (AMBIGUITIES.md section 5).
+
+    Fast path: a whole-string clean numeric literal ("$1577.00", "4.2%", "0.83") --
+    the original convention, kept byte-identical so the already-parsed golds are
+    unchanged. Otherwise fall through to conservative prose extraction (IMP-2): a
+    single primary magnitude with prose around it is lifted to gold_value/gold_unit;
+    everything else stays text/null and is scored by string match (spec section 20).
+    """
+    s = gold_answer.strip()
+    if _NUMERIC_RE.match(s):
+        is_pct = s.endswith("%")
+        is_usd = s.startswith("$")
+        core = s[:-1] if is_pct else s
+        core = core[1:] if is_usd else core
+        core = core.replace(",", "")
+        try:
+            value = float(core)
+        except ValueError:
+            return None, "text"
+        if is_pct:
+            return value, "percent"
+        if is_usd:
+            return value, "USD millions"
+        return value, "ratio"
+
+    return _parse_prose_gold(gold_answer)
 
 
 _QUARTER_RE = re.compile(r"Q([1-4])")
@@ -189,6 +310,32 @@ def derive_filing_period(doc_name: str, doc_type_raw: str, doc_period: int) -> s
 
 def _load_jsonl(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+
+
+def _load_gold_annotations() -> dict[str, dict[str, Any]]:
+    """IMP3-1: load the question_id -> {gold_polarity|gold_canonical, evidence} sidecar.
+
+    Optional: if the file is absent the merge is a no-op (all items default to None),
+    so the builder still runs standalone. The `evidence` field is documentation-only
+    and is NOT emitted into subset.json -- only gold_polarity / gold_canonical are.
+    """
+    if not GOLD_ANNOTATIONS_PATH.exists():
+        return {}
+    doc = json.loads(GOLD_ANNOTATIONS_PATH.read_text())
+    return doc.get("annotations", {})
+
+
+def _annotation_is_confirmed(annotation: dict[str, Any]) -> bool:
+    """Whether an optional sidecar annotation is safe to merge.
+
+    Most sidecar entries are curated annotations. Entries explicitly flagged for
+    human review are pending until the sidecar carries human_reviewed=true.
+    """
+    if not annotation:
+        return False
+    if annotation.get("flagged_for_human_review"):
+        return bool(annotation.get("human_reviewed"))
+    return True
 
 
 def _evidence_clean(evidence: list[dict[str, Any]], doc_by_id: dict[str, dict[str, Any]]) -> bool:
@@ -216,6 +363,21 @@ def _rank_companies(eligible: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     stats.sort(key=lambda s: (-s["n_eligible"], -s["baseline_failures"], s["company"]))
     return stats
+
+
+def _choose_top_n_qualifying(ranked: list[dict[str, Any]], n: int) -> tuple[list[dict[str, Any]], int]:
+    """Expanded-subset mode (--n-companies): take the top `n` ranked companies
+    that individually clear both floors, skipping non-qualifying companies
+    instead of rejecting the whole tier. Same ranking, same floors, same
+    per-company selection as the default path -- so the default 4-company
+    subset is always a prefix (the original 28 items keep their item_ids)."""
+    qualifying = [
+        c
+        for c in ranked
+        if c["baseline_failures"] >= MIN_BASELINE_FAILURE_PER_COMPANY and c["n_eligible"] >= MIN_ELIGIBLE_PER_COMPANY
+    ]
+    chosen = qualifying[:n]
+    return chosen, len(chosen)
 
 
 def _choose_tier(ranked: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], int]:
@@ -271,7 +433,7 @@ def _select_company_rows(rows: list[dict[str, Any]], doc_by_id_getter) -> list[d
     return selected
 
 
-def build_subset() -> tuple[list[dict[str, Any]], dict[str, Any]]:
+def build_subset(n_companies: int | None = None) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     if not VERIFIED_PATH.exists():
         raise SystemExit(f"missing {VERIFIED_PATH} -- run d4_verify.py first")
     if not RAW_PATH.exists():
@@ -283,6 +445,7 @@ def build_subset() -> tuple[list[dict[str, Any]], dict[str, Any]]:
     raw_by_qid = {r["question_id"]: r for r in _load_jsonl(RAW_PATH)}
     parse_report = json.loads(PARSE_REPORT_PATH.read_text())
     doc_by_id = {d["doc_id"]: d for d in parse_report["docs"]}
+    gold_annotations = _load_gold_annotations()  # IMP3-1 sidecar, by question_id
 
     eligible = [r for r in verified if r["include"] and not r["disagreement"]]
     for r in eligible:
@@ -290,7 +453,12 @@ def build_subset() -> tuple[list[dict[str, Any]], dict[str, Any]]:
         r["_clean_evidence"] = _evidence_clean(raw["evidence"], doc_by_id)
 
     ranked = _rank_companies(eligible)
-    chosen_companies, tier_n = _choose_tier(ranked)
+    if n_companies is not None:
+        chosen_companies, tier_n = _choose_top_n_qualifying(ranked, n_companies)
+        selection_mode = "expanded"
+    else:
+        chosen_companies, tier_n = _choose_tier(ranked)
+        selection_mode = "fallback"
 
     items: list[dict[str, Any]] = []
     company_report = []
@@ -311,6 +479,23 @@ def build_subset() -> tuple[list[dict[str, Any]], dict[str, Any]]:
             filing_period = derive_filing_period(raw["doc_name"], doc_type_raw, raw["doc_period"])
 
             gold_value, gold_unit = parse_gold_value(row["gold_answer"])
+            # IMP3-1: pull the canonical annotation for this question (if any). Only the
+            # gold_polarity / gold_canonical fields flow into the item; `evidence` is
+            # documentation kept in the sidecar. Unannotated items stay None (schema default).
+            annotation = gold_annotations.get(row["question_id"], {})
+            annotation_confirmed = _annotation_is_confirmed(annotation)
+            applied_annotation = annotation if annotation_confirmed else {}
+            gold_polarity = applied_annotation.get("gold_polarity")
+            gold_canonical = applied_annotation.get("gold_canonical")
+            # IMP4-1: a few golds carry two magnitudes in prose (e.g. verizon_05's
+            # "$1097 million ... $862 million"), so parse_gold_value leaves them
+            # text/null even though the gold's own expected_formula intends the sum.
+            # The sidecar may supply an explicit human-reviewed gold_value/gold_unit;
+            # apply it additively, defaulting to the parsed value so an annotation
+            # WITHOUT these keys never clobbers an already-parsed number (e.g. amd_01
+            # keeps gold_value=1.57 while gaining only gold_polarity).
+            gold_value = applied_annotation.get("gold_value", gold_value)
+            gold_unit = applied_annotation.get("gold_unit", gold_unit)
             gold_evidence = [
                 gold_evidence_from_raw(ev, doc_type, filing_period) for ev in raw["evidence"]
             ]
@@ -334,6 +519,8 @@ def build_subset() -> tuple[list[dict[str, Any]], dict[str, Any]]:
                 "gold_answer": row["gold_answer"],
                 "gold_value": gold_value,
                 "gold_unit": gold_unit,
+                "gold_polarity": gold_polarity,      # IMP3-1 (None unless annotated)
+                "gold_canonical": gold_canonical,    # IMP3-1 (None unless annotated)
                 "gold_evidence": gold_evidence,
                 "bucket": bucket,
                 "expected_formula": expected_formula,
@@ -342,7 +529,7 @@ def build_subset() -> tuple[list[dict[str, Any]], dict[str, Any]]:
                 "answer_verifiable_from_evidence": True,   # guaranteed by the `include` filter
                 "unit_or_period_ambiguity": False,          # guaranteed by the `include` filter
                 "demo_candidate": demo_candidate,
-                "human_reviewed": False,
+                "human_reviewed": annotation_confirmed,
                 "tolerance": {"relative": 0.01, "absolute": None},
             }
             # Validate against the frozen schema before it ever hits disk.
@@ -375,27 +562,63 @@ def build_subset() -> tuple[list[dict[str, Any]], dict[str, Any]]:
         "bucket_totals": {
             b: sum(c["bucket_counts"][b] for c in company_report) for b in BUCKETS
         },
+        "selection_mode": selection_mode,
     }
     return items, meta
 
 
+def _bucket_target_labels(meta: dict[str, Any]) -> dict[str, str]:
+    if meta.get("selection_mode") == "expanded":
+        return {
+            bucket: f"expanded target ~{meta['tier_n_companies'] * TARGET_COMPOSITION[bucket]}"
+            for bucket in BUCKETS
+        }
+    return {
+        "A_multi_input": "fallback target ~16",
+        "B_judgment": "fallback target ~8",
+        "C_lookup": "fallback target ~8",
+    }
+
+
 def _write_report(meta: dict[str, Any]) -> None:
+    if meta.get("selection_mode") == "expanded":
+        summary_suffix = f"expanded top-company mode: {meta['tier_n_companies']} qualifying companies x <=8 each"
+        target_context = (
+            f"{meta['tier_n_companies']} companies x per-company 4:2:2 target "
+            f"({meta['tier_n_companies'] * TARGET_COMPOSITION['A_multi_input']}/"
+            f"{meta['tier_n_companies'] * TARGET_COMPOSITION['B_judgment']}/"
+            f"{meta['tier_n_companies'] * TARGET_COMPOSITION['C_lookup']})"
+        )
+        policy_text = (
+            f"Expanded mode selected the top {meta['tier_n_companies']} qualifying companies "
+            f"(each with >= {MIN_BASELINE_FAILURE_PER_COMPANY} baseline-failure questions and "
+            f">= {MIN_ELIGIBLE_PER_COMPANY} eligible questions) using the same company ranking "
+            "and per-company 4:2:2 (A:C:B) allocation as fallback mode."
+        )
+    else:
+        summary_suffix = f"fallback tier: {meta['tier_n_companies']} companies x <=8 each"
+        target_context = "fallback 4-company target (16/8/8)"
+        policy_text = (
+            "The 4-companies-x-8 tier is accepted once every candidate clears "
+            f">= {MIN_BASELINE_FAILURE_PER_COMPANY} baseline-failure questions and "
+            f">= {MIN_ELIGIBLE_PER_COMPANY} eligible questions."
+        )
+    bucket_labels = _bucket_target_labels(meta)
     lines = [
         "# D5 subset selection report",
         "",
         f"Selected **{meta['total_items']}** questions across "
-        f"**{meta['tier_n_companies']}** companies (fallback tier: "
-        f"{meta['tier_n_companies']} companies x <=8 each).",
+        f"**{meta['tier_n_companies']}** companies ({summary_suffix}).",
         "",
         "## Bucket composition",
         "",
-        f"- A_multi_input: {meta['bucket_totals']['A_multi_input']} (ideal ~16)",
-        f"- B_judgment: {meta['bucket_totals']['B_judgment']} (ideal ~8)",
-        f"- C_lookup: {meta['bucket_totals']['C_lookup']} (ideal ~8)",
+        f"- A_multi_input: {meta['bucket_totals']['A_multi_input']} ({bucket_labels['A_multi_input']})",
+        f"- B_judgment: {meta['bucket_totals']['B_judgment']} ({bucket_labels['B_judgment']})",
+        f"- C_lookup: {meta['bucket_totals']['C_lookup']} ({bucket_labels['C_lookup']})",
         "",
         "C_lookup questions are scarce in the D3/D4-verified pool for the "
         "highest-eligible-count companies on this corpus, so the achieved "
-        "composition undershoots the ideal 16/8/8 split on A and C in favor of "
+        f"composition undershoots the {target_context} split on A and C in favor of "
         "B; this is the actual FinanceBench distribution, not a selection bug "
         "(see AMBIGUITIES.md section 6 and data/verified.jsonl bucket_d3 counts).",
         "",
@@ -418,11 +641,8 @@ def _write_report(meta: dict[str, Any]) -> None:
         "`disagreement=false` (i.e. excludes everything in `data/disputes.jsonl` "
         "-- those require `human_reviewed: true` per the fallback policy, which "
         "is D6's job and has not happened yet). Companies ranked by "
-        "(eligible count desc, baseline-failure count desc, name asc); the "
-        "4-companies-x-8 tier is accepted once every candidate clears "
-        f">= {MIN_BASELINE_FAILURE_PER_COMPANY} baseline-failure questions and "
-        f">= {MIN_ELIGIBLE_PER_COMPANY} eligible questions. Per-company selection "
-        "targets a 4:2:2 (A:C:B) split of the 8-slot cap, falls back to filling "
+        f"(eligible count desc, baseline-failure count desc, name asc). {policy_text} "
+        "Per-company selection targets a 4:2:2 (A:C:B) split of the 8-slot cap, falls back to filling "
         "remaining slots in A, then C, then B order when a bucket is short, and "
         "drops down from B, then C, then A when a company has more than 8 "
         "eligible questions.",
@@ -432,7 +652,20 @@ def _write_report(meta: dict[str, Any]) -> None:
 
 
 def main() -> int:
-    items, meta = build_subset()
+    import argparse
+
+    ap = argparse.ArgumentParser(description="D5 stratified subset selection (spec section 6).")
+    ap.add_argument(
+        "--n-companies",
+        type=int,
+        default=None,
+        help="Expanded mode: select the top N qualifying companies (>=2 baseline-failure, "
+        ">=4 eligible questions each) instead of walking the spec's 4/3/2 fallback tiers. "
+        "Default: original tier walk (4 companies).",
+    )
+    args = ap.parse_args()
+
+    items, meta = build_subset(n_companies=args.n_companies)
 
     SUBSET_PATH.parent.mkdir(parents=True, exist_ok=True)
     SUBSET_PATH.write_text(json.dumps(items, indent=2) + "\n")

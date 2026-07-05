@@ -340,78 +340,85 @@ def _render_memo_md(memo: Memo) -> str:
 def run_baseline(run_id: str, company: str, item_ids: list[str] | None, trace: TraceWriter) -> None:
     """Single retrieve-then-answer pass per checklist item, streaming events into `trace`."""
     created_at = datetime.now(timezone.utc).isoformat()
-    items = _load_company_items(company, item_ids)
+    llm.set_usage_sink(llm.jsonl_usage_sink(trace.run_dir / "llm_calls.jsonl"))
+    llm.set_call_context(run_id=run_id, system="baseline")
+    try:
+        items = _load_company_items(company, item_ids)
 
-    trace.emit(
-        type="plan",
-        title="Plan the baseline pass",
-        detail=(
-            f"Naive-RAG baseline: one retrieval + one answer call per item, "
-            f"across {len(items)} checklist item(s) for {company}."
-        ),
-        item_id=None,
-        payload={
-            "items": [
-                {
-                    "item_id": item.item_id,
-                    "question": item.question,
-                    "strategy": "single_lookup",
-                    "planned_inputs": [item.question],
-                }
-                for item in items
-            ]
-        },
-    )
+        trace.emit(
+            type="plan",
+            title="Plan the baseline pass",
+            detail=(
+                f"Naive-RAG baseline: one retrieval + one answer call per item, "
+                f"across {len(items)} checklist item(s) for {company}."
+            ),
+            item_id=None,
+            payload={
+                "items": [
+                    {
+                        "item_id": item.item_id,
+                        "question": item.question,
+                        "strategy": "single_lookup",
+                        "planned_inputs": [item.question],
+                    }
+                    for item in items
+                ]
+            },
+        )
 
-    memo_items: list[MemoItem] = []
-    for item in items:
-        try:
-            memo_items.append(_process_item(trace, company, item))
-        except Exception as exc:  # noqa: BLE001 -- one item's failure must not sink the run
-            reason = f"Unexpected baseline error: {exc}"
-            trace.emit(
-                type="error",
-                title="baseline item failed",
-                detail=reason,
-                item_id=item.item_id,
-                payload={"message": reason, "recoverable": True, "where": "agent_loop"},
-            )
-            memo_items.append(_abstained_memo_item(item, reason))
+        memo_items: list[MemoItem] = []
+        for item in items:
+            llm.set_call_context(purpose="baseline_answer", item_id=item.item_id)
+            try:
+                memo_items.append(_process_item(trace, company, item))
+            except Exception as exc:  # noqa: BLE001 -- one item's failure must not sink the run
+                reason = f"Unexpected baseline error: {exc}"
+                trace.emit(
+                    type="error",
+                    title="baseline item failed",
+                    detail=reason,
+                    item_id=item.item_id,
+                    payload={"message": reason, "recoverable": True, "where": "agent_loop"},
+                )
+                memo_items.append(_abstained_memo_item(item, reason))
 
-    items_answered = sum(1 for m in memo_items if m.status == "answered")
-    items_abstained = sum(1 for m in memo_items if m.status == "abstained")
-    citations_total = sum(len(m.citations) for m in memo_items)
+        items_answered = sum(1 for m in memo_items if m.status == "answered")
+        items_abstained = sum(1 for m in memo_items if m.status == "abstained")
+        citations_total = sum(len(m.citations) for m in memo_items)
 
-    memo = Memo(
-        run_id=run_id,
-        company=company,
-        status="completed",
-        created_at=created_at,
-        completed_at=datetime.now(timezone.utc).isoformat(),
-        items=memo_items,
-        summary={
-            "items_total": len(memo_items),
-            "items_answered": items_answered,
-            "items_abstained": items_abstained,
-            "citations_total": citations_total,
-            "calculate_calls": 0,
-        },
-    )
+        memo = Memo(
+            run_id=run_id,
+            company=company,
+            status="completed",
+            created_at=created_at,
+            completed_at=datetime.now(timezone.utc).isoformat(),
+            items=memo_items,
+            summary={
+                "items_total": len(memo_items),
+                "items_answered": items_answered,
+                "items_abstained": items_abstained,
+                "citations_total": citations_total,
+                "calculate_calls": 0,
+            },
+        )
 
-    (trace.run_dir / "memo.json").write_text(memo.model_dump_json(indent=2) + "\n")
-    (trace.run_dir / "memo.md").write_text(_render_memo_md(memo))
+        (trace.run_dir / "memo.json").write_text(memo.model_dump_json(indent=2) + "\n")
+        (trace.run_dir / "memo.md").write_text(_render_memo_md(memo))
 
-    trace.emit(
-        type="verdict",
-        title="Run complete",
-        detail=f"{items_answered}/{len(memo_items)} items answered.",
-        item_id=None,
-        payload={
-            "memo_path": f"runs/{run_id}/memo.json",
-            "summary_stats": memo.summary.model_dump(),
-        },
-    )
-    trace.close()
+        trace.emit(
+            type="verdict",
+            title="Run complete",
+            detail=f"{items_answered}/{len(memo_items)} items answered.",
+            item_id=None,
+            payload={
+                "memo_path": f"runs/{run_id}/memo.json",
+                "summary_stats": memo.summary.model_dump(),
+            },
+        )
+    finally:
+        llm.set_usage_sink(None)
+        llm.clear_call_context()
+        trace.close()
 
 
 __all__ = ["run_baseline"]

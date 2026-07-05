@@ -1,0 +1,13 @@
+{
+  "fixture": "geography_pass",
+  "scorer_under_test": "answer_accuracy",
+  "expected_scores": {
+    "answer_accuracy": "pass",
+    "citation_precision": "pass",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "pass",
+    "abstention": null,
+    "trace_shape": "pass"
+  },
+  "notes": "IMP5-1 geography-synonym case: gold_canonical='North America'; the agent answers 'the United States and Canada', which the tiny generic geography synonym ('north america' <-> 'united states and canada') collapses to the same canonical token, so the token-set-subset match passes. Textbook geography, not answer-specific tuning."
+}

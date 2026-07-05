@@ -1,0 +1,13 @@
+{
+  "fixture": "canonical_pass",
+  "scorer_under_test": "answer_accuracy",
+  "expected_scores": {
+    "answer_accuracy": "pass",
+    "citation_precision": "pass",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "pass",
+    "abstention": null,
+    "trace_shape": "pass"
+  },
+  "notes": "IMP3-1 canonical branch exercising the generic synonym map: gold_canonical='operating'; the agent says 'operations', which the tiny cash-flow synonym map ('operations'->'operating') collapses to the same canonical token, so the token-set-subset match passes. Not a loose substring -- the whole canonical token must be present after normalization."
+}

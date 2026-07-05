@@ -1,0 +1,6 @@
+
+=== 2026-07-04T20:54:58.184828+00:00 uv run --project backend python /Users/omkmorendha/projects/personal/vultr-project/scripts/run_baseline.py --company Verizon --run-id-prefix iter0-baseline
+[baseline] (1/1) Verizon -> run_id=iter0-baseline-verizon
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 8565.57it/s]
+[baseline] Verizon done in 129.0s -> /Users/omkmorendha/projects/personal/vultr-project/runs/iter0-baseline-verizon

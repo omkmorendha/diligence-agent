@@ -40,6 +40,10 @@ def _companies_in_subset() -> list[str]:
 def main() -> int:
     ap = argparse.ArgumentParser(description="Run the naive-RAG baseline over data/subset.json.")
     ap.add_argument("--company", action="append", help="Restrict to this company (repeatable). Default: all.")
+    ap.add_argument(
+        "--run-id-prefix",
+        help="Deterministic run ids: <prefix>-<company-slug> instead of baseline_<slug>_<epoch>.",
+    )
     args = ap.parse_args()
 
     companies = args.company or _companies_in_subset()
@@ -48,7 +52,10 @@ def main() -> int:
         return 1
 
     for i, company in enumerate(companies, 1):
-        run_id = f"baseline_{slugify(company)}_{int(time.time())}"
+        if args.run_id_prefix:
+            run_id = f"{args.run_id_prefix}-{slugify(company)}"
+        else:
+            run_id = f"baseline_{slugify(company)}_{int(time.time())}"
         trace = TraceWriter(run_id)
         t0 = time.time()
         print(f"[baseline] ({i}/{len(companies)}) {company} -> run_id={run_id}", file=sys.stderr)

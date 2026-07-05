@@ -1,0 +1,114 @@
+{
+  "plan": {
+    "analysis_summary": "Diffed iter3 vs iter4 memos, traces and llm_calls for all 7 flip items. KEY FINDING on determinism: the eval scorer is fully deterministic (evals/scorers.py, no LLM judge), so every flip is caused by the AGENT output changing, not scoring noise \u2014 and the endpoint itself is NOT deterministic. On all 11 companies the per-run \"plan\" LLM call had a byte-identical prompt across iter3 and iter4 (identical prompt_tokens: adobe 433, jj 479, pepsico 551, ...) yet completion_tokens differed in EVERY case (adobe 6394\u21924709, jj 3498\u21922219, verizon 2719\u21925319, ~2x swings; 0/11 identical). Temperature 0.2 + seed 42 is effectively non-deterministic on the Vultr/Kimi-K2.6 endpoint \u2014 the seed is not honored \u2014 and this is the churn engine. Classifying the 7 flips: (a) pure sampling/format nondeterminism \u2014 adobe_01 and boeing_02 (leading Yes/No token disappeared: iter4 phrased \"does NOT have\" / \"is not a useful metric\", so the deterministic polarity scorer found no leading yes/no and failed, even though the conclusion was right) and jj_04 (identical answer text and citation \"Approximately $20 billion\", but iter4 left value=null/unit=text instead of 20000/USD millions, so the numeric branch was skipped and it fell to the never-passing exact-string branch). (b) interaction with an iter4 change \u2014 amd_05 and boeing_07 were calibrated ABSTENTIONS in iter3 (not correct), and the commit-nudge flipped them to answered; amd_05's answer is a verbatim gold match (EPYC/semi-custom/Xilinx) but auto-fails because the item carries no gold_polarity/gold_canonical annotation, so any free-text answer fails the exact-string fallback \u2014 an annotation-coverage gap, not an agent regression; boeing_07 similarly auto-fails and is also partly off (cited 89% of BDS segment vs gold's 40% of total). pepsico_06 flipped wrong\u2192abstain because the iter4 \"notes-count-as-outlined\" rule made it over-search Note 3 restructuring (25 tool/retrieval events vs 15) and hit MAX_TOOL_CALLS_PER_ITEM=12 \u2192 flag_outstanding. (c) retrieval nondeterminism \u2014 jj_01: iter4's differently-worded COGS queries surfaced the 2023 8-K continuing-operations COGS ($24,596, Kenvue-stripped) instead of the 10-K's $31,089; with the same avg inventory 11,435 that gives 24,596/11,435=2.15 vs iter3's 31,089/11,435=2.72 (gold 2.7, \u00b11% window [2.673,2.727]) \u2014 the wrong source, not arithmetic, left tolerance. Single highest-leverage knob for iter5: set temperature to 0.0 (seed is dead, so temperature is the only determinism lever) to kill the query-wording/phrasing drift behind ~4 of 7 flips; pair it with two cheap prompt-format canonicalizations (lead free-text judgment answers with \"Yes\"/\"No\"; always populate the numeric value+unit for numeric-gold questions) which deterministically recover adobe_01, boeing_02 and jj_04 regardless of sampling. amd_05/boeing_07 need a data fix (gold_canonical annotations), and jj_01 needs a document-priority rule (prefer the 10-K for FY figures over later 8-K/earnings restatements).",
+    "improvements": [
+      {
+        "id": "IMP5-1",
+        "title": "Answer-format canonicalization prompt rules (lead Yes/No; always populate value/unit for numeric answers)",
+        "category": "agent_prompt",
+        "priority": 1
+      },
+      {
+        "id": "IMP5-2",
+        "title": "Temperature 0.2 -> 0.0 (endpoint does not honor seed; churn reduction)",
+        "category": "config",
+        "priority": 2
+      },
+      {
+        "id": "IMP5-3",
+        "title": "Generic geography synonym (North America <-> United States and Canada) + honest canonical annotations for amd_05/boeing_07; verizon_05 human sign-off",
+        "category": "eval_measurement",
+        "priority": 3
+      },
+      {
+        "id": "IMP5-4",
+        "title": "Judge model switch to DeepSeek-V4-Flash (bake-off: gate PASS, 9/9 agreement, ~30x faster)",
+        "category": "judge",
+        "priority": 4
+      }
+    ]
+  },
+  "analysts": [
+    {
+      "description": "Churn anatomy of the 7 iter3\u2192iter4 flip items",
+      "summary": "Diffed iter3 vs iter4 memos, traces and llm_calls for all 7 flip items. KEY FINDING on determinism: the eval scorer is fully deterministic (evals/scorers.py, no LLM judge), so every flip is caused by the AGENT output changing, not scoring noise \u2014 and the endpoint itself is NOT deterministic. On all 11 companies the per-run \"plan\" LLM call had a byte-identical prompt across iter3 and iter4 (identical prompt_tokens: adobe 433, jj 479, pepsico 551, ...) yet completion_tokens differed in EVERY case (adobe 6394\u21924709, jj 3498\u21922219, verizon 2719\u21925319, ~2x swings; 0/11 identical). Temperature 0.2 + seed 42 is effectively non-deterministic on the Vultr/Kimi-K2.6 endpoint \u2014 the seed is not honored \u2014 and this is the churn engine. Classifying the 7 flips: (a) pure sampling/format nondeterminism \u2014 adobe_01 and boeing_02 (leading Yes/No token disappeared: iter4 phrased \"does NOT have\" / \"is not a useful metric\", so the deterministic polarity scorer found no leading yes/no and failed, even though the conclusion was right) and jj_04 (identical answer text and citation \"Approximately $20 billion\", but iter4 left value=null/unit=text instead of 20000/USD millions, so the numeric branch was skipped and it fell to the never-passing exact-string branch). (b) interaction with an iter4 change \u2014 amd_05 and boeing_07 were calibrated ABSTENTIONS in iter3 (not correct), and the commit-nudge flipped them to answered; amd_05's answer is a verbatim gold match (EPYC/semi-custom/Xilinx) but auto-fails because the item carries no gold_polarity/gold_canonical annotation, so any free-text answer fails the exact-string fallback \u2014 an annotation-coverage gap, not an agent regression; boeing_07 similarly auto-fails and is also partly off (cited 89% of BDS segment vs gold's 40% of total). pepsico_06 flipped wrong\u2192abstain because the iter4 \"notes-count-as-outlined\" rule made it over-search Note 3 restructuring (25 tool/retrieval events vs 15) and hit MAX_TOOL_CALLS_PER_ITEM=12 \u2192 flag_outstanding. (c) retrieval nondeterminism \u2014 jj_01: iter4's differently-worded COGS queries surfaced the 2023 8-K continuing-operations COGS ($24,596, Kenvue-stripped) instead of the 10-K's $31,089; with the same avg inventory 11,435 that gives 24,596/11,435=2.15 vs iter3's 31,089/11,435=2.72 (gold 2.7, \u00b11% window [2.673,2.727]) \u2014 the wrong source, not arithmetic, left tolerance. Single highest-leverage knob for iter5: set temperature to 0.0 (seed is dead, so temperature is the only determinism lever) to kill the query-wording/phrasing drift behind ~4 of 7 flips; pair it with two cheap prompt-format canonicalizations (lead free-text judgment answers with \"Yes\"/\"No\"; always populate the numeric value+unit for numeric-gold questions) which deterministically recover adobe_01, boeing_02 and jj_04 regardless of sampling. amd_05/boeing_07 need a data fix (gold_canonical annotations), and jj_01 needs a document-priority rule (prefer the 10-K for FY figures over later 8-K/earnings restatements).",
+      "findings": [
+        {
+          "title": "Endpoint is non-deterministic: temperature 0.2 + seed 42 is NOT honored on Vultr/Kimi-K2.6 \u2014 this is the root cause of flip churn",
+          "evidence": "The scorer (evals/scorers.py) is 100% deterministic pure functions \u2014 no LLM judge \u2014 so flips can only come from changed agent output. Determinism probe: the once-per-run 'plan' LLM call has a byte-identical prompt across iter3 and iter4 (identical prompt_tokens for all 11 companies: adobe 433, amd 404, boeing 409, johnson_johnson 479, pepsico 551, verizon 344, ...). Yet completion_tokens differ in EVERY pair, often ~2x: adobe 6394\u21924709, amd 6316\u21923821, johnson_johnson 3498\u21922219, pepsico 4852\u21923314, verizon 2719\u21925319, mgm_resorts 3144\u21924544. 0/11 identical. Identical input \u2192 wildly different output length = the seed is ignored and temp-0.2 sampling dominates. Note: request/response bodies and system_fingerprint are NOT logged in llm_calls.jsonl, so this is inferred from identical-prompt token divergence, which is conclusive enough.",
+          "severity": "high",
+          "affected_items": [
+            "adobe_01",
+            "amd_05",
+            "boeing_02",
+            "boeing_07",
+            "johnson_johnson_01",
+            "johnson_johnson_04",
+            "pepsico_06"
+          ],
+          "suggested_fix": "Set LLM_TEMPERATURE=0.0 in backend/app/config.py for iter5. Since seed does nothing on this endpoint, temperature is the only determinism lever. This directly attacks the query-wording drift (jj_01) and phrasing drift (adobe_01, boeing_02) behind ~4 of 7 flips and stabilizes run-to-run comparisons. Caveat: temp 0 locks in one branch deterministically but does not guarantee the CORRECT branch, so pair it with the format canonicalizations below."
+        },
+        {
+          "title": "adobe_01 & boeing_02: correct conclusion, but the leading Yes/No token vanished \u2014 deterministic polarity scorer failed on phrasing alone",
+          "evidence": "Both items are scored purely by _leading_polarity() (subset gold_polarity: adobe_01='no', boeing_02='yes'), which returns the FIRST standalone 'yes'/'no' token. iter3 adobe_01 answer led with 'No, Adobe does not have...' (polarity='no' \u2192 PASS); iter4 led with 'Operating margin is a useful metric for Adobe...' and stated 'Adobe does NOT have an improving...' \u2014 verified _leading_polarity returns None ('NOT' normalizes to 'not', not 'no') \u2192 FAIL, despite the SAME correct conclusion and better numbers (34.64% vs gold 34.6%). iter3 boeing_02 led with 'Yes. Boeing's gross margin improved...' (PASS); iter4 led with 'Gross margin is not a useful metric for Boeing...' \u2192 _leading_polarity None \u2192 FAIL (also took the 'not useful' escape-hatch branch vs gold's 'yes improving').",
+          "severity": "high",
+          "affected_items": [
+            "adobe_01",
+            "boeing_02"
+          ],
+          "suggested_fix": "Add an answer-format rule: for judgment/yes-no questions, ALWAYS lead the answer with a bare 'Yes' or 'No' before any qualification. This deterministically recovers both items regardless of sampling temperature and hardens all future B_judgment/A_multi_input polarity items against phrasing churn. Cheapest, highest-certainty fix."
+        },
+        {
+          "title": "johnson_johnson_04: identical correct answer and citation, but iter4 failed to populate the numeric value field \u2014 pure output-format nondeterminism",
+          "evidence": "gold_value=20000, gold_unit='USD millions', tol 1%. iter3 memo: value=20000.0, unit='USD millions' \u2192 numeric_within_tolerance PASS. iter4 memo: value=null, unit='text' \u2014 but the answer prose ('Approximately $20 billion') and the citation (same 8-K p4 quote 'gain of approximately $20 billion') are IDENTICAL to iter3. Because memo.value is None, scorer's numeric branch (`gold_value is not None AND memo.value is not None`) is skipped and it falls through to the exact-string branch, which never matches free prose \u2192 FAIL. Nothing about the evidence or reasoning changed; only the structured value slot was left empty.",
+          "severity": "high",
+          "affected_items": [
+            "johnson_johnson_04"
+          ],
+          "suggested_fix": "Add a rule: for any question expecting a numeric answer (amount/ratio/percentage/count), the agent MUST populate the structured value and unit fields, not just the prose. This is the cleanest flip to eliminate and immunizes all numeric-gold items against this format regression."
+        },
+        {
+          "title": "johnson_johnson_01: retrieval divergence pulled the wrong COGS source (2023 8-K continuing-ops $24,596) instead of the 10-K's $31,089",
+          "evidence": "gold_value=2.7 ratio, tol 1% \u2192 window [2.673, 2.727]. Same inventory both iters (10-K p46: 12,483 / 10,387, avg 11,435). iter3 cited COGS $31,089 from JOHNSON_JOHNSON_2022_10K p47 \u2192 31,089/11,435 = 2.72 (PASS). iter4 cited COGS $24,596 from JOHNSON_JOHNSON_2023_8K p14 ('Cost of products sold ... 24,596') \u2192 24,596/11,435 = 2.15 (FAIL). The $24,596 is FY2022 COGS RESTATED for continuing operations after the Kenvue/Consumer-Health deconsolidation \u2014 a wrong input for a turnover ratio that uses the 10-K's total inventory. Trace diff: iter4's COGS queries were re-worded ('...consolidated statement of earnings cost of products sold full year') and the 10-K income-statement chunk with $31,089 never ranked into the top-k for those queries, so the model committed to the 8-K figure. It is a source-selection error caused by query-wording nondeterminism, not an arithmetic error.",
+          "severity": "high",
+          "affected_items": [
+            "johnson_johnson_01"
+          ],
+          "suggested_fix": "Add a document-priority rule: for a company's FYxxxx figures, prefer the same-year 10-K primary statements over later 8-K / earnings-release restatements (which may reflect discontinued-operations reclassifications). Temperature 0.0 also reduces the query-wording drift that triggered this."
+        },
+        {
+          "title": "amd_05 & boeing_07: commit-nudge flipped calibrated abstentions to answers that auto-fail for lack of a gold annotation (amd_05's answer is actually a verbatim gold match)",
+          "evidence": "Both were ABSTAINED in iter3 (per_item_scores abstention='incorrect_but_calibrated', answer_accuracy=None), NOT correct \u2014 the task's 'correct\u2192wrong' framing is off for these two; they are abstain\u2192answered-fail. Iter4's commit-nudge produced grounded answers. amd_05 iter4 answer cites AMD_2022_10K p43 verbatim: 'higher sales of ... EPYC server processors, a 21% increase in Gaming ... semi-custom product sales, and ... the inclusion of Xilinx embedded product sales' \u2014 this MATCHES gold almost word-for-word. But amd_05 and boeing_07 have gold_polarity=None AND gold_canonical=None AND gold_value=None, so answer_accuracy falls to the exact-string fallback which never passes free prose \u2192 guaranteed FAIL regardless of answer quality. boeing_07 is additionally partly off (cited 89% of BDS-segment revenue vs gold's '40% of total revenues').",
+          "severity": "medium",
+          "affected_items": [
+            "amd_05",
+            "boeing_07"
+          ],
+          "suggested_fix": "Data fix, not a model change: add gold_canonical annotations for amd_05 (tokens: EPYC / semi-custom / Xilinx) and boeing_07 (commercial airlines / US government) so the deterministic canonical branch can credit correct free-text answers. Without this, the commit-nudge will keep converting safe abstentions into scored losses on un-annotated items \u2014 consider gating the nudge or prioritizing annotation coverage for the remaining un-annotated B_judgment items."
+        },
+        {
+          "title": "pepsico_06: the iter4 'notes-count-as-outlined' prompt rule caused over-search of Note 3 and exhausted the tool-call budget \u2192 abstain (was a wrong '0' before)",
+          "evidence": "This flipped wrong\u2192abstain, not correct\u2192wrong. iter3: 15 tool/retrieval events, committed via record_answer to '0' (wrong; gold=411). iter4: 25 tool/retrieval events \u2014 the trace shows it chasing the notes ('Note 3 restructuring impairment charges FY2022', '2019 Productivity Plan', 'restructuring charges included in selling general administrative') \u2014 hit MAX_TOOL_CALLS_PER_ITEM=12 and ended in flag_outstanding with 'Reached the maximum tool-call budget'. The iter4 notes rule pointed it at the right place (gold's $411M IS in the notes) but it could not extract/commit within budget, so it over-searched into an abstention.",
+          "severity": "medium",
+          "affected_items": [
+            "pepsico_06"
+          ],
+          "suggested_fix": "The notes rule is directionally correct but needs a landing path: either raise the per-item tool budget slightly for note-lookup C_lookup items, or add a mid-loop 'you have found the note value, now commit' nudge so notes searches converge instead of churning. Lower priority than the polarity/value canonicalizations."
+        },
+        {
+          "title": "Recommended single change for iter5 and impact estimate",
+          "evidence": "Flip taxonomy: (a) sampling/format = adobe_01, boeing_02, jj_04 (3); (b) iter4-change interaction = amd_05, boeing_07 (commit-nudge + annotation gap), pepsico_06 (notes rule over-search) (3); (c) retrieval nondeterminism = jj_01 (1). Temperature 0.0 attacks the generative nondeterminism behind (a) and (c) \u2014 ~4 items \u2014 and stabilizes all future run-to-run comparisons, but it will NOT fix jj_04 (structural value slot) or the annotation-gap items. The two format canonicalizations (lead Yes/No; populate numeric value+unit) deterministically recover 3 items (adobe_01, boeing_02, jj_04) independent of temperature.",
+          "severity": "high",
+          "affected_items": [
+            "adobe_01",
+            "boeing_02",
+            "johnson_johnson_04",
+            "johnson_johnson_01"
+          ],
+          "suggested_fix": "Ship a minimal bundle for iter5: (1) LLM_TEMPERATURE=0.0 (primary knob \u2014 kills the churn engine, ~50-70% fewer run-to-run flips); (2) 'lead judgment answers with Yes/No' rule (+2: adobe_01, boeing_02); (3) 'always populate value+unit for numeric-gold questions' rule (+1: jj_04). Estimated net effect: recover 3 flips deterministically (correct-of-61 ~49\u2192~52) and sharply reduce future churn, without touching retrieval. Defer the document-priority rule (jj_01) and gold_canonical annotations (amd_05/boeing_07) as second-tier if scope allows \u2014 they add up to +2 more but carry more regression risk than the three-change core bundle."
+        }
+      ]
+    }
+  ],
+  "note": "Synthesizer output was degenerate for this round; plan assembled by the orchestrator directly from the churn analysis + judge bake-off."
+}

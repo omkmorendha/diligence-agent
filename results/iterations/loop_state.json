@@ -1,0 +1,202 @@
+{
+  "iterations": {
+    "900": {
+      "system": "agent",
+      "label": "pilot: MGM instrumentation check",
+      "completed_at": "2026-07-04T20:51:50.762125+00:00",
+      "wall_s": 0.3,
+      "aggregate": {
+        "answer_accuracy": 0.3333,
+        "citation_precision": 0.5,
+        "citation_provenance": 1.0,
+        "arithmetic_integrity": 1.0,
+        "trace_shape": 1.0,
+        "abstention_correct_rate": null,
+        "n_items": 6,
+        "answered": 6,
+        "abstained": 0
+      },
+      "dir": "results/iterations/pilot"
+    },
+    "0": {
+      "system": "baseline",
+      "label": "baseline61 final-scorer v4",
+      "completed_at": "2026-07-05T06:04:08.481884+00:00",
+      "wall_s": 0.3,
+      "aggregate": {
+        "answer_accuracy": 0.7586,
+        "citation_precision": 0.4138,
+        "citation_provenance": 1.0,
+        "arithmetic_integrity": 0.6897,
+        "trace_shape": 0.4426,
+        "abstention_correct_rate": 0.0,
+        "n_items": 61,
+        "answered": 29,
+        "abstained": 32
+      },
+      "dir": "results/iterations/baseline61"
+    },
+    "1": {
+      "system": "agent",
+      "label": "iter1 rescored final-scorer v4",
+      "completed_at": "2026-07-05T06:04:08.912112+00:00",
+      "wall_s": 0.4,
+      "aggregate": {
+        "answer_accuracy": 0.8409,
+        "citation_precision": 0.6136,
+        "citation_provenance": 1.0,
+        "arithmetic_integrity": 1.0,
+        "trace_shape": 0.5738,
+        "abstention_correct_rate": 0.0,
+        "n_items": 61,
+        "answered": 44,
+        "abstained": 17
+      },
+      "dir": "results/iterations/iter1"
+    },
+    "901": {
+      "system": "agent",
+      "label": "pilot2: IMP-1 citation fix check",
+      "completed_at": "2026-07-05T00:08:16.339207+00:00",
+      "wall_s": 105.8,
+      "aggregate": {
+        "answer_accuracy": 0.3333,
+        "citation_precision": 0.5,
+        "citation_provenance": 1.0,
+        "arithmetic_integrity": 1.0,
+        "trace_shape": 1.0,
+        "abstention_correct_rate": null,
+        "n_items": 6,
+        "answered": 6,
+        "abstained": 0
+      },
+      "dir": "results/iterations/pilot2"
+    },
+    "2": {
+      "system": "agent",
+      "label": "iter2 rescored final-scorer v4",
+      "completed_at": "2026-07-05T06:04:09.328644+00:00",
+      "wall_s": 0.3,
+      "aggregate": {
+        "answer_accuracy": 0.8621,
+        "citation_precision": 0.4828,
+        "citation_provenance": 1.0,
+        "arithmetic_integrity": 1.0,
+        "trace_shape": 0.7377,
+        "abstention_correct_rate": 0.0,
+        "n_items": 61,
+        "answered": 58,
+        "abstained": 3
+      },
+      "dir": "results/iterations/iter2"
+    },
+    "902": {
+      "system": "agent",
+      "label": "pilot3: iter3 changes check",
+      "completed_at": "2026-07-05T02:13:55.821390+00:00",
+      "wall_s": 118.9,
+      "aggregate": {
+        "answer_accuracy": 1.0,
+        "citation_precision": 0.5,
+        "citation_provenance": 1.0,
+        "arithmetic_integrity": 1.0,
+        "trace_shape": 1.0,
+        "abstention_correct_rate": null,
+        "n_items": 6,
+        "answered": 6,
+        "abstained": 0
+      },
+      "dir": "results/iterations/pilot3"
+    },
+    "3": {
+      "system": "agent",
+      "label": "iter3 rescored final-scorer v4",
+      "completed_at": "2026-07-05T06:04:09.764958+00:00",
+      "wall_s": 0.4,
+      "aggregate": {
+        "answer_accuracy": 0.9074,
+        "citation_precision": 0.5926,
+        "citation_provenance": 1.0,
+        "arithmetic_integrity": 1.0,
+        "trace_shape": 0.7541,
+        "abstention_correct_rate": 0.0,
+        "n_items": 61,
+        "answered": 54,
+        "abstained": 7
+      },
+      "dir": "results/iterations/iter3"
+    },
+    "903": {
+      "system": "agent",
+      "label": "pilot4: iter4 behavioral changes",
+      "completed_at": "2026-07-05T04:11:53.862729+00:00",
+      "wall_s": 738.2,
+      "aggregate": {
+        "answer_accuracy": 1.0,
+        "citation_precision": 0.3333,
+        "citation_provenance": 1.0,
+        "arithmetic_integrity": 1.0,
+        "trace_shape": 1.0,
+        "abstention_correct_rate": null,
+        "n_items": 6,
+        "answered": 6,
+        "abstained": 0
+      },
+      "dir": "results/iterations/pilot4"
+    },
+    "4": {
+      "system": "agent",
+      "label": "iter4 rescored final-scorer v4",
+      "completed_at": "2026-07-05T06:04:10.220452+00:00",
+      "wall_s": 0.4,
+      "aggregate": {
+        "answer_accuracy": 0.8475,
+        "citation_precision": 0.6102,
+        "citation_provenance": 1.0,
+        "arithmetic_integrity": 1.0,
+        "trace_shape": 0.7705,
+        "abstention_correct_rate": 0.0,
+        "n_items": 61,
+        "answered": 59,
+        "abstained": 2
+      },
+      "dir": "results/iterations/iter4"
+    },
+    "904": {
+      "system": "agent",
+      "label": "pilot5: temp 0.0 + answer-format rules",
+      "completed_at": "2026-07-05T06:03:36.819087+00:00",
+      "wall_s": 204.7,
+      "aggregate": {
+        "answer_accuracy": 1.0,
+        "citation_precision": 0.5,
+        "citation_provenance": 1.0,
+        "arithmetic_integrity": 1.0,
+        "trace_shape": 1.0,
+        "abstention_correct_rate": null,
+        "n_items": 6,
+        "answered": 6,
+        "abstained": 0
+      },
+      "dir": "results/iterations/pilot5"
+    },
+    "5": {
+      "system": "agent",
+      "label": "iter5 FINAL: temp 0.0 + answer-format rules + geography synonym + amd_05/boeing_07/verizon_05 annotations + DeepSeek judge",
+      "completed_at": "2026-07-05T06:30:22.686016+00:00",
+      "wall_s": 1588.7,
+      "aggregate": {
+        "answer_accuracy": 0.85,
+        "citation_precision": 0.5833,
+        "citation_provenance": 1.0,
+        "arithmetic_integrity": 1.0,
+        "trace_shape": 0.7705,
+        "abstention_correct_rate": 0.0,
+        "n_items": 61,
+        "answered": 60,
+        "abstained": 1
+      },
+      "dir": "results/iterations/iter5"
+    }
+  }
+}

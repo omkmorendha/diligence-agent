@@ -1,0 +1,33 @@
+{
+  "item_id": "gf-001",
+  "question_id": "q-gf-001",
+  "company": "Acme Corp",
+  "question": "In which geographic region did Acme Corp generate the most revenue in FY2023?",
+  "gold_answer": "Acme Corp generated the most revenue in North America in FY2023.",
+  "gold_value": null,
+  "gold_unit": "text",
+  "gold_canonical": "North America",
+  "gold_evidence": [
+    {
+      "doc_id": "acme_2023_10k",
+      "doc_name": "Acme Corp FY2023 10-K",
+      "doc_type": "10k",
+      "filing_period": "FY2023",
+      "pdf_page": 42,
+      "page_label": "42",
+      "evidence_text": "North America generated the largest share of net revenue in fiscal 2023."
+    }
+  ],
+  "bucket": "C_lookup",
+  "expected_formula": null,
+  "expected_inputs": [],
+  "predicted_baseline_failure": false,
+  "answer_verifiable_from_evidence": true,
+  "unit_or_period_ambiguity": false,
+  "demo_candidate": false,
+  "human_reviewed": true,
+  "tolerance": {
+    "relative": 0.01,
+    "absolute": null
+  }
+}
