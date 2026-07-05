@@ -14,6 +14,7 @@ import json
 import queue
 import threading
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Optional
 
 from . import config
@@ -37,13 +38,13 @@ class TraceWriter:
     runs are unaffected (uncontended lock, identical output).
     """
 
-    def __init__(self, run_id: str) -> None:
+    def __init__(self, run_id: str, run_dir: Optional[str | Path] = None) -> None:
         self.run_id = run_id
         self._seq = 0
         self._lock = threading.Lock()
         self.events: list[TraceEvent] = []
         self.sse_queue: "queue.Queue[Optional[TraceEvent]]" = queue.Queue()
-        self.run_dir = config.RUNS_DIR / run_id
+        self.run_dir = Path(run_dir) if run_dir is not None else config.RUNS_DIR / run_id
         self.run_dir.mkdir(parents=True, exist_ok=True)
         self.trace_path = self.run_dir / "trace.jsonl"
 
@@ -90,9 +91,10 @@ class TraceWriter:
         return None
 
     @staticmethod
-    def read(run_id: str) -> list[TraceEvent]:
+    def read(run_id: str, run_dir: Optional[str | Path] = None) -> list[TraceEvent]:
         """Load a completed trace from disk (for replay mode)."""
-        path = config.RUNS_DIR / run_id / "trace.jsonl"
+        base = Path(run_dir) if run_dir is not None else config.RUNS_DIR / run_id
+        path = base / "trace.jsonl"
         if not path.exists():
             return []
         return [TraceEvent(**json.loads(line)) for line in path.read_text().splitlines() if line.strip()]

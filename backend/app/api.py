@@ -29,23 +29,31 @@ import random
 import re
 import threading
 import time
+import zipfile
+from io import BytesIO
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator, Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, Form, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
 from . import config
 from .agent import run_agent
 from .baseline import run_baseline
 from .ingest import slugify
+from .review import run_review as review_runner
 from .schemas import (
     CompanyChecklist,
+    CreateReviewResponse,
     CreateRunRequest,
     CreateRunResponse,
     PageResponse,
+    ReviewCard,
+    ReviewStatus,
+    ReviewStatusResponse,
+    ReviewSummary,
     RunCard,
     RunStatusResponse,
     SubsetItem,
@@ -197,6 +205,396 @@ def create_run(req: CreateRunRequest) -> CreateRunResponse:
     thread.start()
 
     return CreateRunResponse(run_id=run_id, status="queued")
+
+
+# --------------------------------------------------------------------------
+# DiliAgent v1 review API (spec section 11)
+# --------------------------------------------------------------------------
+_UPLOAD_FORMATS = {
+    ".pdf": "pdf",
+    ".docx": "docx",
+    ".md": "md",
+    ".markdown": "md",
+}
+
+_CONTENT_TYPES = {
+    "pdf": "application/pdf",
+    "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "md": "text/markdown",
+}
+
+
+def _review_dir(review_id: str) -> Path:
+    return config.REVIEWS_DIR / review_id
+
+
+def _review_meta_path(review_id: str) -> Path:
+    return _review_dir(review_id) / "review.json"
+
+
+def _review_report_path(review_id: str) -> Path:
+    return _review_dir(review_id) / "report.json"
+
+
+def _review_trace_path(review_id: str) -> Path:
+    return _review_dir(review_id) / "trace.jsonl"
+
+
+def _format_from_suffix(path: str | Path) -> str:
+    suffix = Path(path).suffix.lower()
+    fmt = _UPLOAD_FORMATS.get(suffix)
+    if fmt is None:
+        raise HTTPException(status_code=400, detail="unsupported file type; expected .pdf, .docx, or .md")
+    return fmt
+
+
+def _safe_upload_name(filename: str) -> str:
+    name = Path(filename or "upload").name
+    if not name or name in (".", ".."):
+        return "upload"
+    return name
+
+
+def _validate_upload_bytes(filename: str, data: bytes) -> str:
+    fmt = _format_from_suffix(filename)
+    max_bytes = config.MAX_UPLOAD_MB * 1024 * 1024
+    if not data:
+        raise HTTPException(status_code=400, detail="upload is empty")
+    if len(data) > max_bytes:
+        raise HTTPException(status_code=413, detail=f"upload exceeds {config.MAX_UPLOAD_MB} MB limit")
+
+    if fmt == "pdf":
+        if not data.startswith(b"%PDF-"):
+            raise HTTPException(status_code=400, detail="invalid PDF upload: missing %PDF magic bytes")
+    elif fmt == "docx":
+        if not data.startswith(b"PK\x03\x04"):
+            raise HTTPException(status_code=400, detail="invalid DOCX upload: missing ZIP magic bytes")
+        try:
+            with zipfile.ZipFile(BytesIO(data)) as zf:
+                if "[Content_Types].xml" not in zf.namelist():
+                    raise HTTPException(status_code=400, detail="invalid DOCX upload")
+        except zipfile.BadZipFile as exc:
+            raise HTTPException(status_code=400, detail="invalid DOCX upload") from exc
+    else:
+        try:
+            data.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise HTTPException(status_code=400, detail="Markdown uploads must be UTF-8 text") from exc
+    return fmt
+
+
+def _read_review_json(review_id: str) -> Optional[dict[str, Any]]:
+    path = _review_meta_path(review_id)
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text())
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def _read_review_summary(review_id: str) -> Optional[ReviewSummary]:
+    meta = _read_review_json(review_id) or {}
+    if isinstance(meta.get("summary"), dict):
+        try:
+            return ReviewSummary.model_validate(meta["summary"])
+        except Exception:
+            pass
+    report_path = _review_report_path(review_id)
+    if not report_path.exists():
+        return None
+    try:
+        report = json.loads(report_path.read_text())
+        summary = report.get("summary")
+        return ReviewSummary.model_validate(summary) if isinstance(summary, dict) else None
+    except (json.JSONDecodeError, OSError, ValueError):
+        return None
+
+
+class _ReviewRecord:
+    """Live bookkeeping for a review started by this process."""
+
+    def __init__(self, review_id: str, filename: str, fmt: str, pilot: bool, upload_path: Path) -> None:
+        self.review_id = review_id
+        self.filename = filename
+        self.format = fmt
+        self.pilot = pilot
+        self.upload_path = upload_path
+        self.status: ReviewStatus = "queued"
+        self.created_at = _now_iso()
+        self.started_at: Optional[str] = None
+        self.completed_at: Optional[str] = None
+        self.error: Optional[str] = None
+
+    def to_meta(self) -> dict[str, Any]:
+        return {
+            "review_id": self.review_id,
+            "filename": self.filename,
+            "format": self.format,
+            "status": self.status,
+            "pilot": self.pilot,
+            "created_at": self.created_at,
+            "started_at": self.started_at,
+            "completed_at": self.completed_at,
+            "error": self.error,
+        }
+
+
+_REVIEWS: dict[str, _ReviewRecord] = {}
+_REVIEWS_LOCK = threading.Lock()
+
+
+def _persist_review_meta(record: _ReviewRecord) -> None:
+    _review_dir(record.review_id).mkdir(parents=True, exist_ok=True)
+    existing = _read_review_json(record.review_id) or {}
+    existing.update(record.to_meta())
+    summary = _read_review_summary(record.review_id)
+    if summary is not None:
+        existing["summary"] = summary.model_dump(mode="json")
+    _review_meta_path(record.review_id).write_text(json.dumps(existing, indent=2) + "\n")
+
+
+def _review_executing_locked() -> bool:
+    return any(record.status in ("queued", "running") for record in _REVIEWS.values())
+
+
+def _new_review_id(filename: str) -> str:
+    ts_ms = int(time.time() * 1000)
+    slug = slugify(Path(filename).stem)
+    review_id = f"review_{slug}_{ts_ms}"
+    while review_id in _REVIEWS or _review_dir(review_id).exists():
+        ts_ms += 1
+        review_id = f"review_{slug}_{ts_ms}"
+    return review_id
+
+
+def _execute_review(record: _ReviewRecord) -> None:
+    record.status = "running"
+    record.started_at = _now_iso()
+    _persist_review_meta(record)
+    try:
+        review_runner.run_review(record.review_id, record.upload_path, record.pilot)
+        disk_meta = _read_review_json(record.review_id) or {}
+        disk_status = disk_meta.get("status")
+        record.status = disk_status if disk_status in ("completed", "out_of_scope") else "completed"
+        record.error = None
+    except Exception as exc:  # noqa: BLE001 - background failures must surface as review status
+        record.status = "failed"
+        record.error = str(exc)
+    finally:
+        record.completed_at = _now_iso()
+        _persist_review_meta(record)
+
+
+@app.post("/reviews", response_model=CreateReviewResponse)
+async def create_review(file: UploadFile = File(...), pilot: bool = Form(True)) -> CreateReviewResponse:
+    filename = _safe_upload_name(file.filename or "upload")
+    max_bytes = config.MAX_UPLOAD_MB * 1024 * 1024
+    data = await file.read(max_bytes + 1)
+    fmt = _validate_upload_bytes(filename, data)
+
+    with _REVIEWS_LOCK:
+        if _review_executing_locked():
+            raise HTTPException(status_code=409, detail="a review is already executing")
+        review_id = _new_review_id(filename)
+        review_dir = _review_dir(review_id)
+        review_dir.mkdir(parents=True, exist_ok=False)
+        upload_path = review_dir / f"upload.{fmt}"
+        upload_path.write_bytes(data)
+        record = _ReviewRecord(review_id, filename, fmt, pilot, upload_path)
+        _REVIEWS[review_id] = record
+        _persist_review_meta(record)
+
+    thread = threading.Thread(target=_execute_review, args=(record,), daemon=True)
+    thread.start()
+    return CreateReviewResponse(review_id=review_id, status="queued")
+
+
+@app.post("/reviews/{review_id}/full", response_model=CreateReviewResponse)
+def promote_review_full(review_id: str) -> CreateReviewResponse:
+    meta = _get_review_meta(review_id)
+    if meta is None:
+        raise HTTPException(status_code=404, detail=f"review '{review_id}' not found")
+    if meta["status"] in ("queued", "running"):
+        raise HTTPException(status_code=409, detail="review is already executing")
+    if meta["status"] not in ("completed", "out_of_scope"):
+        raise HTTPException(status_code=409, detail="only a completed pilot review can be promoted")
+    if not meta.get("pilot", True):
+        raise HTTPException(status_code=409, detail="review is already a full review")
+
+    fmt = meta["format"]
+    upload_path = _review_dir(review_id) / f"upload.{fmt}"
+    if not upload_path.exists():
+        raise HTTPException(status_code=404, detail=f"upload artifact missing for '{review_id}'")
+
+    with _REVIEWS_LOCK:
+        if _review_executing_locked():
+            raise HTTPException(status_code=409, detail="a review is already executing")
+        record = _ReviewRecord(review_id, meta["filename"], fmt, False, upload_path)
+        record.created_at = meta["created_at"]
+        _REVIEWS[review_id] = record
+        _persist_review_meta(record)
+
+    thread = threading.Thread(target=_execute_review, args=(record,), daemon=True)
+    thread.start()
+    return CreateReviewResponse(review_id=review_id, status="queued")
+
+
+def _get_review_meta(review_id: str) -> Optional[dict[str, Any]]:
+    with _REVIEWS_LOCK:
+        record = _REVIEWS.get(review_id)
+    meta = _read_review_json(review_id) or {}
+    if record is not None:
+        meta.update(record.to_meta())
+    if not meta:
+        return None
+    summary = _read_review_summary(review_id)
+    if summary is not None:
+        meta["summary"] = summary.model_dump(mode="json")
+    return {
+        "review_id": meta.get("review_id", review_id),
+        "filename": meta.get("filename", "upload"),
+        "format": meta.get("format") or _format_from_suffix(meta.get("filename", "upload.md")),
+        "status": meta.get("status", "failed"),
+        "pilot": meta.get("pilot", True),
+        "created_at": meta.get("created_at") or _dir_iso_mtime(_review_dir(review_id)),
+        "started_at": meta.get("started_at"),
+        "completed_at": meta.get("completed_at"),
+        "error": meta.get("error"),
+        "summary": meta.get("summary"),
+    }
+
+
+def _review_card(review_id: str) -> Optional[ReviewCard]:
+    meta = _get_review_meta(review_id)
+    if meta is None:
+        return None
+    summary = ReviewSummary.model_validate(meta["summary"]) if isinstance(meta.get("summary"), dict) else None
+    return ReviewCard(
+        review_id=meta["review_id"],
+        filename=meta["filename"],
+        format=meta["format"],
+        status=meta["status"],
+        created_at=meta["created_at"],
+        pilot=meta["pilot"],
+        summary=summary,
+    )
+
+
+@app.get("/reviews", response_model=list[ReviewCard])
+def list_reviews() -> list[ReviewCard]:
+    review_ids: set[str] = set()
+    with _REVIEWS_LOCK:
+        review_ids.update(_REVIEWS.keys())
+    if config.REVIEWS_DIR.is_dir():
+        review_ids.update(p.name for p in config.REVIEWS_DIR.iterdir() if p.is_dir())
+    cards = [card for card in (_review_card(review_id) for review_id in review_ids) if card is not None]
+    cards.sort(key=lambda c: c.created_at, reverse=True)
+    return cards
+
+
+@app.get("/reviews/{review_id}", response_model=ReviewStatusResponse)
+def get_review(review_id: str) -> ReviewStatusResponse:
+    meta = _get_review_meta(review_id)
+    if meta is None:
+        raise HTTPException(status_code=404, detail=f"review '{review_id}' not found")
+    summary = ReviewSummary.model_validate(meta["summary"]) if isinstance(meta.get("summary"), dict) else None
+    return ReviewStatusResponse(
+        review_id=meta["review_id"],
+        filename=meta["filename"],
+        format=meta["format"],
+        status=meta["status"],
+        pilot=meta["pilot"],
+        created_at=meta["created_at"],
+        started_at=meta.get("started_at"),
+        completed_at=meta.get("completed_at"),
+        error=meta.get("error"),
+        summary=summary,
+    )
+
+
+def _review_replay_stream(review_id: str) -> Iterator[str]:
+    events = TraceWriter.read(review_id, run_dir=_review_dir(review_id))
+    for i, event in enumerate(events):
+        if i > 0:
+            time.sleep(random.uniform(0.15, 0.4))
+        yield f"data: {event.model_dump_json()}\n\n"
+
+
+def _review_live_stream(review_id: str) -> Iterator[str]:
+    path = _review_trace_path(review_id)
+    offset = 0
+    while True:
+        if path.exists():
+            lines = path.read_text().splitlines()
+            for line in lines[offset:]:
+                if line.strip():
+                    yield f"data: {line}\n\n"
+            offset = len(lines)
+        meta = _get_review_meta(review_id)
+        if meta is None or meta["status"] not in ("queued", "running"):
+            break
+        time.sleep(0.2)
+
+
+@app.get("/reviews/{review_id}/events")
+def review_events(review_id: str) -> StreamingResponse:
+    meta = _get_review_meta(review_id)
+    if meta is None:
+        raise HTTPException(status_code=404, detail=f"review '{review_id}' not found")
+    generator = (
+        _review_live_stream(review_id)
+        if meta["status"] in ("queued", "running")
+        else _review_replay_stream(review_id)
+    )
+    return StreamingResponse(
+        generator,
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@app.get("/reviews/{review_id}/report")
+def get_review_report(review_id: str, format: Optional[str] = Query(None)):
+    meta = _get_review_meta(review_id)
+    if meta is None:
+        raise HTTPException(status_code=404, detail=f"review '{review_id}' not found")
+    if format not in (None, "json", "html"):
+        raise HTTPException(status_code=400, detail="format must be 'json' or 'html'")
+
+    if format == "html":
+        html_path = _review_dir(review_id) / "report.html"
+        if html_path.exists():
+            return FileResponse(html_path, media_type="text/html")
+    else:
+        report_path = _review_report_path(review_id)
+        if report_path.exists():
+            try:
+                return JSONResponse(content=json.loads(report_path.read_text()))
+            except (json.JSONDecodeError, OSError) as exc:
+                raise HTTPException(status_code=500, detail=f"corrupt report for '{review_id}': {exc}") from exc
+
+    if meta["status"] in ("queued", "running"):
+        return JSONResponse(content={"review_id": review_id, "status": meta["status"]}, status_code=202)
+    raise HTTPException(status_code=404, detail=f"report artifact missing for '{review_id}'")
+
+
+@app.get("/reviews/{review_id}/annotated")
+def get_review_annotated(review_id: str):
+    meta = _get_review_meta(review_id)
+    if meta is None:
+        raise HTTPException(status_code=404, detail=f"review '{review_id}' not found")
+    fmt = meta["format"]
+    path = _review_dir(review_id) / f"annotated.{fmt}"
+    if path.exists():
+        return FileResponse(
+            path,
+            media_type=_CONTENT_TYPES.get(fmt, "application/octet-stream"),
+            filename=f"{review_id}_annotated.{fmt}",
+        )
+    if meta["status"] in ("queued", "running"):
+        return JSONResponse(content={"review_id": review_id, "status": meta["status"]}, status_code=202)
+    raise HTTPException(status_code=404, detail=f"annotated artifact missing for '{review_id}'")
 
 
 # --------------------------------------------------------------------------
