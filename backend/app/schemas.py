@@ -29,7 +29,21 @@ ToolName = Literal["search_filing", "get_pages", "calculate", "record_answer", "
 TraceEventType = Literal[
     "plan", "scratchpad", "retrieval", "tool_call", "tool_result",
     "decision", "citation", "item_answer", "verdict", "error",
+    # v1 review pipeline (spec section 10)
+    "claim_extracted", "scope_check", "claim_verdict", "annotation",
 ]
+
+# --- v1 review pipeline literals (spec sections 1.6, 10) ---
+DocFormat = Literal["pdf", "docx", "md"]
+Verdict = Literal[
+    "SUPPORTED", "CONTRADICTED", "PARTIALLY_SUPPORTED",
+    "NOT_IN_CORPUS", "OUT_OF_SCOPE", "UNVERIFIABLE",
+]
+ClaimType = Literal["numeric", "factual", "judgment"]
+# SKIPPED = cut by MAX_CLAIMS cap; ERROR = verification failed after retries (spec section 13).
+ClaimStatus = Literal["PENDING", "VERIFIED", "SKIPPED", "ERROR"]
+VerificationConfidence = Literal["high", "medium", "low"]
+ReviewStatus = Literal["queued", "running", "completed", "failed", "out_of_scope"]
 
 
 # --- section 8: subset item -------------------------------------------------
@@ -283,3 +297,131 @@ class PageResponse(BaseModel):
     page: int
     text: str
     spans: list[dict[str, Any]] = Field(default_factory=list)
+
+
+# --- section 6: DocModel (parsed upload) -----------------------------------
+class DocBlock(BaseModel):
+    """One parsed block of the source document. `char_start`/`char_end` index into
+    the DocModel `canonical_text`; the per-format anchor fields (page for PDF,
+    para_index for DOCX, line_start for MD) are populated only for that format."""
+
+    text: str
+    char_start: int
+    char_end: int
+    page: Optional[int] = None
+    para_index: Optional[int] = None
+    line_start: Optional[int] = None
+
+
+class DocModel(BaseModel):
+    doc_id: str
+    format: DocFormat
+    filename: str
+    canonical_text: str
+    blocks: list[DocBlock] = Field(default_factory=list)
+
+
+# --- section 10: claims + verification -------------------------------------
+class ClaimAnchor(BaseModel):
+    """Verbatim source span for a claim. Offsets index into DocModel.canonical_text;
+    the per-format field (page/para_index/line_start) locates the raw position."""
+
+    quote: str
+    char_start: int
+    char_end: int
+    page: Optional[int] = None
+    para_index: Optional[int] = None
+    line_start: Optional[int] = None
+
+
+class Claim(BaseModel):
+    claim_id: str
+    quote: str
+    claim_type: ClaimType
+    company: str
+    period: Optional[str] = None
+    metric: Optional[str] = None
+    question: str
+    priority: int = 1
+    status: ClaimStatus = "PENDING"
+    anchor: Optional[ClaimAnchor] = None
+
+
+class ClaimValue(BaseModel):
+    """A numeric value + unit extracted from the document or the corpus."""
+
+    value: Optional[float] = None
+    unit: Optional[str] = None
+
+
+class VerificationResult(BaseModel):
+    claim_id: str
+    verdict: Verdict
+    doc_value: Optional[ClaimValue] = None
+    corpus_value: Optional[ClaimValue] = None
+    explanation: str = ""
+    citations: list[Citation] = Field(default_factory=list)
+    calculation: Optional[CalculationResult] = None
+    queries_tried: list[str] = Field(default_factory=list)
+    confidence: VerificationConfidence = "medium"
+
+
+# --- section 9: review report ----------------------------------------------
+class ReviewSummary(BaseModel):
+    """Counts by verdict + claim status (spec section 9)."""
+
+    total_claims: int = 0
+    supported: int = 0
+    contradicted: int = 0
+    partially_supported: int = 0
+    not_in_corpus: int = 0
+    out_of_scope: int = 0
+    unverifiable: int = 0
+    skipped: int = 0
+    error: int = 0
+
+
+class ReviewReportClaim(BaseModel):
+    """A claim paired with its verification result inside the assembled report."""
+
+    claim: Claim
+    result: Optional[VerificationResult] = None
+
+
+class ReviewReport(BaseModel):
+    schema_version: str = "0.1"
+    review_id: str
+    filename: str
+    format: DocFormat
+    company_scope: list[str] = Field(default_factory=list)
+    summary: ReviewSummary = Field(default_factory=ReviewSummary)
+    claims: list[ReviewReportClaim] = Field(default_factory=list)
+
+
+# --- section 11: review API DTOs -------------------------------------------
+class ReviewCard(BaseModel):
+    review_id: str
+    filename: str
+    format: DocFormat
+    status: ReviewStatus
+    created_at: str
+    pilot: bool = True
+    summary: Optional[ReviewSummary] = None
+
+
+class ReviewStatusResponse(BaseModel):
+    review_id: str
+    filename: str
+    format: DocFormat
+    status: ReviewStatus
+    pilot: bool = True
+    created_at: str
+    started_at: Optional[str] = None
+    completed_at: Optional[str] = None
+    error: Optional[str] = None
+    summary: Optional[ReviewSummary] = None
+
+
+class CreateReviewResponse(BaseModel):
+    review_id: str
+    status: ReviewStatus = "queued"

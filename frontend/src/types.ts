@@ -24,7 +24,12 @@ export type TraceEventType =
   | "citation"
   | "item_answer"
   | "verdict"
-  | "error";
+  | "error"
+  // v1 review pipeline (spec section 10)
+  | "claim_extracted"
+  | "scope_check"
+  | "claim_verdict"
+  | "annotation";
 
 // --- section 9: trace event ---
 export interface TraceEvent {
@@ -78,6 +83,15 @@ export interface FinancialInput {
   unit: Unit;
   period: string;
   citation_id: string;
+}
+
+export interface CalculationResult {
+  expression: string;
+  inputs: Record<string, FinancialInput>;
+  value: number;
+  unit?: string | null;
+  rounding?: string | null;
+  steps?: string | null;
 }
 
 // --- section 11 / 17: item answer ---
@@ -308,4 +322,133 @@ export interface PageResponse {
   page: number;
   text: string;
   spans: { run_id: string; item_id: string; citation_id: string; char_start: number; char_end: number }[];
+}
+
+// --- v1 review pipeline (spec section 10) ---
+export type DocFormat = "pdf" | "docx" | "md";
+export type Verdict =
+  | "SUPPORTED"
+  | "CONTRADICTED"
+  | "PARTIALLY_SUPPORTED"
+  | "NOT_IN_CORPUS"
+  | "OUT_OF_SCOPE"
+  | "UNVERIFIABLE";
+export type ClaimType = "numeric" | "factual" | "judgment";
+export type ClaimStatus = "PENDING" | "VERIFIED" | "SKIPPED" | "ERROR";
+export type VerificationConfidence = "high" | "medium" | "low";
+export type ReviewStatus = "queued" | "running" | "completed" | "failed" | "out_of_scope";
+
+// --- section 6: DocModel (parsed upload) ---
+export interface DocBlock {
+  text: string;
+  char_start: number;
+  char_end: number;
+  page?: number | null;
+  para_index?: number | null;
+  line_start?: number | null;
+}
+
+export interface DocModel {
+  doc_id: string;
+  format: DocFormat;
+  filename: string;
+  canonical_text: string;
+  blocks: DocBlock[];
+}
+
+// --- section 10: claims + verification ---
+export interface ClaimAnchor {
+  quote: string;
+  char_start: number;
+  char_end: number;
+  page?: number | null;
+  para_index?: number | null;
+  line_start?: number | null;
+}
+
+export interface Claim {
+  claim_id: string;
+  quote: string;
+  claim_type: ClaimType;
+  company: string;
+  period?: string | null;
+  metric?: string | null;
+  question: string;
+  priority: number;
+  status: ClaimStatus;
+  anchor?: ClaimAnchor | null;
+}
+
+export interface ClaimValue {
+  value?: number | null;
+  unit?: string | null;
+}
+
+export interface VerificationResult {
+  claim_id: string;
+  verdict: Verdict;
+  doc_value?: ClaimValue | null;
+  corpus_value?: ClaimValue | null;
+  explanation: string;
+  citations: Citation[];
+  calculation?: CalculationResult | null;
+  queries_tried: string[];
+  confidence: VerificationConfidence;
+}
+
+// --- section 9: review report ---
+export interface ReviewSummary {
+  total_claims: number;
+  supported: number;
+  contradicted: number;
+  partially_supported: number;
+  not_in_corpus: number;
+  out_of_scope: number;
+  unverifiable: number;
+  skipped: number;
+  error: number;
+}
+
+export interface ReviewReportClaim {
+  claim: Claim;
+  result?: VerificationResult | null;
+}
+
+export interface ReviewReport {
+  schema_version: string;
+  review_id: string;
+  filename: string;
+  format: DocFormat;
+  company_scope: string[];
+  summary: ReviewSummary;
+  claims: ReviewReportClaim[];
+}
+
+// --- section 11: review API ---
+export interface ReviewCard {
+  review_id: string;
+  filename: string;
+  format: DocFormat;
+  status: ReviewStatus;
+  created_at: string;
+  pilot: boolean;
+  summary?: ReviewSummary | null;
+}
+
+export interface ReviewStatusResponse {
+  review_id: string;
+  filename: string;
+  format: DocFormat;
+  status: ReviewStatus;
+  pilot: boolean;
+  created_at: string;
+  started_at?: string | null;
+  completed_at?: string | null;
+  error?: string | null;
+  summary?: ReviewSummary | null;
+}
+
+export interface CreateReviewResponse {
+  review_id: string;
+  status: ReviewStatus;
 }

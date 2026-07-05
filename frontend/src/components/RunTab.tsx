@@ -46,6 +46,12 @@ const TYPE_COLOR: Record<TraceEvent["type"], string> = {
   item_answer: "var(--green)",
   verdict: "var(--accent-text)",
   error: "var(--red)",
+  // v1 review pipeline event types (not surfaced in the RAG Run tab, but the map
+  // must stay exhaustive over TraceEventType).
+  claim_extracted: "var(--accent-text)",
+  scope_check: "var(--amber)",
+  claim_verdict: "var(--green)",
+  annotation: "var(--accent-text)",
 };
 
 const STATUS_DOT: Record<RunStatus, string> = {
