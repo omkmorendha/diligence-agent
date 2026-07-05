@@ -1,7 +1,7 @@
 {
   "iteration": 0,
-  "label": "baseline61 v3 golds",
-  "generated_at": "2026-07-05T09:29:24.649028+05:30",
+  "label": "baseline61 final-scorer v4",
+  "generated_at": "2026-07-05T11:34:08.451514+05:30",
   "aggregate": {
     "answer_accuracy": 0.7586,
     "citation_precision": 0.4138,

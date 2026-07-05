@@ -532,3 +532,24 @@ def get_eval_results() -> JSONResponse:
         return JSONResponse(content=json.loads(path.read_text()))
     except (json.JSONDecodeError, OSError) as exc:
         raise HTTPException(status_code=500, detail=f"corrupt results/comparison.json: {exc}") from exc
+
+
+@app.get("/evals/iterations")
+def get_eval_iterations() -> JSONResponse:
+    """Cumulative improvement-loop dataset (baseline61 + iter1..iter5), all
+    rescored under the final scorer for apples-to-apples. Built by the analysis
+    pipeline into results/iterations/report_data.json (trend, per-bucket,
+    taxonomy, timing, tokens, judges, churn matrix, scoring-version history)."""
+    path = config.RESULTS_DIR / "iterations" / "report_data.json"
+    if not path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="results/iterations/report_data.json not found; run the improve-eval "
+            "analysis pipeline to build the cumulative iteration dataset first",
+        )
+    try:
+        return JSONResponse(content=json.loads(path.read_text()))
+    except (json.JSONDecodeError, OSError) as exc:
+        raise HTTPException(
+            status_code=500, detail=f"corrupt results/iterations/report_data.json: {exc}"
+        ) from exc

@@ -1,7 +1,7 @@
 {
   "iteration": 3,
-  "label": "iter3 rescored v3 golds",
-  "generated_at": "2026-07-05T09:29:25.785486+05:30",
+  "label": "iter3 rescored final-scorer v4",
+  "generated_at": "2026-07-05T11:34:09.712294+05:30",
   "aggregate": {
     "answer_accuracy": 0.9074,
     "citation_precision": 0.5926,

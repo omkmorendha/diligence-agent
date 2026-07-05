@@ -1,0 +1,44 @@
+{
+  "run_id": "fixture-geography-fail",
+  "company": "Acme Corp",
+  "status": "completed",
+  "created_at": "2024-01-01T00:00:00Z",
+  "completed_at": "2024-01-01T00:00:09Z",
+  "items": [
+    {
+      "item_id": "gf-001",
+      "question": "In which geographic region did Acme Corp generate the most revenue in FY2023?",
+      "answer": "Acme Corp generated the most revenue in Europe during FY2023.",
+      "value": null,
+      "unit": "text",
+      "citations": [
+        {
+          "citation_id": "citation_001",
+          "claim": "supporting disclosure",
+          "doc_id": "acme_2023_10k",
+          "doc_name": "Acme Corp FY2023 10-K",
+          "doc_type": "10k",
+          "filing_period": "FY2023",
+          "pdf_page": 42,
+          "page_label": "42",
+          "chunk_id": "acme:acme_2023_10k:p42:c0",
+          "quote": "North America generated the largest share of net revenue in fiscal 2023.",
+          "char_start": 0,
+          "char_end": 72
+        }
+      ],
+      "status": "answered",
+      "confidence": {
+        "grounded_inputs": 1,
+        "assumed_inputs": 0
+      }
+    }
+  ],
+  "summary": {
+    "items_total": 1,
+    "items_answered": 1,
+    "items_abstained": 0,
+    "citations_total": 1,
+    "calculate_calls": 0
+  }
+}

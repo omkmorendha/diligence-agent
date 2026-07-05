@@ -17,6 +17,18 @@ which is exactly the blind spot that produced iter1's zero-variance judge. The r
 rubric's period-mismatch anchor must score it **<= 3**. `run_calibration_gate()` asserts
 this via `HARD_NEGATIVE_GROUNDEDNESS_MAX = 3`.
 
+## long_multiclaim_grounded/
+
+The groundedness floor case (IMP3-3). This is a long, correct, multi-claim memo item
+whose purpose is to catch judge truncation regressions: the judge must return a valid
+groundedness score instead of exhausting its response budget and producing a null
+`judge_error`.
+
+`run_calibration_gate()` asserts this via `LONG_CALIBRATION_GROUNDEDNESS_MIN = 3`.
+Unlike the corrupted and period-mismatch fixtures, this is a **floor**: the answer is
+intended to be grounded, so scores below the floor or missing scores fail calibration.
+
 The gate makes LLM calls, so it is not run in the deterministic CI path — the orchestrator
 must re-run it live (`uv run --project backend evals/judges.py --calibrate`) after any
-prompt change to confirm all three fixtures still fall at/below their ceilings.
+prompt change to confirm the corrupted and period-mismatch fixtures stay at/below their
+ceilings and the long grounded fixture stays at/above its floor.

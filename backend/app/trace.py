@@ -72,6 +72,13 @@ class TraceWriter:
         """Signal end-of-stream to any live SSE consumer."""
         self.sse_queue.put(None)
 
+    def last_event_of_type(self, type: TraceEventType) -> Optional[TraceEvent]:
+        """Return the most recent event of a given type, if any."""
+        for event in reversed(self.events):
+            if event.type == type:
+                return event
+        return None
+
     @staticmethod
     def read(run_id: str) -> list[TraceEvent]:
         """Load a completed trace from disk (for replay mode)."""

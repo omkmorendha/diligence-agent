@@ -272,7 +272,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -309,7 +309,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -348,7 +348,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": true,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -387,7 +387,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": true,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -459,7 +459,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -501,7 +501,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -555,7 +555,10 @@
     "gold_value": null,
     "gold_unit": "text",
     "gold_polarity": null,
-    "gold_canonical": null,
+    "gold_canonical": [
+      "commercial airlines",
+      "US government"
+    ],
     "gold_evidence": [
       {
         "doc_id": "BOEING_2022_10K",
@@ -596,7 +599,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -682,7 +685,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": true,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -718,7 +721,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -825,7 +828,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -861,7 +864,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -901,7 +904,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": true,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -1026,7 +1029,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -1041,7 +1044,11 @@
     "gold_value": null,
     "gold_unit": "text",
     "gold_polarity": null,
-    "gold_canonical": null,
+    "gold_canonical": [
+      "EPYC",
+      "semi-custom",
+      "Xilinx"
+    ],
     "gold_evidence": [
       {
         "doc_id": "AMD_2022_10K",
@@ -1064,7 +1071,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -1102,7 +1109,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -1191,7 +1198,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -1227,7 +1234,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -1304,7 +1311,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -1360,7 +1367,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -1399,7 +1406,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": true,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -1440,7 +1447,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": true,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -1615,7 +1622,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": true,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -1690,7 +1697,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": true,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -1729,7 +1736,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": true,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -1775,7 +1782,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": true,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -1812,7 +1819,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": true,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -1966,7 +1973,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -2298,7 +2305,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -2335,7 +2342,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": true,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -2374,7 +2381,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": true,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null
@@ -2425,7 +2432,7 @@
     "answer_verifiable_from_evidence": true,
     "unit_or_period_ambiguity": false,
     "demo_candidate": false,
-    "human_reviewed": false,
+    "human_reviewed": true,
     "tolerance": {
       "relative": 0.01,
       "absolute": null

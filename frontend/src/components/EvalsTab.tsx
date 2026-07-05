@@ -4,8 +4,8 @@
 // footnote strip, notes as left-rule paragraphs.
 
 import { useEffect, useState } from "react";
-import { ApiError, getEvalResults } from "../api";
-import type { Comparison, SystemMetrics } from "../types";
+import { ApiError, getEvalIterations, getEvalResults } from "../api";
+import type { Comparison, IterationEntry, IterationsReport, SystemMetrics } from "../types";
 import { Card, MONO } from "../ui";
 
 type Cell = { kind: "fraction" | "score5"; value: number | null | undefined };
@@ -282,6 +282,288 @@ function MetricDetailPanel({
   );
 }
 
+// ---------------------------------------------------------------------------
+// Improvement loop — cumulative iteration trend (GET /evals/iterations ->
+// results/iterations/report_data.json). baseline61 + iter1..iter5, all rescored
+// under the final scorer. Rendered with the same hand-rolled Ledger primitives
+// as the baseline-vs-agent table; no chart libraries.
+// ---------------------------------------------------------------------------
+
+const NUM = new Intl.NumberFormat("en-US");
+
+/** correct-of-61 is the headline: fraction of the full 61-item subset scored
+ * correct (abstentions never count), the metric the whole loop moved 22 -> 51. */
+function correctRatio(entry: IterationEntry): number {
+  return entry.aggregate.n_items ? entry.correct_of_61 / entry.aggregate.n_items : 0;
+}
+
+function shortLabel(entry: IterationEntry): string {
+  if (entry.key === "baseline61") return "Baseline";
+  const m = /iter(\d+)/.exec(entry.key);
+  return m ? `Iteration ${m[1]}` : entry.label;
+}
+
+interface TrendCol {
+  key: string;
+  header: string;
+  sub?: string;
+  /** column-level note shown under the header, e.g. judge scale */
+  render: (entry: IterationEntry, ctx: { maxLatency: number; maxTokens: number }) => JSX.Element;
+}
+
+function MonoValue({ text, color = "var(--text)", bold = true }: { text: string; color?: string; bold?: boolean }) {
+  return <span style={{ fontFamily: MONO, fontSize: 13, fontWeight: bold ? 600 : 500, color }}>{text}</span>;
+}
+
+/** thin horizontal bar (Ledger proportion bar) used for latency/token trends. */
+function TrendBar({ ratio, color }: { ratio: number; color: string }) {
+  return (
+    <span style={{ display: "block", marginTop: 4, height: 3, borderRadius: 2, background: "var(--surface-2)", overflow: "hidden" }}>
+      <span style={{ display: "block", height: "100%", width: `${Math.round(Math.max(0, Math.min(1, ratio)) * 100)}%`, background: color }} />
+    </span>
+  );
+}
+
+const TREND_COLS: TrendCol[] = [
+  {
+    key: "correct",
+    header: "Correct of 61",
+    sub: "abstentions excluded",
+    render: (e) => {
+      const ratio = correctRatio(e);
+      const color = cellColor(fraction(ratio));
+      return (
+        <div>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+            <span style={{ fontFamily: MONO, fontSize: 18, fontWeight: 700, color }}>{e.correct_of_61}</span>
+            <span style={{ fontFamily: MONO, fontSize: 12, color: "var(--text-3)" }}>/ {e.aggregate.n_items}</span>
+          </div>
+          <TrendBar ratio={ratio} color={color} />
+        </div>
+      );
+    },
+  },
+  {
+    key: "acc_answered",
+    header: "Acc. of answered",
+    sub: "correct ÷ answered",
+    render: (e) => {
+      const cell = fraction(e.aggregate.answer_accuracy);
+      return <MonoValue text={formatCell(cell)} color={cellColor(cell)} />;
+    },
+  },
+  {
+    key: "citation_precision",
+    header: "Citation precision",
+    render: (e) => {
+      const cell = fraction(e.aggregate.citation_precision);
+      return <MonoValue text={formatCell(cell)} color={cellColor(cell)} />;
+    },
+  },
+  {
+    key: "answered",
+    header: "Answered",
+    sub: "of 61",
+    render: (e) => (
+      <span>
+        <MonoValue text={`${e.aggregate.answered}`} />
+        <span style={{ fontFamily: MONO, fontSize: 11.5, color: "var(--text-3)" }}> · {e.aggregate.abstained} abst.</span>
+      </span>
+    ),
+  },
+  {
+    key: "p95",
+    header: "p95 latency",
+    sub: "per item",
+    render: (e, ctx) => {
+      const v = e.timing.item_wall_p95_s;
+      if (v == null) return <MonoValue text="—" color="var(--text-3)" bold={false} />;
+      return (
+        <div>
+          <MonoValue text={`${v.toFixed(0)}s`} color="var(--text-2)" />
+          <TrendBar ratio={ctx.maxLatency ? v / ctx.maxLatency : 0} color="var(--text-3)" />
+        </div>
+      );
+    },
+  },
+  {
+    key: "prompt_tokens",
+    header: "Prompt tokens",
+    render: (e, ctx) => {
+      const v = e.tokens.prompt_total;
+      return (
+        <div>
+          <MonoValue text={NUM.format(v)} color="var(--text-2)" bold={false} />
+          <TrendBar ratio={ctx.maxTokens ? v / ctx.maxTokens : 0} color="var(--text-3)" />
+        </div>
+      );
+    },
+  },
+  {
+    key: "groundedness_judge",
+    header: "Groundedness",
+    sub: "judge 1–5",
+    render: (e) => {
+      const cell = score5(e.judges.groundedness_judge);
+      return <MonoValue text={formatCell(cell)} color={cellColor(cell)} />;
+    },
+  },
+  {
+    key: "actionability_judge",
+    header: "Actionability",
+    sub: "judge 1–5",
+    render: (e) => {
+      const cell = score5(e.judges.actionability_judge);
+      return <MonoValue text={formatCell(cell)} color={cellColor(cell)} />;
+    },
+  },
+  {
+    key: "gold_agreement_judge",
+    header: "Gold agreement",
+    sub: "judge 1–5",
+    render: (e) => {
+      const cell = score5(e.judges.gold_agreement_judge);
+      return <MonoValue text={formatCell(cell)} color={cellColor(cell)} />;
+    },
+  },
+];
+
+const TREND_GRID = `minmax(112px,1.1fr) ${TREND_COLS.map(() => "minmax(96px,1fr)").join(" ")}`;
+
+function ImprovementLoop() {
+  const [report, setReport] = useState<IterationsReport | null>(null);
+  const [state, setState] = useState<"loading" | "ready" | "missing" | "error">("loading");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getEvalIterations()
+      .then((r) => {
+        setReport(r);
+        setState("ready");
+      })
+      .catch((err) => {
+        if (err instanceof ApiError && err.status === 404) {
+          setState("missing");
+        } else {
+          setState("error");
+          setError(err instanceof ApiError ? err.message : String(err));
+        }
+      });
+  }, []);
+
+  const iterations = report?.iterations ?? [];
+  const maxLatency = Math.max(0, ...iterations.map((e) => e.timing.item_wall_p95_s ?? 0));
+  const maxTokens = Math.max(0, ...iterations.map((e) => e.tokens.prompt_total ?? 0));
+  const first = iterations[0];
+  const last = iterations[iterations.length - 1];
+
+  return (
+    <div style={{ marginBottom: 34 }}>
+      <div style={{ marginBottom: 14 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: -0.3, margin: "0 0 4px" }}>Improvement loop</h2>
+        <div style={{ fontSize: 13, color: "var(--text-2)" }}>
+          Five iterations over the frozen 61-item subset, every run rescored under the final scorer for apples-to-apples.
+        </div>
+      </div>
+
+      {state === "loading" && <div style={{ fontSize: 13, color: "var(--text-3)" }}>Loading iteration trend…</div>}
+      {state === "missing" && (
+        <div style={{ fontSize: 13, color: "var(--text-3)" }}>
+          No <code style={{ fontFamily: MONO }}>results/iterations/report_data.json</code> yet — run the improve-eval analysis
+          pipeline to build the cumulative iteration dataset.
+        </div>
+      )}
+      {state === "error" && <div style={{ fontSize: 13, color: "var(--red)" }}>Failed to load iteration trend: {error}</div>}
+
+      {state === "ready" && iterations.length > 0 && (
+        <Card style={{ overflow: "hidden" }}>
+          {first && last && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "baseline",
+                gap: 10,
+                padding: "12px 20px",
+                borderBottom: "1px solid var(--line)",
+                background: "var(--surface-2)",
+                flexWrap: "wrap",
+              }}
+            >
+              <span style={{ fontSize: 12.5, color: "var(--text-2)" }}>Correct of 61</span>
+              <span style={{ fontFamily: MONO, fontSize: 15, fontWeight: 700, color: "var(--text-3)" }}>{first.correct_of_61}</span>
+              <span style={{ color: "var(--text-3)" }}>→</span>
+              <span style={{ fontFamily: MONO, fontSize: 18, fontWeight: 700, color: cellColor(fraction(correctRatio(last))) }}>
+                {last.correct_of_61}
+              </span>
+              <span style={{ fontFamily: MONO, fontSize: 12.5, fontWeight: 600, color: "var(--green)" }}>
+                +{last.correct_of_61 - first.correct_of_61}
+              </span>
+              <span style={{ fontSize: 12, color: "var(--text-3)" }}>
+                across {iterations.length - 1} iterations · click a metric name below for its definition
+              </span>
+            </div>
+          )}
+
+          <div style={{ overflowX: "auto" }}>
+            <div style={{ minWidth: 900 }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: TREND_GRID,
+                  padding: "10px 20px",
+                  borderBottom: "1px solid var(--line-strong)",
+                  gap: 12,
+                  background: "var(--surface-2)",
+                }}
+              >
+                <span style={headerCellStyle}>Iteration</span>
+                {TREND_COLS.map((col) => (
+                  <span key={col.key} style={{ ...headerCellStyle, textAlign: "left" }}>
+                    {col.header}
+                    {col.sub && (
+                      <span style={{ display: "block", fontWeight: 400, textTransform: "none", letterSpacing: 0, color: "var(--text-3)", fontSize: 10 }}>
+                        {col.sub}
+                      </span>
+                    )}
+                  </span>
+                ))}
+              </div>
+
+              {iterations.map((entry, i) => (
+                <div
+                  key={entry.key}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: TREND_GRID,
+                    padding: "12px 20px",
+                    gap: 12,
+                    alignItems: "center",
+                    borderBottom: i < iterations.length - 1 ? "1px solid var(--line)" : "none",
+                    background: entry.key === "baseline61" ? "color-mix(in srgb, var(--surface-2) 40%, transparent)" : "transparent",
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{shortLabel(entry)}</div>
+                    <div style={{ fontFamily: MONO, fontSize: 10.5, color: "var(--text-3)" }}>{entry.key}</div>
+                  </div>
+                  {TREND_COLS.map((col) => (
+                    <div key={col.key}>{col.render(entry, { maxLatency, maxTokens })}</div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ padding: "10px 20px", fontSize: 11.5, color: "var(--text-3)", background: "var(--surface-2)", borderTop: "1px solid var(--line)" }}>
+            Judge means (groundedness / actionability / gold agreement, 1–5) are only run for the final iteration; “—” marks iterations
+            with no judge pass.
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+}
+
 export function EvalsTab() {
   const [comparison, setComparison] = useState<Comparison | null>(null);
   const [state, setState] = useState<"loading" | "ready" | "missing" | "error">("loading");
@@ -318,6 +600,8 @@ export function EvalsTab() {
       }}
     >
       <div style={{ minWidth: 0, maxWidth: 960 }}>
+      <ImprovementLoop />
+
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
         <div>
           <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: -0.3, margin: "0 0 4px" }}>Baseline vs. agent</h2>

@@ -1,0 +1,13 @@
+{
+  "fixture": "geography_fail",
+  "scorer_under_test": "answer_accuracy",
+  "expected_scores": {
+    "answer_accuracy": "fail",
+    "citation_precision": "pass",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "pass",
+    "abstention": null,
+    "trace_shape": "pass"
+  },
+  "notes": "IMP5-1 geography-synonym branch, wrong-region case: gold_canonical='North America' (== 'united states and canada' via the synonym); the agent picked 'Europe', which maps to no equivalent token, so the token-set-subset match correctly FAILS. Confirms the synonym is a tight equivalence, not a loose geography wildcard."
+}

@@ -325,6 +325,19 @@ def _load_gold_annotations() -> dict[str, dict[str, Any]]:
     return doc.get("annotations", {})
 
 
+def _annotation_is_confirmed(annotation: dict[str, Any]) -> bool:
+    """Whether an optional sidecar annotation is safe to merge.
+
+    Most sidecar entries are curated annotations. Entries explicitly flagged for
+    human review are pending until the sidecar carries human_reviewed=true.
+    """
+    if not annotation:
+        return False
+    if annotation.get("flagged_for_human_review"):
+        return bool(annotation.get("human_reviewed"))
+    return True
+
+
 def _evidence_clean(evidence: list[dict[str, Any]], doc_by_id: dict[str, dict[str, Any]]) -> bool:
     """True if none of the item's evidence pages are on D2's empty/low-text list."""
     for ev in evidence:
@@ -442,8 +455,10 @@ def build_subset(n_companies: int | None = None) -> tuple[list[dict[str, Any]], 
     ranked = _rank_companies(eligible)
     if n_companies is not None:
         chosen_companies, tier_n = _choose_top_n_qualifying(ranked, n_companies)
+        selection_mode = "expanded"
     else:
         chosen_companies, tier_n = _choose_tier(ranked)
+        selection_mode = "fallback"
 
     items: list[dict[str, Any]] = []
     company_report = []
@@ -468,8 +483,10 @@ def build_subset(n_companies: int | None = None) -> tuple[list[dict[str, Any]], 
             # gold_polarity / gold_canonical fields flow into the item; `evidence` is
             # documentation kept in the sidecar. Unannotated items stay None (schema default).
             annotation = gold_annotations.get(row["question_id"], {})
-            gold_polarity = annotation.get("gold_polarity")
-            gold_canonical = annotation.get("gold_canonical")
+            annotation_confirmed = _annotation_is_confirmed(annotation)
+            applied_annotation = annotation if annotation_confirmed else {}
+            gold_polarity = applied_annotation.get("gold_polarity")
+            gold_canonical = applied_annotation.get("gold_canonical")
             # IMP4-1: a few golds carry two magnitudes in prose (e.g. verizon_05's
             # "$1097 million ... $862 million"), so parse_gold_value leaves them
             # text/null even though the gold's own expected_formula intends the sum.
@@ -477,8 +494,8 @@ def build_subset(n_companies: int | None = None) -> tuple[list[dict[str, Any]], 
             # apply it additively, defaulting to the parsed value so an annotation
             # WITHOUT these keys never clobbers an already-parsed number (e.g. amd_01
             # keeps gold_value=1.57 while gaining only gold_polarity).
-            gold_value = annotation.get("gold_value", gold_value)
-            gold_unit = annotation.get("gold_unit", gold_unit)
+            gold_value = applied_annotation.get("gold_value", gold_value)
+            gold_unit = applied_annotation.get("gold_unit", gold_unit)
             gold_evidence = [
                 gold_evidence_from_raw(ev, doc_type, filing_period) for ev in raw["evidence"]
             ]
@@ -512,7 +529,7 @@ def build_subset(n_companies: int | None = None) -> tuple[list[dict[str, Any]], 
                 "answer_verifiable_from_evidence": True,   # guaranteed by the `include` filter
                 "unit_or_period_ambiguity": False,          # guaranteed by the `include` filter
                 "demo_candidate": demo_candidate,
-                "human_reviewed": False,
+                "human_reviewed": annotation_confirmed,
                 "tolerance": {"relative": 0.01, "absolute": None},
             }
             # Validate against the frozen schema before it ever hits disk.
@@ -545,27 +562,63 @@ def build_subset(n_companies: int | None = None) -> tuple[list[dict[str, Any]], 
         "bucket_totals": {
             b: sum(c["bucket_counts"][b] for c in company_report) for b in BUCKETS
         },
+        "selection_mode": selection_mode,
     }
     return items, meta
 
 
+def _bucket_target_labels(meta: dict[str, Any]) -> dict[str, str]:
+    if meta.get("selection_mode") == "expanded":
+        return {
+            bucket: f"expanded target ~{meta['tier_n_companies'] * TARGET_COMPOSITION[bucket]}"
+            for bucket in BUCKETS
+        }
+    return {
+        "A_multi_input": "fallback target ~16",
+        "B_judgment": "fallback target ~8",
+        "C_lookup": "fallback target ~8",
+    }
+
+
 def _write_report(meta: dict[str, Any]) -> None:
+    if meta.get("selection_mode") == "expanded":
+        summary_suffix = f"expanded top-company mode: {meta['tier_n_companies']} qualifying companies x <=8 each"
+        target_context = (
+            f"{meta['tier_n_companies']} companies x per-company 4:2:2 target "
+            f"({meta['tier_n_companies'] * TARGET_COMPOSITION['A_multi_input']}/"
+            f"{meta['tier_n_companies'] * TARGET_COMPOSITION['B_judgment']}/"
+            f"{meta['tier_n_companies'] * TARGET_COMPOSITION['C_lookup']})"
+        )
+        policy_text = (
+            f"Expanded mode selected the top {meta['tier_n_companies']} qualifying companies "
+            f"(each with >= {MIN_BASELINE_FAILURE_PER_COMPANY} baseline-failure questions and "
+            f">= {MIN_ELIGIBLE_PER_COMPANY} eligible questions) using the same company ranking "
+            "and per-company 4:2:2 (A:C:B) allocation as fallback mode."
+        )
+    else:
+        summary_suffix = f"fallback tier: {meta['tier_n_companies']} companies x <=8 each"
+        target_context = "fallback 4-company target (16/8/8)"
+        policy_text = (
+            "The 4-companies-x-8 tier is accepted once every candidate clears "
+            f">= {MIN_BASELINE_FAILURE_PER_COMPANY} baseline-failure questions and "
+            f">= {MIN_ELIGIBLE_PER_COMPANY} eligible questions."
+        )
+    bucket_labels = _bucket_target_labels(meta)
     lines = [
         "# D5 subset selection report",
         "",
         f"Selected **{meta['total_items']}** questions across "
-        f"**{meta['tier_n_companies']}** companies (fallback tier: "
-        f"{meta['tier_n_companies']} companies x <=8 each).",
+        f"**{meta['tier_n_companies']}** companies ({summary_suffix}).",
         "",
         "## Bucket composition",
         "",
-        f"- A_multi_input: {meta['bucket_totals']['A_multi_input']} (ideal ~16)",
-        f"- B_judgment: {meta['bucket_totals']['B_judgment']} (ideal ~8)",
-        f"- C_lookup: {meta['bucket_totals']['C_lookup']} (ideal ~8)",
+        f"- A_multi_input: {meta['bucket_totals']['A_multi_input']} ({bucket_labels['A_multi_input']})",
+        f"- B_judgment: {meta['bucket_totals']['B_judgment']} ({bucket_labels['B_judgment']})",
+        f"- C_lookup: {meta['bucket_totals']['C_lookup']} ({bucket_labels['C_lookup']})",
         "",
         "C_lookup questions are scarce in the D3/D4-verified pool for the "
         "highest-eligible-count companies on this corpus, so the achieved "
-        "composition undershoots the ideal 16/8/8 split on A and C in favor of "
+        f"composition undershoots the {target_context} split on A and C in favor of "
         "B; this is the actual FinanceBench distribution, not a selection bug "
         "(see AMBIGUITIES.md section 6 and data/verified.jsonl bucket_d3 counts).",
         "",
@@ -588,11 +641,8 @@ def _write_report(meta: dict[str, Any]) -> None:
         "`disagreement=false` (i.e. excludes everything in `data/disputes.jsonl` "
         "-- those require `human_reviewed: true` per the fallback policy, which "
         "is D6's job and has not happened yet). Companies ranked by "
-        "(eligible count desc, baseline-failure count desc, name asc); the "
-        "4-companies-x-8 tier is accepted once every candidate clears "
-        f">= {MIN_BASELINE_FAILURE_PER_COMPANY} baseline-failure questions and "
-        f">= {MIN_ELIGIBLE_PER_COMPANY} eligible questions. Per-company selection "
-        "targets a 4:2:2 (A:C:B) split of the 8-slot cap, falls back to filling "
+        f"(eligible count desc, baseline-failure count desc, name asc). {policy_text} "
+        "Per-company selection targets a 4:2:2 (A:C:B) split of the 8-slot cap, falls back to filling "
         "remaining slots in A, then C, then B order when a bucket is short, and "
         "drops down from B, then C, then A when a company has more than 8 "
         "eligible questions.",

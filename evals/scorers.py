@@ -132,15 +132,20 @@ def _calculate_values(item_id: str, trace_events: list[TraceEvent]) -> list[floa
 # They ADD pass opportunities gated on those fields; the numeric and exact-string
 # branches are unchanged, so no existing pass ever becomes a fail.
 
-# Tiny, GENERIC financial-domain synonym map (phrase -> canonical token). Deliberately
-# NOT item-specific: it only collapses the standard cash-flow-statement section names
-# to their {operating,investing,financing} choice tokens so "operations" / "operating
-# activities" all read as the same canonical answer. Never add answer-specific phrases.
+# Tiny, GENERIC synonym map (phrase -> canonical token). Deliberately NOT
+# item-specific: it collapses the standard cash-flow-statement section names to their
+# {operating,investing,financing} choice tokens so "operations" / "operating
+# activities" all read as the same canonical answer, plus ONE textbook-geography
+# equivalence ("North America" == "the United States and Canada") so a gold in either
+# surface form credits an answer phrased in the other. Both phrases fold to the same
+# token, so the mapping is symmetric. Never add answer-specific phrases.
 _CANON_SYNONYMS = {
     "operating activities": "operating",
     "operations": "operating",
     "investing activities": "investing",
     "financing activities": "financing",
+    "north america": "north_america",
+    "united states and canada": "north_america",
 }
 # Generic English stopwords so "Developed Rest of the World" == "Developed Rest of
 # World" -- articles/conjunctions carry no entity signal.

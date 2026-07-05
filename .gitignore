@@ -32,3 +32,6 @@ frontend/vite.config.js
 .DS_Store
 .idea/
 .vscode/
+
+# --- improve-eval loop: scratch pilot runs (superseded verification runs) ---
+results/iterations/pilot*/

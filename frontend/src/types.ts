@@ -121,6 +121,9 @@ export interface Memo {
 }
 
 // --- section 22: eval results ---
+// Judge fields mirror the scorer output in results/agent.json: each judge score
+// carries a *_coverage companion (share of items the judge actually scored), and
+// judge_zero_variance flags a degenerate judge pass (all items same score).
 export interface SystemMetrics {
   answer_accuracy: number;
   citation_precision: number;
@@ -129,7 +132,12 @@ export interface SystemMetrics {
   trace_shape?: number | null;
   abstention_correct_rate?: number | null;
   groundedness_judge?: number | null;
+  groundedness_judge_coverage?: number | null;
   actionability_judge?: number | null;
+  actionability_judge_coverage?: number | null;
+  gold_agreement_judge?: number | null;
+  gold_agreement_judge_coverage?: number | null;
+  judge_zero_variance?: boolean | null;
   by_bucket: Record<string, { answer_accuracy: number }>;
   label?: string;
   notes?: string;
@@ -143,6 +151,107 @@ export interface Comparison {
     bucket_counts: Record<string, number>;
   };
   systems: Record<string, SystemMetrics>;
+}
+
+// --- improvement-loop cumulative dataset ---
+// Mirror of results/iterations/report_data.json (GET /evals/iterations), built by
+// the analysis pipeline. baseline61 + iter1..iter5, all rescored under the final
+// (v4) scorer. Only the fields the EvalsTab trend view consumes are typed strictly;
+// the report also carries score_versions / churn / plans which the tab does not read.
+export interface IterationAggregate {
+  answer_accuracy: number;
+  citation_precision: number;
+  citation_provenance: number;
+  arithmetic_integrity: number;
+  trace_shape?: number | null;
+  abstention_correct_rate?: number | null;
+  n_items: number;
+  answered: number;
+  abstained: number;
+}
+
+export interface IterationJudges {
+  groundedness_judge?: number;
+  groundedness_judge_coverage?: number;
+  actionability_judge?: number;
+  actionability_judge_coverage?: number;
+  gold_agreement_judge?: number;
+  gold_agreement_judge_coverage?: number;
+  judge_zero_variance?: boolean;
+}
+
+export interface IterationTiming {
+  item_wall_p50_s?: number;
+  item_wall_p95_s?: number;
+  item_wall_mean_s?: number;
+  mean_llm_call_s?: number;
+  total_llm_s?: number;
+  run_wall_max_s?: number;
+}
+
+export interface IterationTokens {
+  prompt_total: number;
+  completion_total: number;
+  by_purpose?: Record<string, unknown>;
+}
+
+export interface IterationEntry {
+  key: string;
+  label: string;
+  aggregate: IterationAggregate;
+  correct_of_61: number;
+  by_bucket: Record<string, { answer_accuracy: number }>;
+  timing: IterationTiming;
+  tokens: IterationTokens;
+  judges: IterationJudges;
+}
+
+export interface IterationsReport {
+  iterations: IterationEntry[];
+}
+
+// --- section 8: curated benchmark item ---
+// Mirror of schemas.py SubsetItem. The gold/eval-only fields (including the
+// gold_polarity / gold_canonical annotation additions) NEVER reach this
+// frontend at runtime — every API surface strips a SubsetItem down to
+// AgentVisibleItem first (no-gold-leakage). Typed here only to keep the mirror
+// faithful to the canonical schema.
+export interface Tolerance {
+  relative?: number | null;
+  absolute?: number | null;
+}
+
+export interface GoldEvidence {
+  doc_id: string;
+  doc_name: string;
+  doc_type: DocType;
+  filing_period: string;
+  pdf_page: number;
+  page_label: string;
+  evidence_text: string;
+}
+
+export interface SubsetItem {
+  item_id: string;
+  question_id: string;
+  company: string;
+  question: string;
+  // --- gold / eval-only fields below (never shown to agent or baseline) ---
+  gold_answer: string;
+  gold_value?: number | null;
+  gold_unit: Unit;
+  gold_polarity?: "yes" | "no" | null;
+  gold_canonical?: string | string[] | null;
+  gold_evidence: GoldEvidence[];
+  bucket: Bucket;
+  expected_formula?: string | null;
+  expected_inputs: string[];
+  predicted_baseline_failure: boolean;
+  answer_verifiable_from_evidence: boolean;
+  unit_or_period_ambiguity: boolean;
+  demo_candidate: boolean;
+  human_reviewed: boolean;
+  tolerance: Tolerance;
 }
 
 // --- section 8: agent-visible checklist item (gold fields stripped) ---

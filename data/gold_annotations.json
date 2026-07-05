@@ -1,5 +1,5 @@
 {
-  "_README": "IMP3-1 (results/iterations/iter2/improvement_plan.json). Human-reviewable CANONICAL gold annotations, keyed by question_id, merged into data/subset.json by dataset_builder/d5_select_subset.py. Every annotation is derived from the item's question + gold_answer TEXT ONLY (never from any agent memo/answer); the `evidence` field quotes the exact gold_answer fragment that justifies it. gold_polarity in {yes,no} is the answer to an unambiguous yes/no question; gold_canonical is the canonical entity/category/choice (a string, a string[] for entity-list questions, or one of {operating,investing,financing} for cash-flow-source choices). gold_value/gold_unit may also be supplied when a gold's prose carries multiple magnitudes that parse_gold_value cannot reduce to a single number but the gold's own expected_formula intends a specific total (only verizon_05 so far). These fields ONLY ADD pass opportunities in evals/scorers.py answer_accuracy (gated on presence, above the exact-string fallback); they never weaken any scorer, and gold_answer/gold_evidence are untouched. IMP4-1 (results/iterations/iter3/improvement_plan.json) adds amd_01/boeing_02 (gold_polarity 'yes'), boeing_05/pepsico_07/verizon_04 (gold_canonical), and verizon_05 (gold_value=1959 = pension 1097 + health/life 862, matching the gold's expected_formula '1097 + 862'). verizon_05 carries flagged_for_human_review=true: it is the one borderline the orchestrator surfaces for explicit sign-off (whether the retiree question wants the combined total). pfizer_04 (financebench_id_02419) stays deliberately NOT annotated -- its gold polarity 'yes' (Upjohn spin-off) is contested/stale and the agent's defensible 'No, completed Nov 2020' would still fail, so forcing a pass would be dishonest. pepsico_03 (financebench_id_01009) also stays un-annotated -- a strict canonical built from 'North America' would FALSE-fail the correct answer 'United States and Canada'. johnson_johnson_06 (financebench_id_00651, gold polarity 'no') is annotated and CORRECTLY stays failing when an agent answers 'Yes' -- it is a real defect, not a format artifact. The `flagged_for_human_review` and `evidence`/`item_id` fields are documentation-only and are NOT emitted into subset.json.",
+  "_README": "IMP3-1 (results/iterations/iter2/improvement_plan.json). Human-reviewable CANONICAL gold annotations, keyed by question_id, merged into data/subset.json by dataset_builder/d5_select_subset.py. Every annotation is derived from the item's question + gold_answer TEXT ONLY (never from any agent memo/answer); the `evidence` field quotes the exact gold_answer fragment that justifies it. gold_polarity in {yes,no} is the answer to an unambiguous yes/no question; gold_canonical is the canonical entity/category/choice (a string, a string[] for entity-list questions, or one of {operating,investing,financing} for cash-flow-source choices). gold_value/gold_unit may also be supplied when a gold's prose carries multiple magnitudes that parse_gold_value cannot reduce to a single number but the gold's own expected_formula intends a specific total (only verizon_05 so far). These fields ONLY ADD pass opportunities in evals/scorers.py answer_accuracy (gated on presence, above the exact-string fallback); they never weaken any scorer, and gold_answer/gold_evidence are untouched. IMP4-1 (results/iterations/iter3/improvement_plan.json) adds amd_01/boeing_02 (gold_polarity 'yes'), boeing_05/pepsico_07/verizon_04 (gold_canonical), and verizon_05 (gold_value=1959 = pension 1097 + health/life 862, matching the gold's expected_formula '1097 + 862'). verizon_05 carries flagged_for_human_review=true: it is the one borderline the orchestrator surfaces for explicit sign-off (whether the retiree question wants the combined total). pfizer_04 (financebench_id_02419) stays deliberately NOT annotated -- its gold polarity 'yes' (Upjohn spin-off) is contested/stale and the agent's defensible 'No, completed Nov 2020' would still fail, so forcing a pass would be dishonest. pepsico_03 (financebench_id_01009) also stays un-annotated -- a strict canonical built from 'North America' would FALSE-fail the correct answer 'United States and Canada'. johnson_johnson_06 (financebench_id_00651, gold polarity 'no') is annotated and CORRECTLY stays failing when an agent answers 'Yes' -- it is a real defect, not a format artifact. IMP5-1 (results/iterations/iter4 churn analysis) adds two GOLD-TEXT-derived canonical entity lists: amd_05 (financebench_id_01198, gold_canonical ['EPYC','semi-custom','Xilinx'] -- the gold enumerates exactly those three FY22 revenue drivers) and boeing_07 (financebench_id_01290, gold_canonical ['commercial airlines','US government'] -- the gold names exactly those two customer entities). Both require every listed entity present (token-set subset), so a partial answer still fails. IMP5-1 also adds ONE generic geography synonym to evals/scorers.py's _CANON_SYNONYMS ('north america' <-> 'united states and canada'); pepsico_03 (financebench_id_01009) nonetheless stays deliberately un-annotated here (out of scope), though that synonym would now let a 'North America' canonical credit the correct 'United States and Canada'. The `flagged_for_human_review` and `evidence`/`item_id` fields are documentation-only and are NOT emitted into subset.json.",
   "annotations": {
     "financebench_id_00438": {
       "item_id": "adobe_01",
@@ -98,7 +98,11 @@
     },
     "financebench_id_02416": {
       "item_id": "pfizer_03",
-      "gold_canonical": ["Trillium", "Array", "Therachon"],
+      "gold_canonical": [
+        "Trillium",
+        "Array",
+        "Therachon"
+      ],
       "evidence": "Trillium, Array, and Therachon"
     },
     "financebench_id_01279": {
@@ -128,7 +132,11 @@
     },
     "financebench_id_00494": {
       "item_id": "boeing_05",
-      "gold_canonical": ["737", "777X", "787"],
+      "gold_canonical": [
+        "737",
+        "777X",
+        "787"
+      ],
       "evidence": "Boeing forecasts an increase in the production rates for the 737, 777X and 787 aircrafts in 2023."
     },
     "financebench_id_01474": {
@@ -146,7 +154,26 @@
       "gold_value": 1959,
       "gold_unit": "USD millions",
       "flagged_for_human_review": true,
-      "evidence": "The estimated pension benefits were $1097 million, and the estimated health care and life insurance benefits were $862 million. FLAGGED FOR HUMAN REVIEW: the question asks how much Verizon expected to pay for its retirees in 2024, i.e. the total; the gold's own expected_formula is literally '1097 + 862' (= 1959), so gold_value=1959 is the gold's intended sum (pension + health/life), NOT agent-derived. Only credit once a human confirms the question wants the combined total."
+      "evidence": "The estimated pension benefits were $1097 million, and the estimated health care and life insurance benefits were $862 million. FLAGGED FOR HUMAN REVIEW: the question asks how much Verizon expected to pay for its retirees in 2024, i.e. the total; the gold's own expected_formula is literally '1097 + 862' (= 1959), so gold_value=1959 is the gold's intended sum (pension + health/life), NOT agent-derived. Only credit once a human confirms the question wants the combined total.",
+      "human_reviewed": true,
+      "human_review_note": "Signed off by user 2026-07-05: question asks the total; gold expected_formula is 1097 + 862."
+    },
+    "financebench_id_01198": {
+      "item_id": "amd_05",
+      "gold_canonical": [
+        "EPYC",
+        "semi-custom",
+        "Xilinx"
+      ],
+      "evidence": "In 2022, AMD reported Higher sales of their EPYC server processors, higher semi-custom product sales, and the inclusion of Xilinx embedded product sales. The gold enumerates exactly three named revenue drivers (EPYC, semi-custom, Xilinx); the canonical requires all three, derived from the gold text alone."
+    },
+    "financebench_id_01290": {
+      "item_id": "boeing_07",
+      "gold_canonical": [
+        "commercial airlines",
+        "US government"
+      ],
+      "evidence": "Boeing's primary customers as of FY2022 are a limited number of commercial airlines and the US government. The gold names exactly two customer entities; the canonical entity-set requires both, derived from the gold text alone."
     }
   }
 }

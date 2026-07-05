@@ -1,9 +1,9 @@
 {
   "iteration": 1,
-  "label": "iter1 rescored v3 golds",
-  "generated_at": "2026-07-05T09:29:25.034411+05:30",
+  "label": "iter1 rescored final-scorer v4",
+  "generated_at": "2026-07-05T11:34:08.876589+05:30",
   "aggregate": {
-    "answer_accuracy": 0.8182,
+    "answer_accuracy": 0.8409,
     "citation_precision": 0.6136,
     "citation_provenance": 1.0,
     "arithmetic_integrity": 1.0,
@@ -24,7 +24,7 @@
       "answered": 22
     },
     "B_judgment": {
-      "answer_accuracy": 0.7273,
+      "answer_accuracy": 0.8182,
       "citation_precision": 0.3636,
       "citation_provenance": 1.0,
       "arithmetic_integrity": 1.0,
@@ -170,6 +170,7 @@
       "amd_02",
       "amd_03",
       "amd_04",
+      "amd_05",
       "amd_06",
       "best_buy_01",
       "best_buy_03",
@@ -204,7 +205,6 @@
       "verizon_05"
     ],
     "wrong_text": [
-      "amd_05",
       "boeing_06",
       "boeing_07",
       "pepsico_03",
@@ -1345,10 +1345,10 @@
       "company": "AMD",
       "bucket": "B_judgment",
       "status": "answered",
-      "failure_class": "wrong_text",
+      "failure_class": "correct",
       "abstain_cause": null,
       "scores": {
-        "answer_accuracy": "fail",
+        "answer_accuracy": "pass",
         "citation_precision": "pass",
         "citation_provenance": "pass",
         "arithmetic_integrity": "pass",

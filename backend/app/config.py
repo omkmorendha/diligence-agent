@@ -39,6 +39,9 @@ LLM_MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "16384"))
 # is non-reasoning so this is a no-op today; kept for models that honor it. Sent via
 # extra_body in llm.chat (see llm.py). Leave unset (None) to keep a model's default.
 LLM_REASONING_EFFORT = os.environ.get("LLM_REASONING_EFFORT") or None
+# Optional cheaper/faster model for the Tier-2 LLM judges only (evals/judges.py).
+# Unset -> judges use LLM_MODEL. The agent/baseline never read this.
+JUDGE_MODEL = os.environ.get("JUDGE_MODEL") or None
 
 # --- embeddings (spec section 3) ---
 EMBED_MODEL = os.environ.get("EMBED_MODEL", "sentence-transformers/all-MiniLM-L6-v2")

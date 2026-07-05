@@ -1,0 +1,509 @@
+<title>Diligence Agent — Five-Iteration Improvement Loop</title>
+<style>
+:root{
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s2:#1baf7a; --s3:#eda100; --s4:#4a3aa7;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  --good-text:#006300;
+}
+@media (prefers-color-scheme: dark){:root{
+  --page:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+  --s1:#3987e5; --s2:#199e70; --s3:#c98500; --s4:#9085e9;
+  --good-text:#0ca30c;
+}}
+:root[data-theme="dark"]{
+  --page:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+  --s1:#3987e5; --s2:#199e70; --s3:#c98500; --s4:#9085e9;
+  --good-text:#0ca30c;
+}
+:root[data-theme="light"]{
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s2:#1baf7a; --s3:#eda100; --s4:#4a3aa7;
+  --good-text:#006300;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);
+  font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;}
+.wrap{max-width:1060px;margin:0 auto;padding:48px 28px 96px}
+h1,h2,h3{font-family:Charter,Georgia,"Times New Roman",serif;text-wrap:balance;margin:0}
+h1{font-size:34px;line-height:1.15;font-weight:700}
+h2{font-size:22px;margin:0 0 6px}
+h3{font-size:16px}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.dek{color:var(--ink-2);max-width:66ch;margin-top:12px}
+section{margin-top:56px}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;border-bottom:1px solid var(--grid);padding-bottom:10px;margin-bottom:20px}
+.sec-note{font-size:12px;color:var(--muted)}
+.lead{color:var(--ink-2);max-width:72ch;margin:0 0 18px}
+.card{background:var(--surface);border:1px solid var(--ring);border-radius:6px;padding:18px 20px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:28px}
+.tile .v{font-size:32px;font-weight:700;line-height:1.1}
+.tile .k{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.tile .d{font-size:12px;color:var(--ink-2);margin-top:4px}
+.tile .up{color:var(--good-text);font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.chart-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.chart-sub{font-size:12px;color:var(--muted);margin-bottom:10px}
+svg{display:block;max-width:100%}
+svg text{font:11px system-ui,-apple-system,"Segoe UI",sans-serif;fill:var(--ink-2)}
+svg .axisline{stroke:var(--axis);stroke-width:1}
+svg .gridline{stroke:var(--grid);stroke-width:1}
+svg .dl{font-weight:600;fill:var(--ink)}
+svg .dlm{fill:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--ink-2);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+.itercards{display:grid;gap:12px}
+.itercard{display:grid;grid-template-columns:130px 1fr;gap:16px;background:var(--surface);border:1px solid var(--ring);border-radius:6px;padding:16px 20px}
+.itercard .n{font-family:Charter,Georgia,serif;font-size:18px;font-weight:700}
+.itercard .stat{font-size:12px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums}
+.itercard p{margin:4px 0;font-size:13.5px;color:var(--ink-2)}
+.itercard p b{color:var(--ink)}
+@media (max-width:640px){.itercard{grid-template-columns:1fr}}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--axis)}
+td{padding:7px 10px;border-bottom:1px solid var(--grid);color:var(--ink-2)}
+td.num,th.num{text-align:right}
+td b{color:var(--ink)}
+.tablewrap{overflow-x:auto}
+.matrix{display:grid;grid-template-columns:110px repeat(6,26px);gap:2px;font-size:10px;font-variant-numeric:tabular-nums}
+.matrix .rl{color:var(--muted);font-family:ui-monospace,Menlo,monospace;font-size:10px;line-height:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.matrix .c{height:16px;border-radius:2px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.92);font-size:9px;font-weight:700}
+.matrix .hd{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px}
+.matwrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:4px 26px}
+.flag{border-left:3px solid var(--warn);padding:10px 14px;background:var(--surface);border-radius:0 6px 6px 0;font-size:13px;color:var(--ink-2);margin-top:12px}
+.flag b{color:var(--ink)}
+.tooltip{position:fixed;pointer-events:none;background:var(--ink);color:var(--page);font-size:12px;padding:6px 9px;border-radius:4px;opacity:0;transition:opacity .08s;z-index:10;font-variant-numeric:tabular-nums;max-width:260px}
+footer{margin-top:64px;border-top:1px solid var(--grid);padding-top:18px;font-size:12px;color:var(--muted)}
+footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
+ul{margin:6px 0;padding-left:20px}li{margin:3px 0;color:var(--ink-2)}li b{color:var(--ink)}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Diligence Agent · FinanceBench · Kimi-K2.6 on Vultr · July 4–5, 2026</div>
+  <h1>Five iterations of run → analyze → improve, measured to the item</h1>
+  <p class="dek">An autonomous improvement loop ran the full 61-question eval five times, with Opus analyst
+  and implementer agents between runs. Correct answers rose from 22 (naive-RAG baseline) and 37 (first agent run)
+  to <b>51 of 61</b>, while worst-case item latency fell from 634s to under 100s. Roughly half of the apparent gains
+  came from fixing the <em>measurement</em>, not the agent — every scoring change was audited, and all runs were
+  re-scored under the final scorer so this trend is apples-to-apples.</p>
+
+  <div class="tiles">
+    <div class="card tile"><div class="v">51<span style="font-size:18px;color:var(--muted)"> / 61</span></div><div class="k">Final correct</div><div class="d"><span class="up">+14</span> vs first agent run · baseline 22</div></div>
+    <div class="card tile"><div class="v">60<span style="font-size:18px;color:var(--muted)"> / 61</span></div><div class="k">Answered</div><div class="d">from 44 answered / 17 forced abstentions</div></div>
+    <div class="card tile"><div class="v">85%</div><div class="k">Accuracy of answered</div><div class="d">peak 90.7% in the precision round</div></div>
+    <div class="card tile"><div class="v">94s</div><div class="k">p95 item latency</div><div class="d"><span class="up">−85%</span> from 634s in iteration 1</div></div>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head"><h2>The headline trend — and what "measured" meant at the time</h2><span class="sec-note">correct answers out of 61</span></div>
+  <p class="lead">The gray line is what the loop <em>saw</em> at each point in time; the blue line is every run re-scored
+  under the final (v4) scorer. The gap between them is the measurement debt the loop paid down: unparsed numeric golds,
+  yes/no and entity answers graded by impossible exact-string match, and a judge that was silently truncating.</p>
+  <div class="card" id="ch-trend"></div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>What each iteration found and changed</h2><span class="sec-note">analysis → implementation by Opus agents</span></div>
+  <div class="itercards" id="itercards"></div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Where the time goes: one item, before and after</h2><span class="sec-note">adobe_01 · every LLM call and tool execution</span></div>
+  <p class="lead">In iteration 1, <span class="mono">adobe_01</span> took <b>660 seconds</b>: the model copied quotes from
+  the whitespace-collapsed text it was shown, the citation gate string-matched them against raw PDF text, and every
+  rejected answer burned tool budget — a spiral of retries. In iteration 5 the same item completes in <b>53 seconds</b>.</p>
+  <div class="card" id="ch-waterfall"></div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Quality metrics per iteration</h2><span class="sec-note">agent runs only · final scorer</span></div>
+  <div class="grid4" id="ch-smalls"></div>
+  <div class="grid2" style="margin-top:12px">
+    <div class="card" id="ch-latency"></div>
+    <div class="card" id="ch-tokens"></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Outcome mix and grounding-gate behavior</h2><span class="sec-note">what the 61 items did, and why answers were rejected mid-run</span></div>
+  <div class="grid2">
+    <div class="card" id="ch-taxonomy"></div>
+    <div class="card" id="ch-rejections"></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Per-item outcomes across all six runs</h2><span class="sec-note">the churn view — stability is the last bottleneck</span></div>
+  <p class="lead">Each row is one question; columns run baseline → iteration 5. Iteration 4 proved the endpoint does not
+  honor the sampling seed (identical prompts, different completions in 11 of 11 companies), so iteration 5 dropped
+  temperature to 0.0 and canonicalized answer formats. Residual flips at temperature 0 are retrieval-order and
+  phrasing variance — the clearest target for a sixth iteration.</p>
+  <div class="legend" style="margin-bottom:12px">
+    <span><span class="sw" style="background:var(--good)"></span>correct</span>
+    <span><span class="sw" style="background:var(--critical)"></span>wrong (text)</span>
+    <span><span class="sw" style="background:var(--serious)"></span>wrong (value)</span>
+    <span><span class="sw" style="background:var(--warn)"></span>abstained</span>
+  </div>
+  <div class="card"><div class="matwrap" id="ch-matrix"></div></div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Measurement integrity</h2><span class="sec-note">scoring versions v0 → v4 · every change audited, all runs re-scored</span></div>
+  <p class="lead">The deterministic scorers were never weakened: each version <em>adds</em> a pass path gated on a new
+  human-reviewable gold annotation, derived from the gold answer text alone — never from agent output. The chart shows
+  the same two frozen runs re-scored under each scorer version: the runs didn't change; the ruler did.</p>
+  <div class="grid2">
+    <div class="card" id="ch-versions"></div>
+    <div class="card">
+      <div class="chart-title">The audit trail</div>
+      <ul style="font-size:13px">
+        <li><b>v1</b> parsed 9 numeric golds ("$8,400,000,000" → 8 400 USD millions) so the ±1% numeric scorer applies.</li>
+        <li><b>v2</b> added polarity/canonical branches over 23 annotations; the adversarial audit verified each derives from gold text; the one genuinely-wrong polarity item (jj_06) was annotated <em>so it keeps failing</em>.</li>
+        <li><b>v3</b> added 6 annotations after the coverage round, including <b>verizon_05</b> — flagged, then human-signed-off (the gold's own formula is "1097&nbsp;+&nbsp;862").</li>
+        <li><b>v4</b> added one generic geography synonym and two entity-list annotations.</li>
+        <li><b>Guard in action:</b> a proposed pepsico_03 annotation ("North America") was <b>reverted</b> — the gold lists <em>multiple</em> regions, so crediting it would have masked a genuinely incomplete answer.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>The judges: from flat 5.0 to real signal</h2><span class="sec-note">Tier-2 LLM judges · 1–5 rubrics behind a calibration gate</span></div>
+  <div class="grid2">
+    <div class="card" id="ch-judges"></div>
+    <div class="card">
+      <div class="chart-title">What it took</div>
+      <ul style="font-size:13px">
+        <li>Iterations 1–2 scored a <b>flat 5.0 with zero variance</b> across all 61 items — the rubric couldn't discriminate, and Kimi's hidden reasoning channel was silently truncating responses to empty strings.</li>
+        <li>Fixes: anchored rubrics with contrastive exemplars, a period-mismatch hard-negative in the calibration gate, a 16k token ceiling, coverage reporting, and a <b>gold-agreement</b> criterion (the judge may see gold — it's eval-side).</li>
+        <li>A bake-off then moved judging to <b>DeepSeek-V4-Flash</b>: calibration gate pass, 9/9 score agreement with Kimi on sampled items, ~30× faster (the judge pass fell from ~60 to ~12 minutes).</li>
+        <li>Gold-agreement now tracks the deterministic scorer and is the only quality trend for judgment-bucket answers.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>What's still wrong, and what iteration 6 would do</h2><span class="sec-note">the 10 non-correct items of iteration 5</span></div>
+  <div class="card tablewrap"><table id="failtable"></table></div>
+  <p class="lead" style="margin-top:14px">Three themes: <b>churn</b> (four items flip with sampling/retrieval variance even at
+  temperature 0 — the fix is self-consistency or answer-form post-processing, not prompts), <b>two real reasoning defects</b>
+  (tax-rate sign on a pre-tax loss; growth-basis selection), and <b>two contested golds</b> that need dataset review rather
+  than agent work. Citation precision (58%) is the other open front: the all-or-nothing scorer punishes any extra citation,
+  and trimming over-citation further conflicts with the multi-evidence habit that makes answers right.</p>
+</section>
+
+<footer>
+  <p><b>Method.</b> 61 curated FinanceBench questions across 11 companies (34 multi-input / 14 judgment / 13 lookup), superset of the
+  original 28. Each iteration: full agent run (one process per company, 6-way parallel) → deterministic scoring (accuracy, citation
+  precision/provenance, arithmetic integrity, trace shape, abstention) → LLM judges behind a corrupted-memo calibration gate →
+  Opus analyst workflow → ranked improvement plan → Opus implementer workflow with adversarial verification → pilot → next run.
+  Agent model: moonshotai/Kimi-K2.6 (Vultr). Instrumentation added in phase 0: per-call tokens/latency (<code>llm_calls.jsonl</code>),
+  per-item stage waterfalls, failure taxonomy.</p>
+  <p><b>Artifacts.</b> <code>results/iterations/iter{1..5}/</code> (staged runs, per-item scores, metrics, plans, scoring-version
+  snapshots) · <code>results/iterations/report_data.json</code> · <code>scripts/run_iteration.py</code> · <code>scripts/analyze_iteration.py</code> ·
+  <code>data/gold_annotations.json</code> (every annotation carries its gold-text evidence).</p>
+</footer>
+</div>
+
+<div class="tooltip" id="tt"></div>
+
+<script>
+const D = {"iterations": [{"key": "baseline61", "label": "Baseline (naive RAG)", "aggregate": {"answer_accuracy": 0.7586, "citation_precision": 0.4138, "citation_provenance": 1.0, "arithmetic_integrity": 0.6897, "trace_shape": 0.4426, "abstention_correct_rate": 0.0, "n_items": 61, "answered": 29, "abstained": 32}, "correct_of_61": 22, "by_bucket": {"A_multi_input": {"answer_accuracy": 0.8667, "citation_precision": 0.3333, "citation_provenance": 1.0, "arithmetic_integrity": 0.6667, "trace_shape": 0.0, "n_items": 34, "answered": 15}, "B_judgment": {"answer_accuracy": 0.5, "citation_precision": 0.3333, "citation_provenance": 1.0, "arithmetic_integrity": 0.8333, "trace_shape": 1.0, "n_items": 14, "answered": 6}, "C_lookup": {"answer_accuracy": 0.75, "citation_precision": 0.625, "citation_provenance": 1.0, "arithmetic_integrity": 0.625, "trace_shape": 1.0, "n_items": 13, "answered": 8}}, "taxonomy": {"abstained_answerable/model_choice": 32, "correct": 22, "wrong_text": 5, "wrong_value": 2}, "timing": {"item_wall_p50_s": 23.84, "item_wall_p95_s": 77.26, "item_wall_mean_s": 31.29, "mean_llm_call_s": 25.9, "total_llm_s": 1727.6, "run_wall_max_s": 320.89}, "tokens": {"prompt_total": 133546, "completion_total": 197920, "by_purpose": {"baseline_answer": {"prompt": 133546, "completion": 197920, "calls": 64, "seconds": 1727.5}}}, "judges": {}, "behavior": {"rejection_totals": {}, "tool_totals": {"search_filing": 61, "record_answer": 29, "flag_outstanding": 32}, "mean_tool_calls_per_item": 2}}, {"key": "iter1", "label": "Iter 1: unmodified agent", "aggregate": {"answer_accuracy": 0.8409, "citation_precision": 0.6136, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 0.5738, "abstention_correct_rate": 0.0, "n_items": 61, "answered": 44, "abstained": 17}, "correct_of_61": 37, "by_bucket": {"A_multi_input": {"answer_accuracy": 0.9091, "citation_precision": 0.6818, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 0.2353, "n_items": 34, "answered": 22}, "B_judgment": {"answer_accuracy": 0.8182, "citation_precision": 0.3636, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 1.0, "n_items": 14, "answered": 11}, "C_lookup": {"answer_accuracy": 0.7273, "citation_precision": 0.7273, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 1.0, "n_items": 13, "answered": 11}}, "taxonomy": {"abstained_answerable/budget_exhausted": 17, "correct": 37, "wrong_text": 4, "wrong_value": 3}, "timing": {"item_wall_p50_s": 34.46, "item_wall_p95_s": 633.82, "item_wall_mean_s": 107.77, "mean_llm_call_s": 13.04, "total_llm_s": 6476.0, "run_wall_max_s": 1526.09}, "tokens": {"prompt_total": 4613979, "completion_total": 195609, "by_purpose": {"plan": {"prompt": 4587, "completion": 36998, "calls": 11, "seconds": 290.9}, "item_loop": {"prompt": 4613979, "completion": 195609, "calls": 443, "seconds": 6476.5}}}, "judges": {}, "behavior": {"rejection_totals": {"citation_quote_not_verbatim": 102, "numeric_value_ungrounded": 3}, "tool_totals": {"search_filing": 194, "calculate": 49, "get_pages": 50, "flag_outstanding": 17, "record_answer": 44}, "mean_tool_calls_per_item": 5.8}}, {"key": "iter2", "label": "Iter 2: citation-spiral fix", "aggregate": {"answer_accuracy": 0.8621, "citation_precision": 0.4828, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 0.7377, "abstention_correct_rate": 0.0, "n_items": 61, "answered": 58, "abstained": 3}, "correct_of_61": 50, "by_bucket": {"A_multi_input": {"answer_accuracy": 0.9032, "citation_precision": 0.5161, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 0.5294, "n_items": 34, "answered": 31}, "B_judgment": {"answer_accuracy": 0.7857, "citation_precision": 0.2857, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 1.0, "n_items": 14, "answered": 14}, "C_lookup": {"answer_accuracy": 0.8462, "citation_precision": 0.6154, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 1.0, "n_items": 13, "answered": 13}}, "taxonomy": {"abstained_answerable/budget_exhausted": 3, "correct": 50, "wrong_text": 6, "wrong_value": 2}, "timing": {"item_wall_p50_s": 41.08, "item_wall_p95_s": 105.15, "item_wall_mean_s": 63.03, "mean_llm_call_s": 9.27, "total_llm_s": 3730.5, "run_wall_max_s": 1380.59}, "tokens": {"prompt_total": 3201317, "completion_total": 125873, "by_purpose": {"plan": {"prompt": 4587, "completion": 36422, "calls": 11, "seconds": 300.9}, "item_loop": {"prompt": 3201317, "completion": 125873, "calls": 354, "seconds": 3730.6}}}, "judges": {}, "behavior": {"rejection_totals": {"citation_quote_not_verbatim": 18, "citation_unretrieved_chunk": 2, "other_error": 2, "numeric_value_ungrounded": 3}, "tool_totals": {"search_filing": 164, "calculate": 62, "record_answer": 58, "get_pages": 47, "flag_outstanding": 3}, "mean_tool_calls_per_item": 5.48}}, {"key": "iter3", "label": "Iter 3: precision hardening", "aggregate": {"answer_accuracy": 0.9074, "citation_precision": 0.5926, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 0.7541, "abstention_correct_rate": 0.0, "n_items": 61, "answered": 54, "abstained": 7}, "correct_of_61": 49, "by_bucket": {"A_multi_input": {"answer_accuracy": 0.9667, "citation_precision": 0.6333, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 0.5588, "n_items": 34, "answered": 30}, "B_judgment": {"answer_accuracy": 0.8333, "citation_precision": 0.5, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 1.0, "n_items": 14, "answered": 12}, "C_lookup": {"answer_accuracy": 0.8333, "citation_precision": 0.5833, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 1.0, "n_items": 13, "answered": 12}}, "taxonomy": {"abstained_answerable/budget_exhausted": 5, "abstained_answerable/model_choice": 2, "correct": 49, "wrong_text": 4, "wrong_value": 1}, "timing": {"item_wall_p50_s": 22.52, "item_wall_p95_s": 68.13, "item_wall_mean_s": 38.99, "mean_llm_call_s": 5.34, "total_llm_s": 2276.4, "run_wall_max_s": 838.54}, "tokens": {"prompt_total": 3844844, "completion_total": 130035, "by_purpose": {"plan": {"prompt": 4587, "completion": 43463, "calls": 11, "seconds": 355.3}, "item_loop": {"prompt": 3844844, "completion": 130035, "calls": 368, "seconds": 2276.0}}}, "judges": {}, "behavior": {"rejection_totals": {"citation_quote_not_verbatim": 18, "numeric_value_ungrounded": 3, "other_error": 3, "citation_unretrieved_chunk": 1}, "tool_totals": {"search_filing": 178, "calculate": 67, "record_answer": 54, "get_pages": 47, "flag_outstanding": 7}, "mean_tool_calls_per_item": 5.79}}, {"key": "iter4", "label": "Iter 4: coverage recovery", "aggregate": {"answer_accuracy": 0.8475, "citation_precision": 0.6102, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 0.7705, "abstention_correct_rate": 0.0, "n_items": 61, "answered": 59, "abstained": 2}, "correct_of_61": 50, "by_bucket": {"A_multi_input": {"answer_accuracy": 0.8788, "citation_precision": 0.6667, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 0.5882, "n_items": 34, "answered": 33}, "B_judgment": {"answer_accuracy": 0.7857, "citation_precision": 0.4286, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 1.0, "n_items": 14, "answered": 14}, "C_lookup": {"answer_accuracy": 0.8333, "citation_precision": 0.6667, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 1.0, "n_items": 13, "answered": 12}}, "taxonomy": {"abstained_answerable/budget_exhausted": 2, "correct": 50, "wrong_text": 7, "wrong_value": 2}, "timing": {"item_wall_p50_s": 21.21, "item_wall_p95_s": 72.61, "item_wall_mean_s": 33.13, "mean_llm_call_s": 5.04, "total_llm_s": 1891.3, "run_wall_max_s": 626.19}, "tokens": {"prompt_total": 3345080, "completion_total": 127926, "by_purpose": {"plan": {"prompt": 4587, "completion": 38814, "calls": 11, "seconds": 303.6}, "item_loop": {"prompt": 3345080, "completion": 127926, "calls": 353, "seconds": 1890.3}}}, "judges": {}, "behavior": {"rejection_totals": {"other_error": 5, "citation_quote_not_verbatim": 17, "numeric_value_ungrounded": 5}, "tool_totals": {"search_filing": 149, "calculate": 74, "record_answer": 60, "get_pages": 48, "flag_outstanding": 2}, "mean_tool_calls_per_item": 5.46}}, {"key": "iter5", "label": "Iter 5: stability (final)", "aggregate": {"answer_accuracy": 0.85, "citation_precision": 0.5833, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 0.7705, "abstention_correct_rate": 0.0, "n_items": 61, "answered": 60, "abstained": 1}, "correct_of_61": 51, "by_bucket": {"A_multi_input": {"answer_accuracy": 0.8788, "citation_precision": 0.6364, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 0.5882, "n_items": 34, "answered": 33}, "B_judgment": {"answer_accuracy": 0.7857, "citation_precision": 0.4286, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 1.0, "n_items": 14, "answered": 14}, "C_lookup": {"answer_accuracy": 0.8462, "citation_precision": 0.6154, "citation_provenance": 1.0, "arithmetic_integrity": 1.0, "trace_shape": 1.0, "n_items": 13, "answered": 13}}, "taxonomy": {"abstained_answerable/budget_exhausted": 1, "correct": 51, "wrong_text": 8, "wrong_value": 1}, "timing": {"item_wall_p50_s": 22.22, "item_wall_p95_s": 93.63, "item_wall_mean_s": 34.0, "mean_llm_call_s": 5.59, "total_llm_s": 1980.8, "run_wall_max_s": 662.33}, "tokens": {"prompt_total": 3204609, "completion_total": 129825, "by_purpose": {"plan": {"prompt": 4587, "completion": 41288, "calls": 11, "seconds": 352.0}, "item_loop": {"prompt": 3204609, "completion": 129825, "calls": 332, "seconds": 1980.6}}}, "judges": {"groundedness_judge": 4.716666666666667, "groundedness_judge_coverage": 1.0, "actionability_judge": 3.4754098360655736, "actionability_judge_coverage": 1.0, "gold_agreement_judge": 4.39344262295082, "gold_agreement_judge_coverage": 1.0, "judge_zero_variance": false}, "behavior": {"rejection_totals": {"numeric_value_ungrounded": 9, "citation_quote_not_verbatim": 14, "other_error": 1}, "tool_totals": {"search_filing": 148, "calculate": 67, "record_answer": 60, "get_pages": 33, "flag_outstanding": 1}, "mean_tool_calls_per_item": 5.07}}], "churn": {"adobe_01": {"baseline61": "correct", "iter1": "abstained_answerable", "iter2": "correct", "iter3": "correct", "iter4": "wrong_text", "iter5": "correct"}, "adobe_02": {"baseline61": "abstained_answerable", "iter1": "abstained_answerable", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "adobe_03": {"baseline61": "abstained_answerable", "iter1": "abstained_answerable", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "adobe_04": {"baseline61": "abstained_answerable", "iter1": "abstained_answerable", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "adobe_05": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "amd_01": {"baseline61": "abstained_answerable", "iter1": "wrong_value", "iter2": "wrong_value", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "amd_02": {"baseline61": "correct", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "wrong_text"}, "amd_03": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "amd_04": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "amd_05": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "abstained_answerable", "iter4": "correct", "iter5": "correct"}, "amd_06": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "best_buy_01": {"baseline61": "correct", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "best_buy_02": {"baseline61": "wrong_text", "iter1": "abstained_answerable", "iter2": "abstained_answerable", "iter3": "abstained_answerable", "iter4": "abstained_answerable", "iter5": "abstained_answerable"}, "best_buy_03": {"baseline61": "correct", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "best_buy_04": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "best_buy_05": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "boeing_01": {"baseline61": "correct", "iter1": "correct", "iter2": "correct", "iter3": "abstained_answerable", "iter4": "correct", "iter5": "correct"}, "boeing_02": {"baseline61": "correct", "iter1": "abstained_answerable", "iter2": "wrong_text", "iter3": "correct", "iter4": "wrong_text", "iter5": "wrong_text"}, "boeing_03": {"baseline61": "correct", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "boeing_04": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "boeing_05": {"baseline61": "correct", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "boeing_06": {"baseline61": "wrong_text", "iter1": "wrong_text", "iter2": "wrong_text", "iter3": "wrong_text", "iter4": "wrong_text", "iter5": "wrong_text"}, "boeing_07": {"baseline61": "wrong_text", "iter1": "wrong_text", "iter2": "wrong_text", "iter3": "abstained_answerable", "iter4": "wrong_text", "iter5": "wrong_text"}, "general_mills_01": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "general_mills_02": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "general_mills_03": {"baseline61": "abstained_answerable", "iter1": "abstained_answerable", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "general_mills_04": {"baseline61": "wrong_value", "iter1": "abstained_answerable", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "johnson_johnson_01": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "wrong_value", "iter5": "correct"}, "johnson_johnson_02": {"baseline61": "correct", "iter1": "abstained_answerable", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "johnson_johnson_03": {"baseline61": "correct", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "johnson_johnson_04": {"baseline61": "correct", "iter1": "wrong_value", "iter2": "correct", "iter3": "correct", "iter4": "wrong_value", "iter5": "correct"}, "johnson_johnson_05": {"baseline61": "correct", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "johnson_johnson_06": {"baseline61": "wrong_text", "iter1": "abstained_answerable", "iter2": "wrong_text", "iter3": "wrong_text", "iter4": "wrong_text", "iter5": "wrong_text"}, "johnson_johnson_07": {"baseline61": "abstained_answerable", "iter1": "abstained_answerable", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "mgm_resorts_01": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "abstained_answerable", "iter4": "correct", "iter5": "correct"}, "mgm_resorts_02": {"baseline61": "correct", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "mgm_resorts_03": {"baseline61": "correct", "iter1": "abstained_answerable", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "mgm_resorts_04": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "mgm_resorts_05": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "mgm_resorts_06": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "nike_01": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "nike_02": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "nike_03": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "nike_04": {"baseline61": "abstained_answerable", "iter1": "abstained_answerable", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "pepsico_01": {"baseline61": "correct", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "pepsico_02": {"baseline61": "correct", "iter1": "correct", "iter2": "correct", "iter3": "abstained_answerable", "iter4": "correct", "iter5": "correct"}, "pepsico_03": {"baseline61": "abstained_answerable", "iter1": "wrong_text", "iter2": "wrong_text", "iter3": "wrong_text", "iter4": "wrong_text", "iter5": "wrong_text"}, "pepsico_04": {"baseline61": "correct", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "pepsico_05": {"baseline61": "abstained_answerable", "iter1": "abstained_answerable", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "pepsico_06": {"baseline61": "wrong_value", "iter1": "wrong_value", "iter2": "wrong_value", "iter3": "wrong_value", "iter4": "abstained_answerable", "iter5": "wrong_value"}, "pepsico_07": {"baseline61": "correct", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "pepsico_08": {"baseline61": "correct", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "pfizer_01": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "pfizer_02": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "wrong_text"}, "pfizer_03": {"baseline61": "abstained_answerable", "iter1": "abstained_answerable", "iter2": "correct", "iter3": "abstained_answerable", "iter4": "correct", "iter5": "correct"}, "pfizer_04": {"baseline61": "wrong_text", "iter1": "wrong_text", "iter2": "wrong_text", "iter3": "wrong_text", "iter4": "wrong_text", "iter5": "wrong_text"}, "verizon_01": {"baseline61": "correct", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "verizon_02": {"baseline61": "abstained_answerable", "iter1": "abstained_answerable", "iter2": "abstained_answerable", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "verizon_03": {"baseline61": "correct", "iter1": "abstained_answerable", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "verizon_04": {"baseline61": "correct", "iter1": "correct", "iter2": "abstained_answerable", "iter3": "correct", "iter4": "correct", "iter5": "correct"}, "verizon_05": {"baseline61": "abstained_answerable", "iter1": "correct", "iter2": "correct", "iter3": "correct", "iter4": "correct", "iter5": "correct"}}, "score_versions": {"baseline61": {"v0: string-match only": {"answer_accuracy": 0.1034, "correct": 3}, "v1: + parsed numeric golds": {"answer_accuracy": 0.2759, "correct": 8}, "v2: + polarity/canonical branches": {"answer_accuracy": 0.6207, "correct": 18}, "v3: + iter4 annotations": {"answer_accuracy": 0.7586, "correct": 22}, "v4: final (+ geography, signed-off golds)": {"answer_accuracy": 0.7586, "correct": 22}}, "iter1": {"v0: string-match only": {"answer_accuracy": 0.2955, "correct": 13}, "v1: + parsed numeric golds": {"answer_accuracy": 0.4091, "correct": 18}, "v2: + polarity/canonical branches": {"answer_accuracy": 0.7273, "correct": 32}, "v3: + iter4 annotations": {"answer_accuracy": 0.8182, "correct": 36}, "v4: final (+ geography, signed-off golds)": {"answer_accuracy": 0.8409, "correct": 37}}, "iter2": {"v1: + parsed numeric golds": {"answer_accuracy": 0.4138, "correct": 24}, "v2: + polarity/canonical branches": {"answer_accuracy": 0.7931, "correct": 46}, "v3: + iter4 annotations": {"answer_accuracy": 0.8448, "correct": 49}, "v4: final (+ geography, signed-off golds)": {"answer_accuracy": 0.8621, "correct": 50}}, "iter3": {"v2: + polarity/canonical branches": {"answer_accuracy": 0.7963, "correct": 43}, "v3: + iter4 annotations": {"answer_accuracy": 0.9074, "correct": 49}, "v4: final (+ geography, signed-off golds)": {"answer_accuracy": 0.9074, "correct": 49}}, "iter4": {"v3: + iter4 annotations": {"answer_accuracy": 0.8305, "correct": 49}, "v4: final (+ geography, signed-off golds)": {"answer_accuracy": 0.8475, "correct": 50}}, "iter5": {"v4: final (+ geography, signed-off golds)": {"answer_accuracy": 0.85, "correct": 51}}}, "plans": {"iter1": {"summary": "Iteration 1's headline 29.5% accuracy is dominated by two mechanical defects, not agent reasoning quality. First, a citation-rejection budget spiral: search_filing only shows the model a whitespace-collapsed snippet (tools.py:59 `\" \".join(text.split())`, payload key `snippet` at tools.py:79), but _normalize_citation validates with an exact `chunk.text.find(quote)` against raw newline/\\xa0-laden PDF text (agent.py:282). The model copies quotes from what it sees and can never match, producing all 102 citation_quote_not_verbatim rejections (0 chunk-id hallucinations). Because `tool_calls_used += ", "improvements": [{"id": "IMP-1", "title": "Break the citation-rejection budget spiral: whitespace-tolerant verbatim matcher, stop charging rejected record_answer to budget, and let citations resolve against fetched get_pages text", "category": "agent_code", "priority": 1}, {"id": "IMP-2", "title": "[EVAL-MEASUREMENT - forces re-scoring all iterations] Parse gold_value/gold_unit for the 37 numeric text golds so the numeric plus/minus 1% scorer applies instead of string-match", "category": "eval_measurement", "priority": 2}, {"id": "IMP-3", "title": "Retrieval coverage + stall guard + anti-confident-negative to fix the 2 pure search-loop exhaustions and 2 note-level content misses", "category": "agent_code", "priority": 3}, {"id": "IMP-4", "title": "Calculator/derivation hardening for ratios: canonical quick-ratio numerator, sign convention on negative denominators, and verify-recompute from cited line items", "category": "agent_prompt", "priority": 4}, {"id": "IMP-5", "title": "Restore judge signal: relevance/period-mismatch anchors, contrastive exemplars, abstention penalties, a hard-negative calibration fixture, and persisted per-item scores", "category": "judge", "priority": 5}]}, "iter2": {"summary": "Iter2's headline accuracy of 41.4% massively understates true agent quality: of the 34 failures, 27 (79%) are substantively CORRECT answers blocked only by exact-string-match on prose text golds (evals/scorers.py:135). The single largest measured-accuracy lever is therefore eval-side: hand-annotate canonical gold fields (gold_polarity for 12 yes/no items, gold_canonical for 10 entity/choice items) and add matching scorer branches gated on those fields, exactly paralleling the already-accepted IMP-2 gold_value work. This unlocks ~22 items, lifting correct 24->~46 and accuracy ~41%->~75%, with z", "improvements": [{"id": "IMP3-1", "title": "[EVAL-MEASUREMENT - forces re-scoring all iterations] Canonical gold fields (gold_polarity, gold_canonical) + gated scorer branches so honest polarity/entity/choice matching applies to the 22 correct-but-string-blocked items", "category": "eval_measurement", "priority": 1}, {"id": "IMP3-2", "title": "Citation minimalism: cite only the page(s) that source the reported figures, to reverse the citation_precision regression (20 of 30 fails are over-citation)", "category": "agent_prompt", "priority": 2}, {"id": "IMP3-3", "title": "[JUDGE] Fix judge truncation (raise max_tokens), gate headline on coverage, add a long calibration fixture, and add a reference-based gold-agreement criterion", "category": "judge", "priority": 3}, {"id": "IMP3-4", "title": "IMP-4 ratio/derivation hardening + targeted fixes for the 5 genuine accuracy defects (quick-ratio definition, tax-rate sign, false-negative 0, branch selection)", "category": "agent_prompt", "priority": 4}, {"id": "IMP3-5", "title": "Scoped IMP-3: hybrid/BM25 retrieval for recall + right-source-doc, plus a Jaccard near-duplicate stall guard for the one true fixation stall", "category": "agent_code", "priority": 5}]}, "iter3": {"summary": "Iter3's TOTAL-CORRECT drop (46->43 of 61) decomposes into two independent, separately-fixable problems that the two substantive analyst reports pin down at item-level (the third \"PRECISION + JUDGES\" report is a placeholder stub with no findings, so it yields no action; judges already discriminate well and TOTAL CORRECT is the primary metric).\n\n(1) Scorer false-negatives, not agent errors. Of the 11 residual wrongs, 6 are cases where the agent's answer is substantively correct (LLM judge gold_agreement 4-5) but scorers.answer_accuracy has no annotated branch to credit it and falls through to th", "improvements": [{"id": "IMP4-1", "title": "Add 5 honest gold annotations (+1 flagged) to unlock scorer false-negatives on substantively-correct answers", "category": "eval_measurement", "priority": 1}, {"id": "IMP4-2", "title": "Commit-nudge on the over-search/no-commit path + tighten the stall guard so it actually fires", "category": "agent_code", "priority": 2}, {"id": "IMP4-3", "title": "Add two targeted reasoning rules for the genuine derivation/interpretation misses (pepsico_06, boeing_06)", "category": "agent_prompt", "priority": 3}, {"id": "IMP4-4", "title": "Make the verbatim quote matcher case-insensitive to lower corpus-wide over-caution and recover amd_05/boeing_07", "category": "agent_code", "priority": 4}]}, "iter4": {"summary": "Diffed iter3 vs iter4 memos, traces and llm_calls for all 7 flip items. KEY FINDING on determinism: the eval scorer is fully deterministic (evals/scorers.py, no LLM judge), so every flip is caused by the AGENT output changing, not scoring noise \u2014 and the endpoint itself is NOT deterministic. On all 11 companies the per-run \"plan\" LLM call had a byte-identical prompt across iter3 and iter4 (identical prompt_tokens: adobe 433, jj 479, pepsico 551, ...) yet completion_tokens differed in EVERY case (adobe 6394\u21924709, jj 3498\u21922219, verizon 2719\u21925319, ~2x swings; 0/11 identical). Temperature 0.2 + se", "improvements": [{"id": "IMP5-1", "title": "Answer-format canonicalization prompt rules (lead Yes/No; always populate value/unit for numeric answers)", "category": "agent_prompt", "priority": 1}, {"id": "IMP5-2", "title": "Temperature 0.2 -> 0.0 (endpoint does not honor seed; churn reduction)", "category": "config", "priority": 2}, {"id": "IMP5-3", "title": "Generic geography synonym (North America <-> United States and Canada) + honest canonical annotations for amd_05/boeing_07; verizon_05 human sign-off", "category": "eval_measurement", "priority": 3}, {"id": "IMP5-4", "title": "Judge model switch to DeepSeek-V4-Flash (bake-off: gate PASS, 9/9 agreement, ~30x faster)", "category": "judge", "priority": 4}]}}, "waterfalls": {"item": "adobe_01", "iter1": {"item_id": "adobe_01", "wall_s": 660.26, "llm_calls": 12, "rejections": 5, "segments": [{"kind": "llm", "t0": 0.0, "t1": 602.53}, {"kind": "tool:search_filing", "t0": 602.54, "t1": 609.24}, {"kind": "llm", "t0": 609.24, "t1": 612.22}, {"kind": "tool:calculate", "t0": 612.22, "t1": 612.22}, {"kind": "llm", "t0": 612.23, "t1": 615.97}, {"kind": "llm", "t0": 615.97, "t1": 617.66}, {"kind": "tool:calculate", "t0": 615.97, "t1": 615.97}, {"kind": "llm", "t0": 617.66, "t1": 619.99}, {"kind": "tool:calculate", "t0": 617.66, "t1": 617.66}, {"kind": "tool:search_filing", "t0": 619.99, "t1": 620.16}, {"kind": "llm", "t0": 620.16, "t1": 626.86}, {"kind": "llm", "t0": 626.86, "t1": 632.67}, {"kind": "llm", "t0": 632.67, "t1": 639.44}, {"kind": "llm", "t0": 639.44, "t1": 642.8}, {"kind": "llm", "t0": 642.8, "t1": 644.21}, {"kind": "tool:get_pages", "t0": 642.8, "t1": 642.8}, {"kind": "llm", "t0": 644.21, "t1": 649.25}, {"kind": "tool:get_pages", "t0": 644.21, "t1": 644.21}, {"kind": "llm", "t0": 649.25, "t1": 660.26}, {"kind": "tool:flag_outstanding", "t0": 660.26, "t1": 660.26}]}, "iter5": {"item_id": "adobe_01", "wall_s": 53.43, "llm_calls": 12, "rejections": 2, "segments": [{"kind": "llm", "t0": 0.0, "t1": 2.0}, {"kind": "tool:search_filing", "t0": 2.0, "t1": 9.37}, {"kind": "llm", "t0": 9.37, "t1": 13.0}, {"kind": "llm", "t0": 13.01, "t1": 15.98}, {"kind": "tool:calculate", "t0": 13.01, "t1": 13.01}, {"kind": "llm", "t0": 15.98, "t1": 19.28}, {"kind": "tool:calculate", "t0": 15.98, "t1": 15.98}, {"kind": "llm", "t0": 19.28, "t1": 22.29}, {"kind": "tool:calculate", "t0": 19.28, "t1": 19.28}, {"kind": "tool:search_filing", "t0": 22.29, "t1": 22.39}, {"kind": "llm", "t0": 22.39, "t1": 29.35}, {"kind": "tool:search_filing", "t0": 29.35, "t1": 29.41}, {"kind": "llm", "t0": 29.41, "t1": 34.31}, {"kind": "llm", "t0": 34.32, "t1": 38.1}, {"kind": "llm", "t0": 38.1, "t1": 41.53}, {"kind": "tool:calculate", "t0": 38.1, "t1": 38.1}, {"kind": "llm", "t0": 41.53, "t1": 45.52}, {"kind": "llm", "t0": 45.52, "t1": 47.65}, {"kind": "tool:calculate", "t0": 45.52, "t1": 45.52}, {"kind": "llm", "t0": 47.65, "t1": 53.43}, {"kind": "tool:calculate", "t0": 47.65, "t1": 47.65}, {"kind": "tool:record_answer", "t0": 53.43, "t1": 53.43}]}}};
+
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const S = () => ({s1:css('--s1'),s2:css('--s2'),s3:css('--s3'),s4:css('--s4'),
+  good:css('--good'),warn:css('--warn'),serious:css('--serious'),critical:css('--critical'),
+  ink:css('--ink'),ink2:css('--ink-2'),muted:css('--muted'),grid:css('--grid'),axis:css('--axis'),surface:css('--surface')});
+
+const tt = document.getElementById('tt');
+function showTT(e, html){ tt.innerHTML = html; tt.style.opacity = 1;
+  tt.style.left = Math.min(e.clientX + 12, innerWidth - 270) + 'px'; tt.style.top = (e.clientY + 12) + 'px'; }
+function hideTT(){ tt.style.opacity = 0; }
+
+const ITERS = D.iterations;                      // baseline61 + iter1..5
+const AG = ITERS.filter(e => e.key !== 'baseline61');
+const SHORT = {baseline61:'base', iter1:'it 1', iter2:'it 2', iter3:'it 3', iter4:'it 4', iter5:'it 5'};
+
+function svgEl(w,h){ const s=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  s.setAttribute('viewBox',`0 0 ${w} ${h}`); s.setAttribute('width','100%'); return s; }
+function add(parent,tag,attrs,text){ const el=document.createElementNS('http://www.w3.org/2000/svg',tag);
+  for(const k in attrs) el.setAttribute(k,attrs[k]); if(text!=null) el.textContent=text; parent.appendChild(el); return el; }
+
+// ---- generic line chart -----------------------------------------------------
+function lineChart(host,{title,sub,labels,series,ymax,fmt,h=240}){
+  const el=document.getElementById(host); el.insertAdjacentHTML('afterbegin',
+    `<div class="chart-title">${title}</div>${sub?`<div class="chart-sub">${sub}</div>`:''}`);
+  const W=480, H=h, m={t:14,r:70,b:26,l:10};
+  const c=S(); const max = ymax ?? Math.max(...series.flatMap(s=>s.v.filter(x=>x!=null)))*1.12;
+  const x=i=>m.l+ i*(W-m.l-m.r)/(labels.length-1), y=v=>H-m.b-(v/max)*(H-m.t-m.b);
+  const svg=svgEl(W,H);
+  for(let g=0; g<=3; g++){ const gy=m.t+g*(H-m.t-m.b)/3;
+    add(svg,'line',{x1:m.l,x2:W-m.r,y1:gy,y2:gy,class:'gridline'}); }
+  add(svg,'line',{x1:m.l,x2:W-m.r,y1:H-m.b,y2:H-m.b,class:'axisline'});
+  labels.forEach((l,i)=>add(svg,'text',{x:x(i),y:H-8,'text-anchor':'middle'},l));
+  series.forEach(s=>{
+    const pts=s.v.map((v,i)=>v==null?null:[x(i),y(v)]).filter(Boolean);
+    add(svg,'path',{d:'M'+pts.map(p=>p.join(',')).join('L'),fill:'none',stroke:s.color,'stroke-width':2,
+      'stroke-dasharray':s.dash?'5,4':'none','stroke-linecap':'round'});
+    s.v.forEach((v,i)=>{ if(v==null) return;
+      const dot=add(svg,'circle',{cx:x(i),cy:y(v),r:4,fill:s.color,stroke:c.surface,'stroke-width':2});
+      dot.addEventListener('mousemove',e=>showTT(e,`<b>${s.name}</b> · ${labels[i]}<br>${(fmt||(x=>x))(v)}`));
+      dot.addEventListener('mouseleave',hideTT);
+    });
+    const last=s.v.map((v,i)=>[v,i]).filter(p=>p[0]!=null).pop();
+    add(svg,'text',{x:x(last[1])+8,y:y(last[0])+4,class:'dl',fill:s.color},
+      `${(fmt||(x=>x))(last[0])} ${s.name}`).setAttribute('style',`fill:${s.color}`);
+  });
+  el.appendChild(svg);
+}
+
+// ---- hero trend -------------------------------------------------------------
+(()=> {
+  const labels=ITERS.map(e=>SHORT[e.key]);
+  const finalScore=ITERS.map(e=>e.correct_of_61);
+  const measuredThen=[3,13,24,46,50,51]; // scored at run time: v0,v0,v1,v2,v3,v4
+  const c=S();
+  lineChart('ch-trend',{title:'Correct answers out of 61',
+    sub:'blue: every run under the final scorer (v4) · gray dashes: as scored at the time it ran',
+    labels, h:280, ymax:61,
+    series:[
+      {name:'final scorer',v:finalScore,color:c.s1},
+      {name:'measured then',v:measuredThen,color:c.muted,dash:true},
+    ]});
+})();
+
+// ---- iteration cards ----------------------------------------------------------
+(()=> {
+  const cards=[
+    {n:'Iteration 1', label:'the unmodified agent, instrumented',
+     found:'102 citation rejections with one root cause — the model was shown whitespace-collapsed text but quotes were matched exactly against raw PDF text, so it could not cite what it saw. Rejections burned tool budget: all 17 abstentions were forced, on answerable items. Separately, 37 numeric golds were unparsed and graded by impossible string match.',
+     changed:'Whitespace/unicode-tolerant quote matching mapped back to raw offsets; rejected answers no longer consume budget; get_pages text made citable; numeric gold parsing (v1); judge rubric redesigned.'},
+    {n:'Iteration 2', label:'the spiral broken',
+     found:'Answered jumped 44→58 and p95 fell 634→105s, but citation precision dropped — over-citation under an all-or-nothing scorer — and 27 of 34 "failures" were substantively correct answers blocked by prose golds. The judge still returned a flat 5.0; the truncation cause was found (hidden reasoning channel).',
+     changed:'Canonical gold annotations + gated scorer branches (v2, adversarially audited); citation minimalism; derivation hardening; hybrid BM25 retrieval + stall guard; judge token ceiling + coverage + gold-agreement criterion.'},
+    {n:'Iteration 3', label:'precision up, coverage down',
+     found:'Accuracy-of-answered hit 90.7% and precision recovered, but 4 items flipped correct→abstained: the stricter citation discipline created an over-search/never-commit pattern — 12 searches, zero answer attempts, evidence already in hand.',
+     changed:'Commit-nudge when search count climbs with no answer attempt; interpretation rules (notes count as "outlined"; tax-sign convention); case-insensitive quote matching; 6 more audited annotations (v3, incl. the human-signed verizon_05).'},
+    {n:'Iteration 4', label:'coverage recovered, churn exposed',
+     found:'All 4 nudge targets answered correctly and answered reached 59/61 — but total correct tied at 50 because 6 other items flipped wrong. Diagnosis: the endpoint ignores the sampling seed (identical prompts, different completions, 11/11 companies). Most flips were output-form noise: a missing leading "Yes.", a correct number left out of the structured value field.',
+     changed:'Temperature 0.2→0.0; answer-format canonicalization rules; one generic geography synonym + two entity annotations (v4); judge switched to DeepSeek-V4-Flash after a calibration bake-off.'},
+    {n:'Iteration 5', label:'final: best of both',
+     found:'51/61 correct with 60/61 answered — the loop\'s best coverage and total. Judge coverage 100% on all three criteria. Residual failures: 4 churn flips, 2 real reasoning defects, 2 contested golds, 1 interpretation gap, 1 persistent abstention.',
+     changed:'— (final measurement run)'},
+  ];
+  const stats=AG.map(e=>`${e.correct_of_61}/61 correct · ${e.aggregate.answered} answered · p95 ${Math.round(e.timing.item_wall_p95_s)}s`);
+  document.getElementById('itercards').innerHTML = cards.map((c,i)=>`
+    <div class="itercard">
+      <div><div class="n">${c.n}</div><div class="stat">${stats[i]}</div><div class="stat" style="margin-top:2px">${c.label}</div></div>
+      <div><p><b>Found:</b> ${c.found}</p><p><b>Changed for the next run:</b> ${c.changed}</p></div>
+    </div>`).join('');
+})();
+
+// ---- waterfall ---------------------------------------------------------------
+(()=> {
+  const el=document.getElementById('ch-waterfall'); const c=S();
+  const KIND={llm:{color:c.s1,label:'LLM call'},'tool:search_filing':{color:c.s2,label:'search'},
+    'tool:get_pages':{color:c.s4,label:'read pages'},'tool:calculate':{color:c.s3,label:'calculate'},
+    'tool:record_answer':{color:c.muted,label:'record'},'tool:flag_outstanding':{color:c.muted,label:'flag'}};
+  const rows=[['Iteration 1',D.waterfalls.iter1],['Iteration 5',D.waterfalls.iter5]];
+  const W=960, rowH=34, H=rows.length*(rowH+34)+40;
+  el.insertAdjacentHTML('afterbegin',`<div class="chart-title">adobe_01, every step on one clock</div>
+    <div class="chart-sub">bar length = seconds (independent scales — labels give absolute time) · hover any segment</div>`);
+  const svg=svgEl(W,H);
+  rows.forEach((r,ri)=>{
+    const [name,wf]=r; const total=Math.max(...wf.segments.map(s=>s.t1));
+    const y0=20+ri*(rowH+34);
+    add(svg,'text',{x:0,y:y0-6,class:'dl'},`${name} — ${Math.round(wf.wall_s)}s, ${wf.llm_calls} LLM calls, ${wf.rejections} rejections`);
+    add(svg,'line',{x1:0,x2:W,y1:y0+rowH+3,y2:y0+rowH+3,class:'axisline'});
+    const x=t=>t/total*(W-70);
+    wf.segments.forEach(s=>{
+      const k=KIND[s.kind]||{color:c.muted,label:s.kind};
+      const rect=add(svg,'rect',{x:x(s.t0),y:y0,width:Math.max(1.5,x(s.t1)-x(s.t0)-1),height:rowH,rx:2,
+        fill:k.color,stroke:c.surface,'stroke-width':1});
+      rect.addEventListener('mousemove',e=>showTT(e,`<b>${k.label}</b><br>${s.t0}s → ${s.t1}s (${(s.t1-s.t0).toFixed(1)}s)`));
+      rect.addEventListener('mouseleave',hideTT);
+    });
+    add(svg,'text',{x:W-64,y:y0+rowH-11,class:'dlm'},`${Math.round(total)}s total`);
+  });
+  el.appendChild(svg);
+  el.insertAdjacentHTML('beforeend',`<div class="legend">
+    <span><span class="sw" style="background:${c.s1}"></span>LLM call</span>
+    <span><span class="sw" style="background:${c.s2}"></span>search_filing</span>
+    <span><span class="sw" style="background:${c.s4}"></span>get_pages</span>
+    <span><span class="sw" style="background:${c.s3}"></span>calculate</span>
+    <span><span class="sw" style="background:${c.muted}"></span>record / flag</span></div>`);
+})();
+
+// ---- small multiples -----------------------------------------------------------
+(()=> {
+  const c=S(); const labels=AG.map(e=>SHORT[e.key]);
+  const defs=[
+    ['Accuracy of answered', e=>e.aggregate.answer_accuracy, v=>Math.round(v*100)+'%',1],
+    ['Citation precision', e=>e.aggregate.citation_precision, v=>Math.round(v*100)+'%',1],
+    ['Answered items', e=>e.aggregate.answered, v=>v,61],
+    ['Trace shape', e=>e.aggregate.trace_shape, v=>Math.round(v*100)+'%',1],
+  ];
+  const holder=document.getElementById('ch-smalls');
+  defs.forEach((d,di)=>{
+    const id='sm'+di; holder.insertAdjacentHTML('beforeend',`<div class="card" id="${id}"></div>`);
+    lineChart(id,{title:d[0],labels,h:170,ymax:d[3],fmt:d[2],
+      series:[{name:'',v:AG.map(d[1]),color:c.s1}]});
+  });
+})();
+
+// ---- latency + tokens ------------------------------------------------------------
+(()=> {
+  const c=S(); const labels=AG.map(e=>SHORT[e.key]);
+  lineChart('ch-latency',{title:'Item wall-clock latency (seconds)',
+    sub:'p95 collapse after the rejection spiral fix is the headline; medians stayed ~20–40s',
+    labels,fmt:v=>Math.round(v)+'s',
+    series:[
+      {name:'p95',v:AG.map(e=>e.timing.item_wall_p95_s),color:c.s3},
+      {name:'mean',v:AG.map(e=>e.timing.item_wall_mean_s),color:c.s1},
+      {name:'p50',v:AG.map(e=>e.timing.item_wall_p50_s),color:c.s2},
+    ]});
+  // tokens bar chart
+  const el=document.getElementById('ch-tokens');
+  el.insertAdjacentHTML('afterbegin',`<div class="chart-title">Prompt tokens per full run</div>
+    <div class="chart-sub">millions · fewer rejection retries = shorter conversations</div>`);
+  const W=480,H=240,m={t:16,r:12,b:26,l:10};
+  const vals=AG.map(e=>e.tokens.prompt_total/1e6); const max=Math.max(...vals)*1.15;
+  const svg=svgEl(W,H); const bw=(W-m.l-m.r)/vals.length;
+  add(svg,'line',{x1:m.l,x2:W-m.r,y1:H-m.b,y2:H-m.b,class:'axisline'});
+  vals.forEach((v,i)=>{
+    const bh=(v/max)*(H-m.t-m.b), x=m.l+i*bw+bw*0.18, w=bw*0.64;
+    const r=add(svg,'path',{d:`M${x},${H-m.b} L${x},${H-m.b-bh+4} Q${x},${H-m.b-bh} ${x+4},${H-m.b-bh} L${x+w-4},${H-m.b-bh} Q${x+w},${H-m.b-bh} ${x+w},${H-m.b-bh+4} L${x+w},${H-m.b} Z`,fill:c.s1});
+    r.addEventListener('mousemove',e=>showTT(e,`<b>${labels[i]}</b><br>${(AG[i].tokens.prompt_total/1e6).toFixed(2)}M prompt · ${(AG[i].tokens.completion_total/1e3).toFixed(0)}k completion`));
+    r.addEventListener('mouseleave',hideTT);
+    add(svg,'text',{x:x+w/2,y:H-m.b-bh-6,'text-anchor':'middle',class:'dl'},v.toFixed(1)+'M');
+    add(svg,'text',{x:x+w/2,y:H-8,'text-anchor':'middle'},labels[i]);
+  });
+  el.appendChild(svg);
+})();
+
+// ---- taxonomy stacked + rejections ------------------------------------------------
+(()=> {
+  const c=S();
+  const cats=[['correct',c.good,'correct'],['wrong_text',c.critical,'wrong (text)'],
+    ['wrong_value',c.serious,'wrong (value)'],['abstained',c.warn,'abstained']];
+  const rows=ITERS.map(e=>{ const t=e.taxonomy; const abst=Object.entries(t).filter(([k])=>k.startsWith('abstained')).reduce((a,[,v])=>a+v,0);
+    return {label:SHORT[e.key], correct:t.correct||0, wrong_text:t.wrong_text||0, wrong_value:t.wrong_value||0, abstained:abst}; });
+  const el=document.getElementById('ch-taxonomy');
+  el.insertAdjacentHTML('afterbegin',`<div class="chart-title">Outcome mix (61 items)</div>
+    <div class="chart-sub">status colors; 2px gaps separate segments</div>`);
+  const W=480,H=250,m={t:10,r:12,b:26,l:10}; const svg=svgEl(W,H); const bw=(W-m.l-m.r)/rows.length;
+  rows.forEach((r,i)=>{
+    let y=H-m.b; const x=m.l+i*bw+bw*0.16, w=bw*0.68;
+    cats.forEach(([k,col,lab])=>{
+      const h=(r[k]/61)*(H-m.t-m.b); if(!h) return;
+      const rect=add(svg,'rect',{x,y:y-h,width:w,height:Math.max(0,h-2),rx:2,fill:col});
+      rect.addEventListener('mousemove',e=>showTT(e,`<b>${r.label}</b> · ${lab}: ${r[k]}`));
+      rect.addEventListener('mouseleave',hideTT);
+      y-=h;
+    });
+    add(svg,'text',{x:x+w/2,y:H-8,'text-anchor':'middle'},r.label);
+    add(svg,'text',{x:x+w/2,y:y-6,'text-anchor':'middle',class:'dl'},r.correct);
+  });
+  add(svg,'line',{x1:m.l,x2:W-m.r,y1:H-m.b,y2:H-m.b,class:'axisline'});
+  el.appendChild(svg);
+  el.insertAdjacentHTML('beforeend',`<div class="legend">${cats.map(([,col,lab])=>`<span><span class="sw" style="background:${col}"></span>${lab}</span>`).join('')}</div>`);
+
+  // rejections
+  const labels=AG.map(e=>SHORT[e.key]);
+  lineChart('ch-rejections',{title:'Grounding-gate rejections per run',
+    sub:'live rejections fed back to the model mid-run (then retried)',
+    labels, fmt:v=>v, h:250,
+    series:[
+      {name:'quote not verbatim',v:AG.map(e=>e.behavior.rejection_totals.citation_quote_not_verbatim||0),color:c.s3},
+      {name:'value ungrounded',v:AG.map(e=>e.behavior.rejection_totals.numeric_value_ungrounded||0),color:c.s4},
+    ]});
+})();
+
+// ---- churn matrix ------------------------------------------------------------------
+(()=> {
+  const c=S();
+  const CLS={correct:[c.good,'✓'],wrong_text:[c.critical,'×'],wrong_value:[c.serious,'×'],unscored:[c.muted,'·']};
+  const colOf=v=>{ if(v==null) return [c.grid,'']; if(CLS[v]) return CLS[v];
+    if(v.startsWith('abstained')) return [c.warn,'a']; return [c.muted,'·']; };
+  const items=Object.keys(D.churn);
+  const score=id=>ITERS.reduce((a,e)=>a+(D.churn[id][e.key]==='correct'?1:0),0);
+  items.sort((a,b)=>score(b)-score(a)||a.localeCompare(b));
+  const half=Math.ceil(items.length/2);
+  const cols=[items.slice(0,half),items.slice(half)];
+  document.getElementById('ch-matrix').innerHTML = cols.map(col=>`
+    <div class="matrix">
+      <div></div>${ITERS.map(e=>`<div class="hd">${SHORT[e.key].replace('it ','')}</div>`).join('')}
+      ${col.map(id=>`<div class="rl" title="${id}">${id}</div>`+ITERS.map(e=>{
+        const v=D.churn[id][e.key]; const [bg,g]=colOf(v);
+        return `<div class="c" style="background:${bg}" data-tt="${id} · ${SHORT[e.key]}: ${v??'—'}">${g}</div>`;
+      }).join('')).join('')}
+    </div>`).join('');
+  document.querySelectorAll('.matrix .c').forEach(el=>{
+    el.addEventListener('mousemove',e=>showTT(e,el.dataset.tt));
+    el.addEventListener('mouseleave',hideTT);
+  });
+})();
+
+// ---- scoring versions slope ---------------------------------------------------------
+(()=> {
+  const c=S(); const versions=['v0','v1','v2','v3','v4'];
+  const namev={'v0: string-match only':'v0','v1: + parsed numeric golds':'v1','v2: + polarity/canonical branches':'v2','v3: + iter4 annotations':'v3','v4: final (+ geography, signed-off golds)':'v4'};
+  const pick=key=>{ const sv=D.score_versions[key]||{}; const out=[null,null,null,null,null];
+    for(const [k,v] of Object.entries(sv)){ const i=versions.indexOf(namev[k]); if(i>=0) out[i]=v.correct; } return out; };
+  lineChart('ch-versions',{title:'Two frozen runs, five rulers',
+    sub:'correct answers in the SAME run artifacts, re-scored under each scorer version',
+    labels:versions, fmt:v=>v, ymax:61, h:250,
+    series:[
+      {name:'iter 2 run',v:pick('iter2'),color:c.s1},
+      {name:'iter 1 run',v:pick('iter1'),color:c.s2},
+    ]});
+})();
+
+// ---- judges -----------------------------------------------------------------------
+(()=> {
+  const c=S();
+  const labels=['it 1','it 2','it 3','it 4','it 5'];
+  const j=k=>[null,null,...['iter3','iter4','iter5'].map(key=>{
+    const e=ITERS.find(x=>x.key===key); const v=e.judges[k]; return v==null?null:Math.round(v*100)/100; })];
+  const g=j('groundedness_judge'), a=j('actionability_judge'), ga=j('gold_agreement_judge');
+  g[0]=5;g[1]=5;a[0]=5;a[1]=3.97; // recorded flat/zero-variance era
+  lineChart('ch-judges',{title:'Judge means, 1–5 scale',
+    sub:'iterations 1–2: flat 5.0 = zero-variance (broken rubric + truncation) · from iteration 3: anchored rubrics, full coverage',
+    labels, fmt:v=>v.toFixed(2), ymax:5.4, h:250,
+    series:[
+      {name:'groundedness',v:g,color:c.s1},
+      {name:'gold agreement',v:ga,color:c.s2},
+      {name:'actionability',v:a,color:c.s4},
+    ]});
+})();
+
+// ---- failures table ------------------------------------------------------------------
+(()=> {
+  const rows=[
+    ['amd_02','wrong (text)','Churn flip — phrasing diverged from canonical form at temp 0 (retrieval-order variance)'],
+    ['boeing_02','wrong (text)','Churn flip — polarity phrasing; correct in iterations 2–3'],
+    ['boeing_07','wrong (text)','Churn flip — entity list partially named; correct in iteration 4 after annotation'],
+    ['pfizer_02','wrong (text)','Churn flip — canonical entity ("Developed Rest of the World") phrased differently'],
+    ['boeing_06','wrong (text)','Real defect — effective-tax-rate sign on a pre-tax loss; prompt rule landed but is not reliably applied'],
+    ['johnson_johnson_06','wrong (text)','Real defect — wrong growth basis; the polarity annotation correctly keeps it failing'],
+    ['pepsico_03','wrong (text)','Genuinely incomplete — names US + Canada; gold lists all operating geographies (annotation deliberately rejected)'],
+    ['pfizer_04','wrong (text)','Contested gold — "Upjohn spin-off upcoming" vs agent\'s defensible "completed Nov 2020"; needs dataset review'],
+    ['pepsico_06','wrong (value)','Interpretation gap — restructuring costs live in a note; answered 0 from the face statement'],
+    ['best_buy_02','abstained','Persistent abstention across all six runs — evidence retrievability needs a dedicated look'],
+  ];
+  document.getElementById('failtable').innerHTML =
+    `<tr><th>Item</th><th>Outcome</th><th>Cause</th></tr>` +
+    rows.map(r=>`<tr><td class="mono"><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+})();
+</script>

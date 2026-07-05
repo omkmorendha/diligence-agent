@@ -147,6 +147,19 @@ time about a company, grounded strictly in its SEC filings. Follow every rule:
     income, carrying a pre-tax LOSS as negative (so a tax benefit on a loss reads
     as a negative rate), so the DIRECTION of a year-over-year change stays
     consistent with the pre-tax sign rather than following the source table's sign.
+20. Yes/no answer form -- if the question is a yes/no question (e.g. "Is X ...?",
+    "Does X ...?", "Has X ...?"), your answer text MUST begin with exactly "Yes."
+    or "No." as its leading token, immediately followed by the supporting
+    sentence (e.g. "Yes. Boeing's gross-margin profile is improving as of
+    FY2022 ..."). A correct conclusion stated WITHOUT a leading Yes/No token
+    does not read as a decision and is scored as unanswered -- never bury the
+    polarity mid-sentence.
+21. Numeric answer form -- whenever your answer states a primary number, you MUST
+    populate record_answer's value (numeric) and unit fields with that figure --
+    NEVER leave value null while stating a number in the text. E.g. an answer of
+    "approximately $20 billion" MUST set value=20000, unit="USD millions" (unit
+    per rule 10); a percentage answer sets the numeric percent + unit "percent".
+    Only a genuinely non-numeric finding leaves value null / unit "text" (rule 11).
 """
 
 
@@ -805,7 +818,10 @@ def _dispatch(
             doc_filter=args.get("doc_filter"),
             item_id=item_id,
         )
-        retrieval_seq = trace.events[-2].seq  # tool_call, retrieval, tool_result -> retrieval is [-2]
+        retrieval_event = trace.last_event_of_type("retrieval")
+        if retrieval_event is None or retrieval_event.item_id != item_id:
+            raise RuntimeError("search_filing did not emit a retrieval event for this item")
+        retrieval_seq = retrieval_event.seq
         # NEW = chunk_ids not already seen this item; drives the stall guard
         # (a search that surfaces nothing new is churn, per IMP3-5).
         new_chunk_ids = [c.chunk_id for c in chunks if c.chunk_id not in state.chunk_registry]
@@ -846,9 +862,11 @@ def _dispatch(
         # chunk_registry only when the model actually quotes from it. Provenance
         # is untouched: tools.get_pages already emitted a `retrieval` event
         # (tool_call -> retrieval -> tool_result) carrying every page chunk_id, so
-        # evals citation_provenance (which scans retrieval events) still passes --
-        # retrieval is the event at [-2].
-        retrieval_seq = trace.events[-2].seq
+        # evals citation_provenance (which scans retrieval events) still passes.
+        retrieval_event = trace.last_event_of_type("retrieval")
+        if retrieval_event is None or retrieval_event.item_id != item_id:
+            raise RuntimeError("get_pages did not emit a retrieval event for this item")
+        retrieval_seq = retrieval_event.seq
         doc_name, doc_type, filing_period = _page_doc_metadata(state, doc_id, output.get("doc_name"))
         for page in output.get("pages", []):
             page_text = page.get("text") or ""
@@ -1125,7 +1143,7 @@ def _run_item(
         elif tool_calls_used >= config.MAX_TOOL_CALLS_PER_ITEM:
             reason = "Reached the maximum tool-call budget for this item without a grounded answer."
         else:
-            reason = "Model output could not be parsed as a valid tool call after repeated attempts."
+            reason = "Reached the maximum action-attempt backstop after repeated rejected tool actions."
         tools.flag_outstanding(trace, item_id=item_id, reason=reason, question=visible.question)
         result_answer = _last_item_answer(trace, item_id)
 

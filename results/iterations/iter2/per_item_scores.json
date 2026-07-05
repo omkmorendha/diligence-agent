@@ -108,7 +108,7 @@
     "status": "answered"
   },
   {
-    "answer_accuracy": "fail",
+    "answer_accuracy": "pass",
     "citation_precision": "fail",
     "citation_provenance": "pass",
     "arithmetic_integrity": "pass",

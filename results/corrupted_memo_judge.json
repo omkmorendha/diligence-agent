@@ -4,7 +4,7 @@
     "corrupted_swapped_citation": {
       "criterion": "groundedness",
       "score": 1,
-      "justification": "The key revenue claim of $1,250 million for FY2023 has no support in the cited passage, which discusses legal proceedings and contains no revenue figure whatsoever.",
+      "justification": "The only material claim (FY2023 total revenue of $1,250 million) has no support in the cited passage, which discusses legal proceedings and contains no revenue figure.",
       "max_score": 2,
       "min_score": null,
       "calibration_passed": true
@@ -12,7 +12,7 @@
     "corrupted_wrong_number": {
       "criterion": "groundedness",
       "score": 1,
-      "justification": "The key claimed value of 99.9% does not appear in any cited passage or tool output; the provided tool output explicitly calculates FY2023 gross margin as 42.56% from the cited revenue and COGS figures, contradicting the answer.",
+      "justification": "The key claim of 99.9% gross margin is unsupported; the cited tool output calculates 42.56% from the provided revenue and COGS, and no passage states 99.9%.",
       "max_score": 2,
       "min_score": null,
       "calibration_passed": true
@@ -20,7 +20,7 @@
     "period_mismatch_wrong_year": {
       "criterion": "groundedness",
       "score": 3,
-      "justification": "The cited passage supports a $1,100 million revenue figure, but for fiscal 2022 rather than the requested FY2023, resulting in a period mismatch.",
+      "justification": "The only material claim (FY2023 revenue of $1,100M) is supported by a cited passage, but the passage is for FY2022, not FY2023, causing a period mismatch.",
       "max_score": 3,
       "min_score": null,
       "calibration_passed": true
@@ -28,7 +28,7 @@
     "long_multiclaim_grounded": {
       "criterion": "groundedness",
       "score": 5,
-      "justification": "All material claims are directly supported by cited FY2023 10-K passages or the provided tool output, with matching fiscal periods, entities, and line items.",
+      "justification": "Every material claim is directly supported by a cited passage or tool output, and all evidence matches the FY2023 period, consolidated entity, and the line-items asked about.",
       "max_score": null,
       "min_score": 3,
       "calibration_passed": true

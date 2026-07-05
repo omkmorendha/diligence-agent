@@ -14,7 +14,7 @@
     "iter2-agent-verizon"
   ],
   "num_items_scored": 61,
-  "answer_accuracy": 0.8448275862068966,
+  "answer_accuracy": 0.8620689655172413,
   "citation_precision": 0.4827586206896552,
   "citation_provenance": 1.0,
   "arithmetic_integrity": 1.0,
@@ -25,7 +25,7 @@
       "answer_accuracy": 0.9032258064516129
     },
     "B_judgment": {
-      "answer_accuracy": 0.7142857142857143
+      "answer_accuracy": 0.7857142857142857
     },
     "C_lookup": {
       "answer_accuracy": 0.8461538461538461

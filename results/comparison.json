@@ -1,12 +1,12 @@
 {
-  "created_at": "2026-07-04T19:42:38Z",
+  "created_at": "2026-07-05T06:33:02Z",
   "subset": {
-    "num_questions": 28,
-    "num_companies": 4,
+    "num_questions": 61,
+    "num_companies": 11,
     "bucket_counts": {
-      "A_multi_input": 12,
-      "C_lookup": 6,
-      "B_judgment": 10
+      "A_multi_input": 34,
+      "C_lookup": 13,
+      "B_judgment": 14
     }
   },
   "systems": {
@@ -15,47 +15,50 @@
       "notes": "Context only, not apples-to-apples with this exact subset."
     },
     "baseline": {
-      "answer_accuracy": 0.0,
-      "citation_precision": 0.0,
+      "answer_accuracy": 0.7586206896551724,
+      "citation_precision": 0.41379310344827586,
       "citation_provenance": 1.0,
-      "arithmetic_integrity": 1.0,
-      "trace_shape": 0.5714285714285714,
-      "abstention_correct_rate": 0.0,
-      "groundedness_judge": null,
-      "actionability_judge": null,
-      "by_bucket": {
-        "B_judgment": {
-          "answer_accuracy": 0.0
-        },
-        "C_lookup": {
-          "answer_accuracy": 0.0
-        }
-      },
-      "label": "Naive-RAG baseline",
-      "notes": "Real deterministic scores from results/baseline.json: 4 run(s), 28/28 subset items scored."
-    },
-    "agent": {
-      "answer_accuracy": 0.13636363636363635,
-      "citation_precision": 0.5454545454545454,
-      "citation_provenance": 1.0,
-      "arithmetic_integrity": 0.9090909090909091,
-      "trace_shape": 0.6071428571428571,
+      "arithmetic_integrity": 0.6896551724137931,
+      "trace_shape": 0.4426229508196721,
       "abstention_correct_rate": 0.0,
       "groundedness_judge": null,
       "actionability_judge": null,
       "by_bucket": {
         "A_multi_input": {
-          "answer_accuracy": 0.25
+          "answer_accuracy": 0.8666666666666667
         },
         "B_judgment": {
-          "answer_accuracy": 0.0
+          "answer_accuracy": 0.5
         },
         "C_lookup": {
-          "answer_accuracy": 0.16666666666666666
+          "answer_accuracy": 0.75
+        }
+      },
+      "label": "Naive-RAG baseline",
+      "notes": "Real deterministic scores from results/baseline.json: 11 run(s), 61/61 subset items scored."
+    },
+    "agent": {
+      "answer_accuracy": 0.85,
+      "citation_precision": 0.5833333333333334,
+      "citation_provenance": 1.0,
+      "arithmetic_integrity": 1.0,
+      "trace_shape": 0.7704918032786885,
+      "abstention_correct_rate": 0.0,
+      "groundedness_judge": 4.716666666666667,
+      "actionability_judge": 3.4754098360655736,
+      "by_bucket": {
+        "A_multi_input": {
+          "answer_accuracy": 0.8787878787878788
+        },
+        "B_judgment": {
+          "answer_accuracy": 0.7857142857142857
+        },
+        "C_lookup": {
+          "answer_accuracy": 0.8461538461538461
         }
       },
       "label": "Agent",
-      "notes": "Real deterministic scores from results/agent.json: 4 run(s), 28/28 subset items scored."
+      "notes": "Real deterministic scores from results/agent.json: 11 run(s), 61/61 subset items scored."
     }
   }
 }

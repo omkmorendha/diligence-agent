@@ -1,2 +1,2 @@
-HEAD: 502a4c539bf1535939e434675a1d5d5bd8db65c1
-label: iter1 rescored v3 golds
+HEAD: 1d8bf90ae98e764b6ed8d8e8bc5e1ca82b3502bc
+label: iter1 rescored final-scorer v4

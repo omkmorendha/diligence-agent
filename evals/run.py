@@ -218,7 +218,11 @@ def _run_judges_over(
                 attempted[criterion] += 1
                 s = verdict.get("score")
                 row_scores[criterion] = s
-                row_rationale[criterion] = verdict.get("justification")
+                row_rationale[criterion] = (
+                    f"judge_error: {verdict.get('judge_error')}"
+                    if s is None and verdict.get("judge_error")
+                    else verdict.get("justification")
+                )
                 if s is not None:
                     scores[criterion].append(s)
             item_rows.append(

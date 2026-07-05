@@ -25,7 +25,7 @@ verbatim-citation gate guarantees a claimed number appears in its citation, so t
 The redesign restores signal by scoring period/entity relevance (not just presence) and
 by failing hollow abstentions.
 
-Calibration gate (spec section 21), two fixture classes with distinct ceilings:
+Calibration gate (spec section 21), three fixture classes with distinct bounds:
 
     evals/fixtures/corrupted_swapped_citation/       (citation swapped to an unrelated
                                                        passage) -> assert groundedness<=2
@@ -33,12 +33,15 @@ Calibration gate (spec section 21), two fixture classes with distinct ceilings:
     evals/judge_fixtures/period_mismatch_wrong_year/ (well-cited number but WRONG fiscal
                                                        year -- the operating-region
                                                        hard-negative) -> assert <=3
+    evals/judge_fixtures/long_multiclaim_grounded/   (long, correct, multi-claim answer
+                                                       used as a truncation guard)
+                                                     -> assert groundedness>=3
 
-Run judges against all three, assert they score groundedness at/below each ceiling, and
+Run judges against all fixture groups, assert they satisfy their ceiling or floor, and
 persist results/corrupted_memo_judge.json. If calibration fails, judge scores must not
-be shown as headline metrics (see evals/run.py's --judges integration). The
-period-mismatch fixture lives under evals/judge_fixtures/ (NOT evals/fixtures/) so the
-deterministic score_fixtures() gate cannot discover it and the 8/8 count is untouched.
+be shown as headline metrics (see evals/run.py's --judges integration). The judge-only
+fixtures live under evals/judge_fixtures/ (NOT evals/fixtures/) so the deterministic
+score_fixtures() gate cannot discover them and the 8/8 count is untouched.
 
 Usage:
     uv run --project backend evals/judges.py --calibrate
@@ -64,7 +67,7 @@ from llm_json import call_json_with_retry  # noqa: E402
 
 from scorers import FIXTURES_DIR  # noqa: E402
 
-# Two classes of calibration fixture, each with its own groundedness ceiling:
+# Three classes of calibration fixture, each with its own groundedness bound:
 #
 #   (1) Egregious corruption (swapped/injected) -- the citation is topically unrelated
 #       to the claim it backs, so a working judge must floor it. Threshold <= 2. These
@@ -77,6 +80,9 @@ from scorers import FIXTURES_DIR  # noqa: E402
 #       real blind spot. A working judge must score it <= 3 (period-mismatch anchor).
 #       It lives in evals/judge_fixtures/ (NOT evals/fixtures/) so it can never be
 #       discovered by score_fixtures() and can never perturb the deterministic count.
+#   (3) Long, correct multi-claim fixture (IMP3-3): the judge must return a valid
+#       groundedness score at or above LONG_CALIBRATION_GROUNDEDNESS_MIN. This is a
+#       floor-based truncation guard, not a corrupted-answer ceiling.
 CALIBRATION_FIXTURES = ("corrupted_swapped_citation", "corrupted_wrong_number")
 CALIBRATION_GROUNDEDNESS_MAX = 2  # spec: "assert judges score it low" (scale 1-5, 3=partial)
 
@@ -288,6 +294,14 @@ def _passages_block(cited_passages: list[str]) -> str:
     return "\n".join(f"[{i}] {p}" for i, p in enumerate(cited_passages, 1))
 
 
+def _compact_passages(cited_passages: list[str], max_chars: int = 1200) -> list[str]:
+    compacted: list[str] = []
+    for passage in cited_passages:
+        text = passage if len(passage) <= max_chars else passage[:max_chars] + "..."
+        compacted.append(text)
+    return compacted
+
+
 def _tool_outputs_block(tool_outputs: Optional[list[dict[str, Any]]]) -> str:
     if not tool_outputs:
         return "(no tool outputs)"
@@ -330,10 +344,38 @@ Score groundedness now. Respond with the JSON object only."""
     # flag. LIVE-PROVEN: adobe_01 returned empty at 4000/8000 but valid JSON (score 3) at
     # 16000. 16384 is that empirical threshold rounded to a power-of-two boundary.
     obj, error = call_json_with_retry(
-        messages, _validate_judge_output, max_tokens=16384, reasoning_effort=config.LLM_REASONING_EFFORT
+        messages, _validate_judge_output, max_tokens=16384, reasoning_effort=config.LLM_REASONING_EFFORT, model=config.JUDGE_MODEL
     )
     if obj is not None:
         return {"criterion": "groundedness", "score": obj["score"], "justification": obj["justification"]}
+
+    # Fallback for answered items whose full evidence block triggered truncation or
+    # malformed output: keep the same rubric, but compact the cited passages so the
+    # per-item audit does not lose groundedness unless both attempts fail.
+    compact_prompt = f"""MEMO ITEM:
+{_memo_item_summary(memo_item)}
+
+COMPACT CITED PASSAGES:
+{_passages_block(_compact_passages(cited_passages))}
+
+TOOL OUTPUTS:
+{_tool_outputs_block(tool_outputs)}
+
+Score groundedness now. Respond with the JSON object only."""
+    compact_messages = [
+        {"role": "system", "content": GROUNDEDNESS_SYSTEM_PROMPT},
+        {"role": "user", "content": compact_prompt},
+    ]
+    compact_obj, compact_error = call_json_with_retry(
+        compact_messages, _validate_judge_output, max_tokens=16384, reasoning_effort=config.LLM_REASONING_EFFORT, model=config.JUDGE_MODEL
+    )
+    if compact_obj is not None:
+        return {
+            "criterion": "groundedness",
+            "score": compact_obj["score"],
+            "justification": compact_obj["justification"],
+        }
+    error = f"{error}; compact_retry: {compact_error}"
     return {"criterion": "groundedness", "score": None, "justification": None, "judge_error": error}
 
 
@@ -354,7 +396,7 @@ Score actionability now. Respond with the JSON object only."""
     # nulled ~52% of actionability scores (the null bias re-inflates the mean). Raise to the
     # empirically-reliable 16384 so the judge returns real JSON instead of erroring.
     obj, error = call_json_with_retry(
-        messages, _validate_judge_output, max_tokens=16384, reasoning_effort=config.LLM_REASONING_EFFORT
+        messages, _validate_judge_output, max_tokens=16384, reasoning_effort=config.LLM_REASONING_EFFORT, model=config.JUDGE_MODEL
     )
     if obj is not None:
         return {"criterion": "actionability", "score": obj["score"], "justification": obj["justification"]}
@@ -393,7 +435,7 @@ Score agreement now. Respond with the JSON object only."""
     # max_tokens=16384 (IMP3-3): same hidden-reasoning-channel overflow as the other two
     # criteria -- keep the cap high so a long gold/memo pair returns real JSON, not ''.
     obj, error = call_json_with_retry(
-        messages, _validate_judge_output, max_tokens=16384, reasoning_effort=config.LLM_REASONING_EFFORT
+        messages, _validate_judge_output, max_tokens=16384, reasoning_effort=config.LLM_REASONING_EFFORT, model=config.JUDGE_MODEL
     )
     if obj is not None:
         return {"criterion": "gold_agreement", "score": obj["score"], "justification": obj["justification"]}

@@ -77,6 +77,7 @@ def _record_usage(
     has_tools: bool,
     n_messages: int,
     error: Optional[str] = None,
+    model: Optional[str] = None,
 ) -> None:
     if _usage_sink is None:
         return
@@ -84,7 +85,7 @@ def _record_usage(
     record: dict[str, Any] = {
         "ts": datetime.now(timezone.utc).isoformat(),
         "duration_s": round(time.monotonic() - started_monotonic, 4),
-        "model": config.LLM_MODEL,
+        "model": model or config.LLM_MODEL,
         "stream": stream,
         "json_mode": json_mode,
         "has_tools": has_tools,
@@ -111,6 +112,7 @@ def chat(
     max_tokens: int = config.LLM_MAX_TOKENS,
     seed: int = config.LLM_SEED,
     reasoning_effort: Optional[str] = None,
+    model: Optional[str] = None,
 ) -> Any:
     """Send a chat completion. Returns the raw OpenAI response (or a stream iterator).
 
@@ -127,7 +129,9 @@ def chat(
       parameter.
     """
     kwargs: dict[str, Any] = {
-        "model": config.LLM_MODEL,
+        # `model` overrides for auxiliary calls (e.g. the cheaper judge model);
+        # the agent/baseline always use the configured LLM_MODEL.
+        "model": model or config.LLM_MODEL,
         "messages": messages,
         "temperature": temperature,
         "max_tokens": max_tokens,
@@ -149,13 +153,13 @@ def chat(
         _record_usage(
             started, None, stream=stream, json_mode=json_mode,
             has_tools=bool(tools), n_messages=len(messages),
-            error=f"{type(exc).__name__}: {exc}",
+            error=f"{type(exc).__name__}: {exc}", model=model,
         )
         raise
     # Streaming responses carry no usage object; record latency-to-create only.
     _record_usage(
         started, None if stream else response, stream=stream, json_mode=json_mode,
-        has_tools=bool(tools), n_messages=len(messages),
+        has_tools=bool(tools), n_messages=len(messages), model=model,
     )
     return response
 

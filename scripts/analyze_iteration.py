@@ -96,7 +96,7 @@ def _percentile(values: list[float], pct: float) -> Optional[float]:
     if not values:
         return None
     ordered = sorted(values)
-    idx = min(len(ordered) - 1, max(0, int(round(pct / 100 * (len(ordered) - 1)))))
+    idx = min(len(ordered) - 1, max(0, round(pct / 100 * (len(ordered) - 1))))
     return round(ordered[idx], 2)
 
 
@@ -105,14 +105,16 @@ def analyze(iteration: int, runs_dir: Path, scores_path: Path, subset_path: Path
     score_rows = json.loads(scores_path.read_text()) if scores_path.exists() else []
     scores_by_item: dict[str, dict[str, Any]] = {r["item_id"]: r for r in score_rows if r.get("item_id")}
 
-    run_dirs = sorted(d for d in runs_dir.iterdir() if d.is_dir() and (d / "trace.jsonl").exists())
+    run_dirs = sorted(
+        d for d in runs_dir.iterdir() if d.is_dir() and (d / "trace.jsonl").exists() and (d / "memo.json").exists()
+    )
     per_item: list[dict[str, Any]] = []
     per_run: list[dict[str, Any]] = []
 
     for run_dir in run_dirs:
         events = _read_jsonl(run_dir / "trace.jsonl")
         llm_calls = _read_jsonl(run_dir / "llm_calls.jsonl")
-        memo = json.loads((run_dir / "memo.json").read_text()) if (run_dir / "memo.json").exists() else {"items": []}
+        memo = json.loads((run_dir / "memo.json").read_text())
 
         run_t0 = _ts(events[0]["ts"]) if events else None
         run_t1 = _ts(events[-1]["ts"]) if events else None

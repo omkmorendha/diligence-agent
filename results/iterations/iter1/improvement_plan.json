@@ -312,16 +312,6 @@
           "suggested_fix": "On citation rejection, emit the attempted quote, chunk_id, and a normalized diff into the error event payload for future iterations."
         }
       ]
-    },
-    {
-      "summary": "test",
-      "findings": [
-        {
-          "title": "t",
-          "evidence": "e",
-          "severity": "high"
-        }
-      ]
     }
   ]
 }
