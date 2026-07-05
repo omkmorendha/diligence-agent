@@ -129,6 +129,24 @@ def test_trace_emit_is_concurrency_safe(tmp_path, monkeypatch):
     assert seqs == list(range(1, total + 1))
 
 
+def test_trace_writer_continues_existing_sequence(tmp_path, monkeypatch):
+    monkeypatch.setattr(config, "RUNS_DIR", tmp_path)
+    trace_dir = tmp_path / "review_rerun"
+    trace_dir.mkdir()
+    existing = [
+        {"schema_version": "0.1", "run_id": "review_rerun", "seq": 1, "ts": "t", "type": "plan", "title": "old"},
+        {"schema_version": "0.1", "run_id": "review_rerun", "seq": 2, "ts": "t", "type": "verdict", "title": "old"},
+    ]
+    (trace_dir / "trace.jsonl").write_text("\n".join(json.dumps(row) for row in existing) + "\n")
+
+    trace = TraceWriter(run_id="review_rerun")
+    event = trace.emit("plan", "full review started")
+
+    assert event.seq == 3
+    lines = (trace_dir / "trace.jsonl").read_text().splitlines()
+    assert [json.loads(line)["seq"] for line in lines] == [1, 2, 3]
+
+
 def test_clear_call_context_resets_run_and_call_state(fake_llm):
     llm.set_run_context(run_id="r1", system="agent")
     llm.set_call_context(purpose="plan", item_id="c1")

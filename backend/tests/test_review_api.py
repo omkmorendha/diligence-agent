@@ -288,6 +288,63 @@ def test_run_review_chains_mocked_stages(tmp_path, monkeypatch) -> None:
     assert calls == ["parse", ("extract", True), "scope", ("verify", ["c01"], rr.config.REVIEW_WORKERS), "annotate", "html"]
 
 
+def test_full_review_does_not_reuse_stale_pilot_result_for_changed_claim(tmp_path, monkeypatch) -> None:
+    rr = importlib.import_module("app.review.run_review")
+    monkeypatch.setattr(rr.config, "REVIEWS_DIR", tmp_path / "reviews")
+    review_dir = tmp_path / "reviews" / "review_test"
+    review_dir.mkdir(parents=True)
+    upload = tmp_path / "memo.md"
+    upload.write_text("PepsiCo revenue increased in FY2022.\n")
+    old_claim = _claim(status="VERIFIED")
+    old_claim.quote = "PepsiCo reported $600 million in restructuring costs."
+    old_report = ReviewReport(
+        review_id="review_test",
+        filename="upload.md",
+        format="md",
+        company_scope=["PepsiCo"],
+        summary=ReviewSummary(total_claims=1, supported=1),
+        claims=[ReviewReportClaim(claim=old_claim, result=_supported_result())],
+    )
+    (review_dir / "report.json").write_text(json.dumps(old_report.model_dump(mode="json"), indent=2))
+
+    docmodel = DocModel(
+        doc_id="upload",
+        format="md",
+        filename="upload.md",
+        canonical_text="PepsiCo revenue increased in FY2022.",
+        blocks=[],
+    )
+    new_claim = _claim(status="PENDING")
+    new_claim.quote = "PepsiCo revenue increased in FY2022."
+    verified_result = VerificationResult(
+        claim_id="c01",
+        verdict="CONTRADICTED",
+        explanation="Fresh full verification ran.",
+        confidence="high",
+    )
+    calls = []
+
+    monkeypatch.setattr(rr, "parse_document", lambda path: docmodel)
+    monkeypatch.setattr(rr, "extract_claims", lambda model, pilot, trace=None: [new_claim])
+    monkeypatch.setattr(rr, "scope_check", lambda claims: claims)
+    monkeypatch.setattr(rr, "corpus_registry", lambda: {})
+    monkeypatch.setattr(rr, "scope_verdict", lambda claim, reg=None: (None, ""))
+    monkeypatch.setattr(rr, "out_of_scope_fraction", lambda claims: 0.0)
+
+    def fake_verify(review_id: str, claims: list[Claim], trace, workers: int):
+        calls.append(("verify", [claim.quote for claim in claims]))
+        return [verified_result]
+
+    monkeypatch.setattr(rr, "verify_claims", fake_verify)
+    monkeypatch.setitem(rr._ANNOTATORS, "md", lambda src, report, out: Path(out).write_text("annotated"))
+    monkeypatch.setattr(rr, "render_report_html", lambda report, model: "<html>ok</html>")
+
+    report = rr.run_review("review_test", upload, pilot=False)
+
+    assert calls == [("verify", ["PepsiCo revenue increased in FY2022."])]
+    assert report.claims[0].result.verdict == "CONTRADICTED"
+
+
 def test_run_review_fail_fast_out_of_scope(tmp_path, monkeypatch) -> None:
     rr = importlib.import_module("app.review.run_review")
     monkeypatch.setattr(rr.config, "REVIEWS_DIR", tmp_path / "reviews")

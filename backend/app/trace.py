@@ -40,13 +40,30 @@ class TraceWriter:
 
     def __init__(self, run_id: str, run_dir: Optional[str | Path] = None) -> None:
         self.run_id = run_id
-        self._seq = 0
         self._lock = threading.Lock()
         self.events: list[TraceEvent] = []
         self.sse_queue: "queue.Queue[Optional[TraceEvent]]" = queue.Queue()
         self.run_dir = Path(run_dir) if run_dir is not None else config.RUNS_DIR / run_id
         self.run_dir.mkdir(parents=True, exist_ok=True)
         self.trace_path = self.run_dir / "trace.jsonl"
+        self._seq = self._last_persisted_seq()
+
+    def _last_persisted_seq(self) -> int:
+        """Continue seq when appending to an existing trace, e.g. full promotion."""
+        if not self.trace_path.exists():
+            return 0
+        last_seq = 0
+        for line in self.trace_path.read_text().splitlines():
+            if not line.strip():
+                continue
+            try:
+                raw = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            seq = raw.get("seq")
+            if isinstance(seq, int) and seq > last_seq:
+                last_seq = seq
+        return last_seq
 
     def emit(
         self,

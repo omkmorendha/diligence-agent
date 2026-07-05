@@ -137,9 +137,25 @@ def _scope_results(claims, trace: TraceWriter):
     return scoped, results
 
 
+def _claim_reuse_key(claim) -> tuple[str, str, str, str, str, str]:
+    """Stable key for safely reusing pilot results across a full promotion.
+
+    Extraction is re-run for full reviews, and claim IDs are assigned by extraction
+    order. Reuse only when the material claim identity matches, not merely `c01`.
+    """
+    return (
+        claim.quote,
+        claim.question,
+        claim.company,
+        claim.period or "",
+        claim.metric or "",
+        claim.claim_type,
+    )
+
+
 def _load_existing_results(review_dir: Path):
     """Load prior pilot results when a review is promoted to full mode."""
-    from ..schemas import VerificationResult
+    from ..schemas import Claim, VerificationResult
 
     path = review_dir / "report.json"
     if not path.exists():
@@ -150,14 +166,16 @@ def _load_existing_results(review_dir: Path):
         return {}
     results = {}
     for row in report.get("claims", []):
+        claim = row.get("claim") if isinstance(row, dict) else None
         result = row.get("result") if isinstance(row, dict) else None
-        if not isinstance(result, dict) or not result.get("claim_id"):
+        if not isinstance(claim, dict) or not isinstance(result, dict) or not result.get("claim_id"):
             continue
         try:
+            parsed_claim = Claim.model_validate(claim)
             parsed = VerificationResult.model_validate(result)
         except ValueError:
             continue
-        results[parsed.claim_id] = parsed
+        results[_claim_reuse_key(parsed_claim)] = parsed
     return results
 
 
@@ -248,9 +266,9 @@ def run_review(review_id: str, upload_path: str | Path, pilot: bool) -> ReviewRe
                 prior_results = _load_existing_results(review_dir)
                 reused = []
                 for claim in claims:
-                    result = prior_results.get(claim.claim_id)
+                    result = prior_results.get(_claim_reuse_key(claim))
                     if claim.status == "PENDING" and result is not None:
-                        reused.append(result)
+                        reused.append(result.model_copy(update={"claim_id": claim.claim_id}))
                 if reused:
                     results.extend(reused)
                     _mark_verified(claims, reused, trace)
@@ -275,6 +293,7 @@ def run_review(review_id: str, upload_path: str | Path, pilot: bool) -> ReviewRe
         (review_dir / "report.html").write_text(html)
 
         completed_at = _now_iso()
+        trace.emit("verdict", "review completed", payload={"status": status})
         _write_meta(
             review_id,
             status=status,
@@ -284,15 +303,14 @@ def run_review(review_id: str, upload_path: str | Path, pilot: bool) -> ReviewRe
             annotated=annotated.name,
             summary=report.summary.model_dump(mode="json"),
         )
-        trace.emit("verdict", "review completed", payload={"status": status})
         return report
     except Exception as exc:
         completed_at = _now_iso()
-        _write_meta(review_id, status="failed", pilot=pilot, completed_at=completed_at, error=str(exc))
         try:
             trace.emit("error", "review failed", detail=str(exc))
         except Exception:
             pass
+        _write_meta(review_id, status="failed", pilot=pilot, completed_at=completed_at, error=str(exc))
         raise
     finally:
         llm.set_usage_sink(None)

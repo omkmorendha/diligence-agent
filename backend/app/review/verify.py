@@ -102,7 +102,10 @@ def verify_claims(
             future.cancel()
             _mark_error(trace, claim, TimeoutError(f"review {review_id} exceeded {timeout_s:g}s wall-clock cap"))
     finally:
-        executor.shutdown(wait=False, cancel_futures=True)
+        # Python cannot kill already-running worker threads. Wait for them before
+        # returning so the caller does not clear run-scoped LLM context while a
+        # verification agent is still inside the v0 item loop.
+        executor.shutdown(wait=True, cancel_futures=True)
 
     return _ordered_results(claims, results_by_claim)
 

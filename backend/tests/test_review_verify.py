@@ -6,6 +6,7 @@ fan-out behavior without touching a real LLM endpoint.
 
 from __future__ import annotations
 
+import time
 from types import SimpleNamespace
 
 from app import config
@@ -206,3 +207,30 @@ def test_agent_failure_marks_claim_error_without_sinking_review(monkeypatch) -> 
     assert good.status == "VERIFIED"
     error_event = next(e for e in trace.events if e.type == "claim_verdict" and e.item_id == "bad")
     assert error_event.payload["status"] == "ERROR"
+
+
+def test_timeout_waits_for_running_worker_before_returning(monkeypatch) -> None:
+    trace = FakeTrace()
+    claim = _claim()
+    monkeypatch.setattr(verify_module.registry, "corpus_registry", _registry)
+    monkeypatch.setattr(config, "REVIEW_TIMEOUT_S", 0.01)
+
+    def slow_agent(trace_arg, company, visible, **kwargs):
+        time.sleep(0.05)
+        return ItemAnswer(
+            item_id=visible.item_id,
+            question=visible.question,
+            answer="PepsiCo reported $600 million.",
+            value=600.0,
+            unit="USD millions",
+        )
+
+    monkeypatch.setattr(verify_module.agent, "run_agent_item", slow_agent)
+
+    started = time.monotonic()
+    results = verify_claims("review_timeout", [claim], trace, workers=1)
+    elapsed = time.monotonic() - started
+
+    assert results == []
+    assert claim.status == "ERROR"
+    assert elapsed >= 0.05
