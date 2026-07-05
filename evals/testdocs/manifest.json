@@ -1,0 +1,265 @@
+{
+  "schema_version": 1,
+  "description": "Ground truth for the DiliAgent v1 seeded-error test documents. Each claim_text appears verbatim in its document. expected_verdict is what a correct review pipeline should report.",
+  "generator": "scripts/make_testdocs.py",
+  "source_dataset": "data/subset.json",
+  "totals": {
+    "accurate": 11,
+    "corrupted": 10,
+    "fabricated": 4
+  },
+  "documents": [
+    {
+      "doc_id": "pepsico_memo",
+      "filename": "pepsico_memo.pdf",
+      "format": "pdf",
+      "company": "PepsiCo",
+      "title": "Project Cola — Draft Diligence Memo (PepsiCo, Inc.)",
+      "claims": [
+        {
+          "claim_id": "pep_c01",
+          "item_id": "pepsico_03",
+          "seeded_status": "accurate",
+          "expected_verdict": "SUPPORTED",
+          "claim_text": "PepsiCo primarily operates across North America, Latin America, Europe, Africa, the Middle East, South Asia, Asia Pacific, Australia, New Zealand and China as of FY2022.",
+          "note": "",
+          "section": "Overview"
+        },
+        {
+          "claim_id": "pep_c02",
+          "item_id": "pepsico_01",
+          "seeded_status": "corrupted",
+          "expected_verdict": "CONTRADICTED",
+          "claim_text": "On May 26, 2023, PepsiCo increased its unsecured five-year revolving credit agreement by $600 million.",
+          "note": "Gold: the increase was $400 million.",
+          "section": "Credit and Liquidity"
+        },
+        {
+          "claim_id": "pep_c03",
+          "item_id": "pepsico_02",
+          "seeded_status": "accurate",
+          "expected_verdict": "SUPPORTED",
+          "claim_text": "As of May 26, 2023, PepsiCo may borrow a total of $8.4 billion under its unsecured revolving credit agreements.",
+          "note": "",
+          "section": "Credit and Liquidity"
+        },
+        {
+          "claim_id": "pep_c04",
+          "item_id": "pepsico_04",
+          "seeded_status": "corrupted",
+          "expected_verdict": "CONTRADICTED",
+          "claim_text": "In Q1 FY2023, management raised full-year guidance for core constant currency EPS growth by 2 percentage points.",
+          "note": "Gold: guidance was raised by 1 percentage point.",
+          "section": "Earnings and Guidance"
+        },
+        {
+          "claim_id": "pep_c05",
+          "item_id": "pepsico_07",
+          "seeded_status": "accurate",
+          "expected_verdict": "SUPPORTED",
+          "claim_text": "The guidance raise reflected a strong start to FY2023.",
+          "note": "",
+          "section": "Earnings and Guidance"
+        },
+        {
+          "claim_id": "pep_c06",
+          "item_id": "pepsico_05",
+          "seeded_status": "corrupted",
+          "expected_verdict": "CONTRADICTED",
+          "claim_text": "FY2022 unadjusted EBITDA less capital expenditures was approximately $10,342 million, defining unadjusted EBITDA as unadjusted operating income plus depreciation and amortization from the cash flow statement.",
+          "note": "Gold: $9,068 million.",
+          "section": "Earnings and Guidance"
+        },
+        {
+          "claim_id": "pep_c07",
+          "item_id": "pepsico_06",
+          "seeded_status": "accurate",
+          "expected_verdict": "SUPPORTED",
+          "claim_text": "Restructuring costs outlined in the FY2022 income statement amounted to $411 million.",
+          "note": "",
+          "section": "Cost Structure"
+        },
+        {
+          "claim_id": "pep_c08",
+          "item_id": "pepsico_08",
+          "seeded_status": "corrupted",
+          "expected_verdict": "CONTRADICTED",
+          "claim_text": "At the AGM held on May 3, 2023, the shareholder proposal for a congruency report on net-zero emissions policies was approved by shareholders.",
+          "note": "Gold: the proposal was defeated.",
+          "section": "Governance and Workforce"
+        },
+        {
+          "claim_id": "pep_c09",
+          "item_id": null,
+          "seeded_status": "fabricated",
+          "expected_verdict": "NOT_IN_CORPUS",
+          "claim_text": "PepsiCo's global employee attrition rate improved to 6.1% in FY2022.",
+          "note": "Attrition rate is not disclosed in the corpus filings.",
+          "section": "Governance and Workforce"
+        },
+        {
+          "claim_id": "pep_c10",
+          "item_id": null,
+          "seeded_status": "fabricated",
+          "expected_verdict": "NOT_IN_CORPUS",
+          "claim_text": "PepsiCo repurchased $12.5 billion of common shares during FY2024.",
+          "note": "The corpus contains no FY2024 filings; unverifiable by design.",
+          "section": "Capital Return"
+        }
+      ]
+    },
+    {
+      "doc_id": "boeing_memo",
+      "filename": "boeing_memo.docx",
+      "format": "docx",
+      "company": "Boeing",
+      "title": "Project Skyline — Draft Diligence Memo (The Boeing Company)",
+      "claims": [
+        {
+          "claim_id": "ba_c01",
+          "item_id": "boeing_01",
+          "seeded_status": "accurate",
+          "expected_verdict": "SUPPORTED",
+          "claim_text": "Three categories each represented more than 20% of Boeing's FY2022 revenue: Commercial Airplanes at 39%, Defense at 35%, and Services at 26% of total revenue.",
+          "note": "",
+          "section": "Revenue Mix"
+        },
+        {
+          "claim_id": "ba_c02",
+          "item_id": "boeing_07",
+          "seeded_status": "accurate",
+          "expected_verdict": "SUPPORTED",
+          "claim_text": "Boeing's primary customers are a limited number of commercial airlines and the US government, with the US government accounting for 40% of total revenues in FY2022.",
+          "note": "",
+          "section": "Revenue Mix"
+        },
+        {
+          "claim_id": "ba_c03",
+          "item_id": "boeing_02",
+          "seeded_status": "corrupted",
+          "expected_verdict": "CONTRADICTED",
+          "claim_text": "Boeing's gross margin profile deteriorated in FY2022, with gross margin falling from 5.3% in FY2021 to 4.8% in FY2022.",
+          "note": "Gold: margin improved from 4.8% (FY2021) to 5.3% (FY2022).",
+          "section": "Margins and Tax"
+        },
+        {
+          "claim_id": "ba_c04",
+          "item_id": "boeing_06",
+          "seeded_status": "accurate",
+          "expected_verdict": "SUPPORTED",
+          "claim_text": "The effective tax rate was 0.62% in FY2022, compared with -14.76% in FY2021.",
+          "note": "",
+          "section": "Margins and Tax"
+        },
+        {
+          "claim_id": "ba_c05",
+          "item_id": "boeing_03",
+          "seeded_status": "corrupted",
+          "expected_verdict": "CONTRADICTED",
+          "claim_text": "Year-end FY2018 net property, plant, and equipment stood at $13,645 million.",
+          "note": "Gold: $12,645 million.",
+          "section": "Balance Sheet"
+        },
+        {
+          "claim_id": "ba_c06",
+          "item_id": "boeing_04",
+          "seeded_status": "accurate",
+          "expected_verdict": "SUPPORTED",
+          "claim_text": "Boeing's business remains subject to cyclicality driven by its exposure to the cyclical airline industry.",
+          "note": "",
+          "section": "Outlook and Risk"
+        },
+        {
+          "claim_id": "ba_c07",
+          "item_id": "boeing_05",
+          "seeded_status": "corrupted",
+          "expected_verdict": "CONTRADICTED",
+          "claim_text": "For 2023, Boeing is forecasting production rate cuts for the 737 and 787 programs.",
+          "note": "Gold: production rate increases for the 737, 777X and 787.",
+          "section": "Outlook and Risk"
+        },
+        {
+          "claim_id": "ba_c08",
+          "item_id": null,
+          "seeded_status": "fabricated",
+          "expected_verdict": "NOT_IN_CORPUS",
+          "claim_text": "Boeing's win rate on competitive defense bids was approximately 71% in FY2022.",
+          "note": "Bid win rate is not disclosed in the corpus filings.",
+          "section": "Outlook and Risk"
+        }
+      ]
+    },
+    {
+      "doc_id": "amd_memo",
+      "filename": "amd_memo.md",
+      "format": "markdown",
+      "company": "AMD",
+      "title": "Project Silicon — Draft Diligence Memo (Advanced Micro Devices)",
+      "claims": [
+        {
+          "claim_id": "amd_c01",
+          "item_id": "amd_01",
+          "seeded_status": "corrupted",
+          "expected_verdict": "CONTRADICTED",
+          "claim_text": "AMD's FY2022 quick ratio was 0.91, indicating a strained liquidity position.",
+          "note": "Gold: quick ratio 1.57, healthy liquidity.",
+          "section": "Liquidity"
+        },
+        {
+          "claim_id": "amd_c02",
+          "item_id": "amd_02",
+          "seeded_status": "accurate",
+          "expected_verdict": "SUPPORTED",
+          "claim_text": "Excluding Embedded, the Data Center segment showed the largest proportional sales increase from FY2021 to FY2022.",
+          "note": "",
+          "section": "Segments and Revenue Drivers"
+        },
+        {
+          "claim_id": "amd_c03",
+          "item_id": "amd_05",
+          "seeded_status": "accurate",
+          "expected_verdict": "SUPPORTED",
+          "claim_text": "FY2022 revenue growth was driven by higher EPYC server processor sales, higher semi-custom product sales, and the inclusion of Xilinx embedded product sales.",
+          "note": "",
+          "section": "Segments and Revenue Drivers"
+        },
+        {
+          "claim_id": "amd_c04",
+          "item_id": null,
+          "seeded_status": "fabricated",
+          "expected_verdict": "NOT_IN_CORPUS",
+          "claim_text": "Average selling prices for EPYC processors rose approximately 12% in FY2022.",
+          "note": "EPYC ASP change is not disclosed in the corpus filings.",
+          "section": "Segments and Revenue Drivers"
+        },
+        {
+          "claim_id": "amd_c05",
+          "item_id": "amd_04",
+          "seeded_status": "accurate",
+          "expected_verdict": "SUPPORTED",
+          "claim_text": "AMD reported customer concentration in FY2022, with one customer accounting for 16% of consolidated net revenue.",
+          "note": "",
+          "section": "Customers"
+        },
+        {
+          "claim_id": "amd_c06",
+          "item_id": "amd_03",
+          "seeded_status": "corrupted",
+          "expected_verdict": "CONTRADICTED",
+          "claim_text": "FY2015 depreciation and amortization margin, taking D&A from the cash flow statement as a percentage of revenue, was 7.5%.",
+          "note": "Gold: 4.2%.",
+          "section": "Historical Financials and Cash Flow"
+        },
+        {
+          "claim_id": "amd_c07",
+          "item_id": "amd_06",
+          "seeded_status": "corrupted",
+          "expected_verdict": "CONTRADICTED",
+          "claim_text": "Financing activities brought in the most cash for AMD in FY2022, ahead of operating and investing activities.",
+          "note": "Gold: operating activities brought in the most cash.",
+          "section": "Historical Financials and Cash Flow"
+        }
+      ]
+    }
+  ]
+}
