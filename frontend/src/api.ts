@@ -18,19 +18,39 @@ import type {
   RunStatusResponse,
 } from "./types";
 
+async function parseJsonResponse<T>(res: Response, url: string): Promise<T> {
+  const contentType = res.headers.get("content-type") || "";
+  const text = await res.text();
+  if (!text) {
+    throw new ApiError(res.status, `Empty response from ${url}`);
+  }
+  try {
+    return JSON.parse(text) as T;
+  } catch (exc) {
+    const hint =
+      res.ok && !contentType.includes("application/json")
+        ? " If you are running the Vite dev server, restart it so new API proxy routes are active."
+        : "";
+    throw new ApiError(
+      res.status,
+      `Expected JSON from ${url}, got ${contentType || "an untyped response"}.${hint}`,
+    );
+  }
+}
+
 async function getJson<T>(url: string): Promise<T> {
   const res = await fetch(url);
   if (!res.ok) {
     let detail = res.statusText;
     try {
-      const body = await res.json();
+      const body = await parseJsonResponse<{ detail?: string }>(res, url);
       detail = body.detail ?? detail;
     } catch {
       // response body wasn't JSON; keep statusText
     }
     throw new ApiError(res.status, detail);
   }
-  return res.json() as Promise<T>;
+  return parseJsonResponse<T>(res, url);
 }
 
 export class ApiError extends Error {
