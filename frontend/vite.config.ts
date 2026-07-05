@@ -8,6 +8,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/runs": { target: "http://localhost:8000", changeOrigin: true },
+      "/reviews": { target: "http://localhost:8000", changeOrigin: true },
       "/companies": { target: "http://localhost:8000", changeOrigin: true },
       "/corpus": { target: "http://localhost:8000", changeOrigin: true },
       "/evals": { target: "http://localhost:8000", changeOrigin: true },
