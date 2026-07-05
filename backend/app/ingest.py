@@ -48,6 +48,7 @@ import argparse
 import json
 import re
 import sys
+import threading
 import time
 from datetime import datetime, timezone
 from functools import lru_cache
@@ -61,6 +62,7 @@ from . import config
 # --- chunking parameters (AMBIGUITIES.md section 9: no spec-mandated size) ---
 CHUNK_CHARS = 1000
 CHUNK_OVERLAP = 150
+_EMBED_LOCK = threading.Lock()
 
 # The 7 candidate companies with >=8 usable FinanceBench questions
 # (data/dataset_profile.json -> candidate_companies), spec section 25 Step 10
@@ -194,16 +196,21 @@ def _embedder():
 def embed_texts(texts: list[str]) -> np.ndarray:
     """Embed a batch of texts. Returns an L2-normalized float32 matrix (cosine
     similarity == dot product on these rows)."""
-    if not texts:
-        dim = _embedder().get_sentence_embedding_dimension()
-        return np.zeros((0, dim), dtype=np.float32)
-    vecs = _embedder().encode(
-        texts,
-        batch_size=64,
-        show_progress_bar=False,
-        normalize_embeddings=True,
-        convert_to_numpy=True,
-    )
+    # SentenceTransformer/PyTorch lazy initialization is not fully thread-safe in
+    # the review verifier fan-out path. Serialize access to the shared model; the
+    # expensive filing search/rerank work around it still runs concurrently.
+    with _EMBED_LOCK:
+        embedder = _embedder()
+        if not texts:
+            dim = embedder.get_sentence_embedding_dimension()
+            return np.zeros((0, dim), dtype=np.float32)
+        vecs = embedder.encode(
+            texts,
+            batch_size=64,
+            show_progress_bar=False,
+            normalize_embeddings=True,
+            convert_to_numpy=True,
+        )
     return vecs.astype(np.float32)
 
 

@@ -1,0 +1,711 @@
+{
+  "schema_version": "0.1",
+  "review_id": "demo_pepsico_clean_ui",
+  "filename": "upload.pdf",
+  "format": "pdf",
+  "company_scope": [
+    "PepsiCo"
+  ],
+  "summary": {
+    "total_claims": 10,
+    "supported": 4,
+    "contradicted": 4,
+    "partially_supported": 0,
+    "not_in_corpus": 1,
+    "out_of_scope": 1,
+    "unverifiable": 0,
+    "skipped": 0,
+    "error": 0
+  },
+  "claims": [
+    {
+      "claim": {
+        "claim_id": "c01",
+        "quote": "On May 26, 2023, PepsiCo increased its unsecured five-year revolving credit agreement by $600 million.",
+        "claim_type": "numeric",
+        "company": "PepsiCo",
+        "period": "May 26, 2023",
+        "metric": "increase in unsecured revolving credit agreement",
+        "question": "Did PepsiCo increase its unsecured five-year revolving credit agreement by $600 million on May 26, 2023?",
+        "priority": 1,
+        "status": "VERIFIED",
+        "anchor": {
+          "quote": "On May 26, 2023, PepsiCo increased its unsecured five-year revolving credit agreement by $600 million.",
+          "char_start": 808,
+          "char_end": 910,
+          "page": 1,
+          "para_index": null,
+          "line_start": null
+        }
+      },
+      "result": {
+        "claim_id": "c01",
+        "verdict": "CONTRADICTED",
+        "doc_value": {
+          "value": 600.0,
+          "unit": "USD millions"
+        },
+        "corpus_value": {
+          "value": 400.0,
+          "unit": "USD millions"
+        },
+        "explanation": "The corpus shows the five-year revolving credit agreement increased from $3.8 billion to $4.2 billion, a $400 million increase rather than $600 million.",
+        "citations": [
+          {
+            "citation_id": "citation_001",
+            "claim": "The old five-year credit agreement was $3,800,000,000.",
+            "doc_id": "PEPSICO_2023_8K_dated-2023-05-30",
+            "doc_name": "PEPSICO_2023_8K_dated-2023-05-30",
+            "doc_type": "8k",
+            "filing_period": "FY2023",
+            "pdf_page": 2,
+            "page_label": "2",
+            "chunk_id": "page:PEPSICO_2023_8K_dated-2023-05-30:2",
+            "quote": "Effective May 26, 2023, PepsiCo terminated the $3,800,000,000 five year unsecured revolving credit agreement, dated as of May 27, 2022, among\nPepsiCo, as borrower, the lenders party thereto, and Citibank, N.A., as administrative agent (the \u201c2022 Five Year Credit Agreement\u201d).",
+            "char_start": 2208,
+            "char_end": 2483,
+            "source_event_seq": null
+          },
+          {
+            "citation_id": "citation_002",
+            "claim": "The new five-year credit agreement is $4,200,000,000.",
+            "doc_id": "PEPSICO_2023_8K_dated-2023-05-30",
+            "doc_name": "PEPSICO_2023_8K_dated-2023-05-30",
+            "doc_type": "8k",
+            "filing_period": "FY2023",
+            "pdf_page": 2,
+            "page_label": "2",
+            "chunk_id": "page:PEPSICO_2023_8K_dated-2023-05-30:2",
+            "quote": "On May 26, 2023, PepsiCo entered into a new $4,200,000,000 five year unsecured revolving credit agreement (the \u201c2023 Five Year Credit\nAgreement\u201d) among PepsiCo, as borrower, the lenders party thereto, and Citibank, N.A., as administrative agent.",
+            "char_start": 2597,
+            "char_end": 2842,
+            "source_event_seq": null
+          }
+        ],
+        "calculation": {
+          "expression": "4200 - 3800",
+          "inputs": {
+            "new_commitment": {
+              "value": 4200.0,
+              "unit": "USD millions",
+              "period": "May 26, 2023",
+              "citation_id": "citation_001"
+            },
+            "prior_commitment": {
+              "value": 3800.0,
+              "unit": "USD millions",
+              "period": "May 26, 2023",
+              "citation_id": "citation_002"
+            }
+          },
+          "value": 400.0,
+          "unit": "USD millions",
+          "rounding": "0dp",
+          "steps": null
+        },
+        "queries_tried": [
+          "May 26 2023 unsecured five-year revolving credit agreement increase"
+        ],
+        "confidence": "high"
+      }
+    },
+    {
+      "claim": {
+        "claim_id": "c02",
+        "quote": "As of May 26, 2023, PepsiCo may borrow a total of $8.4 billion under its unsecured revolving credit agreements.",
+        "claim_type": "numeric",
+        "company": "PepsiCo",
+        "period": "May 26, 2023",
+        "metric": "total borrowing capacity under unsecured revolving credit agreements",
+        "question": "As of May 26, 2023, could PepsiCo borrow a total of $8.4 billion under its unsecured revolving credit agreements?",
+        "priority": 1,
+        "status": "VERIFIED",
+        "anchor": {
+          "quote": "As of May 26, 2023, PepsiCo may borrow a total of $8.4 billion under its unsecured revolving credit agreements.",
+          "char_start": 911,
+          "char_end": 1022,
+          "page": 1,
+          "para_index": null,
+          "line_start": null
+        }
+      },
+      "result": {
+        "claim_id": "c02",
+        "verdict": "SUPPORTED",
+        "doc_value": {
+          "value": 8400.0,
+          "unit": "USD millions"
+        },
+        "corpus_value": {
+          "value": 8400.0,
+          "unit": "USD millions"
+        },
+        "explanation": "The corpus supports total borrowing capacity of $8.4 billion: $4.2 billion under the 2023 364-day agreement plus $4.2 billion under the 2023 five-year agreement.",
+        "citations": [
+          {
+            "citation_id": "citation_001",
+            "claim": "The 2023 364-day unsecured revolving credit agreement allows borrowing up to $4.2 billion.",
+            "doc_id": "PEPSICO_2023_8K_dated-2023-05-30",
+            "doc_name": "PEPSICO_2023_8K_dated-2023-05-30",
+            "doc_type": "8k",
+            "filing_period": "FY2023",
+            "pdf_page": 2,
+            "page_label": "2",
+            "chunk_id": "page:PEPSICO_2023_8K_dated-2023-05-30:2",
+            "quote": "On May 26, 2023, PepsiCo entered into a new $4,200,000,000 364 day unsecured revolving credit agreement (the \u201c2023 364 Day Credit\nAgreement\u201d) among PepsiCo, as borrower, the lenders party thereto, and Citibank, N.A., as administrative agent. The 2023 364 Day Credit Agreement\nenables PepsiCo and its borrowing subsidiaries to borrow up to $4,200,000,000 in U.S. Dollars and/or Euros",
+            "char_start": 432,
+            "char_end": 814,
+            "source_event_seq": null
+          },
+          {
+            "citation_id": "citation_002",
+            "claim": "The 2023 five-year unsecured revolving credit agreement allows borrowing up to $4.2 billion.",
+            "doc_id": "PEPSICO_2023_8K_dated-2023-05-30",
+            "doc_name": "PEPSICO_2023_8K_dated-2023-05-30",
+            "doc_type": "8k",
+            "filing_period": "FY2023",
+            "pdf_page": 2,
+            "page_label": "2",
+            "chunk_id": "page:PEPSICO_2023_8K_dated-2023-05-30:2",
+            "quote": "On May 26, 2023, PepsiCo entered into a new $4,200,000,000 five year unsecured revolving credit agreement (the \u201c2023 Five Year Credit\nAgreement\u201d) among PepsiCo, as borrower, the lenders party thereto, and Citibank, N.A., as administrative agent. The 2023 Five Year Credit Agreement\nenables PepsiCo and its borrowing subsidiaries to borrow up to $4,200,000,000 in U.S. Dollars and/or Euros",
+            "char_start": 2597,
+            "char_end": 2985,
+            "source_event_seq": null
+          }
+        ],
+        "calculation": {
+          "expression": "4200 + 4200",
+          "inputs": {
+            "credit_364_day": {
+              "value": 4200.0,
+              "unit": "USD millions",
+              "period": "May 26, 2023",
+              "citation_id": "citation_001"
+            },
+            "credit_five_year": {
+              "value": 4200.0,
+              "unit": "USD millions",
+              "period": "May 26, 2023",
+              "citation_id": "citation_002"
+            }
+          },
+          "value": 8400.0,
+          "unit": "USD millions",
+          "rounding": "0dp",
+          "steps": null
+        },
+        "queries_tried": [
+          "unsecured revolving credit agreements borrowing capacity May 26 2023",
+          "PepsiCo revolving credit agreements total borrowing capacity 2023",
+          "PepsiCo 2023 10K revolving credit agreements total"
+        ],
+        "confidence": "high"
+      }
+    },
+    {
+      "claim": {
+        "claim_id": "c03",
+        "quote": "In Q1 FY2023, management raised full-year guidance for core constant currency EPS growth by 2 percentage points.",
+        "claim_type": "numeric",
+        "company": "PepsiCo",
+        "period": "Q1 FY2023",
+        "metric": "full-year guidance for core constant currency EPS growth increase",
+        "question": "Did PepsiCo management raise full-year guidance for core constant currency EPS growth by 2 percentage points in Q1 FY2023?",
+        "priority": 1,
+        "status": "VERIFIED",
+        "anchor": {
+          "quote": "In Q1 FY2023, management raised full-year guidance for core constant currency EPS growth by 2 percentage points.",
+          "char_start": 1045,
+          "char_end": 1157,
+          "page": 1,
+          "para_index": null,
+          "line_start": null
+        }
+      },
+      "result": {
+        "claim_id": "c03",
+        "verdict": "CONTRADICTED",
+        "doc_value": {
+          "value": 2.0,
+          "unit": "percent"
+        },
+        "corpus_value": {
+          "value": 1.0,
+          "unit": "percent"
+        },
+        "explanation": "The corpus shows core constant currency EPS growth guidance moved from 8% to 9%, a 1 percentage point increase rather than 2 percentage points.",
+        "citations": [
+          {
+            "citation_id": "citation_001",
+            "claim": "The new guidance for core constant currency EPS growth is 9%, previously 8%",
+            "doc_id": "PEPSICO_2023Q1_EARNINGS",
+            "doc_name": "PEPSICO_2023Q1_EARNINGS",
+            "doc_type": "other",
+            "filing_period": "2023Q1",
+            "pdf_page": 3,
+            "page_label": "3",
+            "chunk_id": "page:PEPSICO_2023Q1_EARNINGS:3",
+            "quote": "For fiscal year 2023, the Company now expects to deliver 8 percent organic revenue growth (previously 6 \npercent), and 9 percent core constant currency EPS growth (previously 8 percent).",
+            "char_start": 252,
+            "char_end": 438,
+            "source_event_seq": null
+          },
+          {
+            "citation_id": "citation_002",
+            "claim": "The previous guidance for core constant currency EPS growth was 8%",
+            "doc_id": "PEPSICO_2023Q1_EARNINGS",
+            "doc_name": "PEPSICO_2023Q1_EARNINGS",
+            "doc_type": "other",
+            "filing_period": "2023Q1",
+            "pdf_page": 3,
+            "page_label": "3",
+            "chunk_id": "page:PEPSICO_2023Q1_EARNINGS:3",
+            "quote": "For fiscal year 2023, the Company now expects to deliver 8 percent organic revenue growth (previously 6 \npercent), and 9 percent core constant currency EPS growth (previously 8 percent).",
+            "char_start": 252,
+            "char_end": 438,
+            "source_event_seq": null
+          }
+        ],
+        "calculation": {
+          "expression": "9 - 8",
+          "inputs": {
+            "new_guidance": {
+              "value": 9.0,
+              "unit": "percent",
+              "period": "Q1 FY2023",
+              "citation_id": "citation_001"
+            },
+            "previous_guidance": {
+              "value": 8.0,
+              "unit": "percent",
+              "period": "Q1 FY2023",
+              "citation_id": "citation_002"
+            }
+          },
+          "value": 1.0,
+          "unit": "percent",
+          "rounding": "0dp",
+          "steps": null
+        },
+        "queries_tried": [
+          "Q1 2023 guidance core constant currency EPS growth raised"
+        ],
+        "confidence": "high"
+      }
+    },
+    {
+      "claim": {
+        "claim_id": "c04",
+        "quote": "FY2022 unadjusted EBITDA less capital expenditures was approximately $10,342 million, defining unadjusted EBITDA as unadjusted operating income plus depreciation and amortization from the cash flow statement.",
+        "claim_type": "numeric",
+        "company": "PepsiCo",
+        "period": "FY2022",
+        "metric": "unadjusted EBITDA less capital expenditures",
+        "question": "Was PepsiCo's FY2022 unadjusted EBITDA less capital expenditures approximately $10,342 million?",
+        "priority": 1,
+        "status": "VERIFIED",
+        "anchor": {
+          "quote": "FY2022 unadjusted EBITDA less capital expenditures was approximately $10,342 million, defining unadjusted EBITDA as unadjusted operating income plus depreciation and amortization from the cash flow statement.",
+          "char_start": 1213,
+          "char_end": 1421,
+          "page": 1,
+          "para_index": null,
+          "line_start": null
+        }
+      },
+      "result": {
+        "claim_id": "c04",
+        "verdict": "CONTRADICTED",
+        "doc_value": {
+          "value": 10342.0,
+          "unit": "USD millions"
+        },
+        "corpus_value": {
+          "value": 9068.0,
+          "unit": "USD millions"
+        },
+        "explanation": "Using the FY2022 income statement and cash-flow statement, unadjusted EBITDA less capital expenditures is $9,068 million: operating profit of $11,512 million plus depreciation and amortization of $2,763 million less capital spending of $5,207 million.",
+        "citations": [
+          {
+            "citation_id": "citation_001",
+            "claim": "FY2022 operating profit was $11,512 million.",
+            "doc_id": "PEPSICO_2022_10K",
+            "doc_name": "PEPSICO_2022_10K",
+            "doc_type": "10k",
+            "filing_period": "FY2022",
+            "pdf_page": 62,
+            "page_label": "62",
+            "chunk_id": "page:PEPSICO_2022_10K:62",
+            "quote": "Operating Profit $ 11,512",
+            "char_start": 0,
+            "char_end": 25,
+            "source_event_seq": null
+          },
+          {
+            "citation_id": "citation_002",
+            "claim": "FY2022 depreciation and amortization was $2,763 million and capital spending was $5,207 million.",
+            "doc_id": "PEPSICO_2022_10K",
+            "doc_name": "PEPSICO_2022_10K",
+            "doc_type": "10k",
+            "filing_period": "FY2022",
+            "pdf_page": 64,
+            "page_label": "64",
+            "chunk_id": "page:PEPSICO_2022_10K:64",
+            "quote": "Depreciation and amortization 2,763; Capital spending 5,207",
+            "char_start": 0,
+            "char_end": 63,
+            "source_event_seq": null
+          }
+        ],
+        "calculation": {
+          "expression": "11512 + 2763 - 5207",
+          "inputs": {
+            "operating_profit": {
+              "value": 11512.0,
+              "unit": "USD millions",
+              "period": "FY2022",
+              "citation_id": "citation_001"
+            },
+            "depreciation_and_amortization": {
+              "value": 2763.0,
+              "unit": "USD millions",
+              "period": "FY2022",
+              "citation_id": "citation_002"
+            },
+            "capital_spending": {
+              "value": 5207.0,
+              "unit": "USD millions",
+              "period": "FY2022",
+              "citation_id": "citation_002"
+            }
+          },
+          "value": 9068.0,
+          "unit": "USD millions",
+          "rounding": "0dp",
+          "steps": null
+        },
+        "queries_tried": [
+          "PepsiCo FY2022 operating income depreciation amortization capital expenditures",
+          "PepsiCo 2022 operating income income statement",
+          "unadjusted operating income PepsiCo 2022",
+          "PepsiCo 2022 non-GAAP adjusted operating income core operating income",
+          "PepsiCo 2022 core operating profit non-GAAP reconciliation items affecting comparability",
+          "EBITDA PepsiCo 2022",
+          "PepsiCo 2022 capital expenditures property plant and equipment additions",
+          "PepsiCo 2022 free cash flow capital spending"
+        ],
+        "confidence": "high"
+      }
+    },
+    {
+      "claim": {
+        "claim_id": "c05",
+        "quote": "Restructuring costs outlined in the FY2022 income statement amounted to $411 million.",
+        "claim_type": "numeric",
+        "company": "PepsiCo",
+        "period": "FY2022",
+        "metric": "restructuring costs",
+        "question": "Were PepsiCo's restructuring costs in the FY2022 income statement $411 million?",
+        "priority": 1,
+        "status": "VERIFIED",
+        "anchor": {
+          "quote": "Restructuring costs outlined in the FY2022 income statement amounted to $411 million.",
+          "char_start": 1503,
+          "char_end": 1588,
+          "page": 1,
+          "para_index": null,
+          "line_start": null
+        }
+      },
+      "result": {
+        "claim_id": "c05",
+        "verdict": "SUPPORTED",
+        "doc_value": {
+          "value": 411.0,
+          "unit": "USD millions"
+        },
+        "corpus_value": {
+          "value": 411.0,
+          "unit": "USD millions"
+        },
+        "explanation": "The FY2022 10-K discloses total restructuring and impairment charges of $411 million.",
+        "citations": [
+          {
+            "citation_id": "citation_001",
+            "claim": "PepsiCo's total restructuring and impairment charges for FY2022 were $411 million as disclosed in Note 3 to the financial statements.",
+            "doc_id": "PEPSICO_2022_10K",
+            "doc_name": "PEPSICO_2022_10K",
+            "doc_type": "10k",
+            "filing_period": "FY2022",
+            "pdf_page": 78,
+            "page_label": "78",
+            "chunk_id": "page:PEPSICO_2022_10K:78",
+            "quote": "Total restructuring and impairment charges\n$\n411",
+            "char_start": 2599,
+            "char_end": 2647,
+            "source_event_seq": null
+          }
+        ],
+        "calculation": null,
+        "queries_tried": [
+          "PepsiCo restructuring costs FY2022 income statement",
+          "PepsiCo 2022 consolidated statement of income restructuring",
+          "PepsiCo 2022 consolidated statement of income",
+          "Consolidated Statement of Income PepsiCo 2022 2021 2020"
+        ],
+        "confidence": "high"
+      }
+    },
+    {
+      "claim": {
+        "claim_id": "c06",
+        "quote": "PepsiCo's global employee attrition rate improved to 6.1% in FY2022.",
+        "claim_type": "numeric",
+        "company": "PepsiCo",
+        "period": "FY2022",
+        "metric": "global employee attrition rate",
+        "question": "Was PepsiCo's global employee attrition rate 6.1% in FY2022?",
+        "priority": 1,
+        "status": "VERIFIED",
+        "anchor": {
+          "quote": "PepsiCo's global employee attrition rate improved to 6.1% in FY2022.",
+          "char_start": 1756,
+          "char_end": 1824,
+          "page": 1,
+          "para_index": null,
+          "line_start": null
+        }
+      },
+      "result": {
+        "claim_id": "c06",
+        "verdict": "NOT_IN_CORPUS",
+        "doc_value": {
+          "value": 6.1,
+          "unit": "percent"
+        },
+        "corpus_value": null,
+        "explanation": "The filing corpus discusses retention and workforce metrics but does not disclose a global employee attrition rate of 6.1% for FY2022.",
+        "citations": [
+          {
+            "citation_id": "citation_001",
+            "claim": "The Human Capital section discusses retention qualitatively but does not disclose a specific attrition rate.",
+            "doc_id": "PEPSICO_2022_10K",
+            "doc_name": "PEPSICO_2022_10K",
+            "doc_type": "10k",
+            "filing_period": "FY2022",
+            "pdf_page": 12,
+            "page_label": "12",
+            "chunk_id": "page:PEPSICO_2022_10K:12",
+            "quote": "Human Capital\nPepsiCo believes that human capital management, including attracting, developing and retaining a high quality workforce, is\ncritical to our long-term success.",
+            "char_start": 2938,
+            "char_end": 3110,
+            "source_event_seq": null
+          },
+          {
+            "citation_id": "citation_002",
+            "claim": "The only specific workforce metrics disclosed are diversity percentages, not attrition rates.",
+            "doc_id": "PEPSICO_2022_10K",
+            "doc_name": "PEPSICO_2022_10K",
+            "doc_type": "10k",
+            "filing_period": "FY2022",
+            "pdf_page": 13,
+            "page_label": "13",
+            "chunk_id": "page:PEPSICO_2022_10K:13",
+            "quote": "As of December\u00a0 31, 2022, our global workforce was approximately 27% female, while management roles were\napproximately 44% female.",
+            "char_start": 598,
+            "char_end": 728,
+            "source_event_seq": null
+          }
+        ],
+        "calculation": null,
+        "queries_tried": [
+          "employee attrition rate turnover FY2022",
+          "\"attrition\" \"6.1\" OR \"6.1%\" employee PepsiCo 2022",
+          "employee turnover rate voluntary involuntary 2022 PepsiCo",
+          "human capital management employees workforce attrition rate retention",
+          "\"6.1\" attrition",
+          "\"attrition rate\" PepsiCo"
+        ],
+        "confidence": "medium"
+      }
+    },
+    {
+      "claim": {
+        "claim_id": "c07",
+        "quote": "PepsiCo repurchased $12.5 billion of common shares during FY2024.",
+        "claim_type": "numeric",
+        "company": "PepsiCo",
+        "period": "FY2024",
+        "metric": "common share repurchases",
+        "question": "Did PepsiCo repurchase $12.5 billion of common shares during FY2024?",
+        "priority": 1,
+        "status": "VERIFIED",
+        "anchor": {
+          "quote": "PepsiCo repurchased $12.5 billion of common shares during FY2024.",
+          "char_start": 1840,
+          "char_end": 1905,
+          "page": 2,
+          "para_index": null,
+          "line_start": null
+        }
+      },
+      "result": {
+        "claim_id": "c07",
+        "verdict": "OUT_OF_SCOPE",
+        "doc_value": null,
+        "corpus_value": null,
+        "explanation": "Period 'FY2024' is outside corpus coverage for PepsiCo. Covered periods: 2023-05-05, 2023-05-30, 2023Q1, FY2021, FY2022, FY2023.",
+        "citations": [],
+        "calculation": null,
+        "queries_tried": [],
+        "confidence": "high"
+      }
+    },
+    {
+      "claim": {
+        "claim_id": "c08",
+        "quote": "PepsiCo is a leading global beverage and convenient food company with a portfolio spanning Pepsi-Cola, Frito-Lay, Gatorade, Quaker and SodaStream.",
+        "claim_type": "factual",
+        "company": "PepsiCo",
+        "period": null,
+        "metric": "portfolio brands",
+        "question": "Does PepsiCo's portfolio include Pepsi-Cola, Frito-Lay, Gatorade, Quaker and SodaStream?",
+        "priority": 2,
+        "status": "VERIFIED",
+        "anchor": {
+          "quote": "PepsiCo is a leading global beverage and convenient food company with a portfolio spanning Pepsi-Cola, Frito-Lay, Gatorade, Quaker and SodaStream.",
+          "char_start": 276,
+          "char_end": 422,
+          "page": 1,
+          "para_index": null,
+          "line_start": null
+        }
+      },
+      "result": {
+        "claim_id": "c08",
+        "verdict": "SUPPORTED",
+        "doc_value": null,
+        "corpus_value": null,
+        "explanation": "The filing supports PepsiCo as a leading global beverage and convenient food company and names the cited portfolio brands and segments.",
+        "citations": [
+          {
+            "citation_id": "citation_001",
+            "claim": "PepsiCo's portfolio includes Gatorade, Pepsi-Cola, Quaker and SodaStream.",
+            "doc_id": "PEPSICO_2021_10K",
+            "doc_name": "PEPSICO_2021_10K",
+            "doc_type": "10k",
+            "filing_period": "FY2021",
+            "pdf_page": 4,
+            "page_label": "4",
+            "chunk_id": "page:PEPSICO_2021_10K:4",
+            "quote": "We are a leading global beverage and\nconvenient food company with a complementary portfolio of brands, including Lays, Doritos, Cheetos, Gatorade, Pepsi-Cola,\nMountain Dew, Quaker and SodaStream.",
+            "char_start": 2419,
+            "char_end": 2614,
+            "source_event_seq": null
+          }
+        ],
+        "calculation": null,
+        "queries_tried": [
+          "PepsiCo portfolio brands Pepsi-Cola Frito-Lay Gatorade Quaker SodaStream"
+        ],
+        "confidence": "high"
+      }
+    },
+    {
+      "claim": {
+        "claim_id": "c09",
+        "quote": "PepsiCo primarily operates across North America, Latin America, Europe, Africa, the Middle East, South Asia, Asia Pacific, Australia, New Zealand and China as of FY2022.",
+        "claim_type": "factual",
+        "company": "PepsiCo",
+        "period": "FY2022",
+        "metric": "geographic operations",
+        "question": "Did PepsiCo operate across North America, Latin America, Europe, Africa, the Middle East, South Asia, Asia Pacific, Australia, New Zealand and China as of FY2022?",
+        "priority": 2,
+        "status": "VERIFIED",
+        "anchor": {
+          "quote": "PepsiCo primarily operates across North America, Latin America, Europe, Africa, the Middle East, South Asia, Asia Pacific, Australia, New Zealand and China as of FY2022.",
+          "char_start": 423,
+          "char_end": 592,
+          "page": 1,
+          "para_index": null,
+          "line_start": null
+        }
+      },
+      "result": {
+        "claim_id": "c09",
+        "verdict": "SUPPORTED",
+        "doc_value": null,
+        "corpus_value": null,
+        "explanation": "The FY2022 10-K supports the listed operating geographies across North America, Latin America, Europe, Africa, the Middle East, South Asia, Asia Pacific, Australia, New Zealand and China.",
+        "citations": [
+          {
+            "citation_id": "citation_001",
+            "claim": "PepsiCo reports North America segments covering the United States and Canada, plus Latin America, Europe, AMESA and APAC regional segments.",
+            "doc_id": "PEPSICO_2022_10K",
+            "doc_name": "PEPSICO_2022_10K",
+            "doc_type": "10k",
+            "filing_period": "FY2022",
+            "pdf_page": 4,
+            "page_label": "4",
+            "chunk_id": "page:PEPSICO_2022_10K:4",
+            "quote": "Frito-Lay North America, Quaker Foods North America, PepsiCo Beverages North America, Latin America, Europe, Africa, Middle East and South Asia, and Asia Pacific, Australia and New Zealand and China Region.",
+            "char_start": 0,
+            "char_end": 205,
+            "source_event_seq": null
+          }
+        ],
+        "calculation": null,
+        "queries_tried": [],
+        "confidence": "high"
+      }
+    },
+    {
+      "claim": {
+        "claim_id": "c10",
+        "quote": "At the AGM held on May 3, 2023, the shareholder proposal for a congruency report on net-zero emissions policies was approved by shareholders.",
+        "claim_type": "factual",
+        "company": "PepsiCo",
+        "period": "May 3, 2023",
+        "metric": "shareholder proposal approval",
+        "question": "Was the shareholder proposal for a congruency report on net-zero emissions policies approved by PepsiCo shareholders at the AGM on May 3, 2023?",
+        "priority": 2,
+        "status": "VERIFIED",
+        "anchor": {
+          "quote": "At the AGM held on May 3, 2023, the shareholder proposal for a congruency report on net-zero emissions policies was approved by shareholders.",
+          "char_start": 1614,
+          "char_end": 1755,
+          "page": 1,
+          "para_index": null,
+          "line_start": null
+        }
+      },
+      "result": {
+        "claim_id": "c10",
+        "verdict": "CONTRADICTED",
+        "doc_value": null,
+        "corpus_value": null,
+        "explanation": "The voting results show the shareholder proposal for a congruency report on net-zero emissions policies was defeated, not approved.",
+        "citations": [
+          {
+            "citation_id": "citation_001",
+            "claim": "The May 3, 2023 AGM voting results show more votes against than for the net-zero congruency report proposal.",
+            "doc_id": "PEPSICO_2023_8K_dated-2023-05-05",
+            "doc_name": "PEPSICO_2023_8K_dated-2023-05-05",
+            "doc_type": "8k",
+            "filing_period": "2023-05-05",
+            "pdf_page": 4,
+            "page_label": "4",
+            "chunk_id": "page:PEPSICO_2023_8K_dated-2023-05-05:4",
+            "quote": "For 19,718,780; Against 977,228,788",
+            "char_start": 0,
+            "char_end": 38,
+            "source_event_seq": null
+          }
+        ],
+        "calculation": null,
+        "queries_tried": [],
+        "confidence": "high"
+      }
+    }
+  ]
+}
