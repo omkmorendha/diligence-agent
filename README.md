@@ -1,6 +1,6 @@
-# Diligence Agent
+# DiliAgent
 
-Diligence Agent is a FinanceBench-backed diligence memo generator.
+DiliAgent is a FinanceBench-backed diligence memo generator.
 
 It compares naive retrieve-then-answer RAG against a planning, multi-retrieval,
 calculator-using agent on a curated FinanceBench subset.
