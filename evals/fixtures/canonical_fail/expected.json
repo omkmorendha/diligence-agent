@@ -1,0 +1,13 @@
+{
+  "fixture": "canonical_fail",
+  "scorer_under_test": "answer_accuracy",
+  "expected_scores": {
+    "answer_accuracy": "fail",
+    "citation_precision": "pass",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "pass",
+    "abstention": null,
+    "trace_shape": "pass"
+  },
+  "notes": "IMP3-1 canonical branch, wrong-entity case: gold_canonical='corporate bonds' requires BOTH tokens present in the answer; the agent picked 'government bonds', so 'corporate' is missing and the token-set-subset match correctly FAILS. Demonstrates the branch is not a loose substring/keyword check -- sharing only the generic token 'bonds' is not enough to false-pass."
+}

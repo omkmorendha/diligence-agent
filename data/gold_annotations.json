@@ -1,0 +1,152 @@
+{
+  "_README": "IMP3-1 (results/iterations/iter2/improvement_plan.json). Human-reviewable CANONICAL gold annotations, keyed by question_id, merged into data/subset.json by dataset_builder/d5_select_subset.py. Every annotation is derived from the item's question + gold_answer TEXT ONLY (never from any agent memo/answer); the `evidence` field quotes the exact gold_answer fragment that justifies it. gold_polarity in {yes,no} is the answer to an unambiguous yes/no question; gold_canonical is the canonical entity/category/choice (a string, a string[] for entity-list questions, or one of {operating,investing,financing} for cash-flow-source choices). gold_value/gold_unit may also be supplied when a gold's prose carries multiple magnitudes that parse_gold_value cannot reduce to a single number but the gold's own expected_formula intends a specific total (only verizon_05 so far). These fields ONLY ADD pass opportunities in evals/scorers.py answer_accuracy (gated on presence, above the exact-string fallback); they never weaken any scorer, and gold_answer/gold_evidence are untouched. IMP4-1 (results/iterations/iter3/improvement_plan.json) adds amd_01/boeing_02 (gold_polarity 'yes'), boeing_05/pepsico_07/verizon_04 (gold_canonical), and verizon_05 (gold_value=1959 = pension 1097 + health/life 862, matching the gold's expected_formula '1097 + 862'). verizon_05 carries flagged_for_human_review=true: it is the one borderline the orchestrator surfaces for explicit sign-off (whether the retiree question wants the combined total). pfizer_04 (financebench_id_02419) stays deliberately NOT annotated -- its gold polarity 'yes' (Upjohn spin-off) is contested/stale and the agent's defensible 'No, completed Nov 2020' would still fail, so forcing a pass would be dishonest. pepsico_03 (financebench_id_01009) also stays un-annotated -- a strict canonical built from 'North America' would FALSE-fail the correct answer 'United States and Canada'. johnson_johnson_06 (financebench_id_00651, gold polarity 'no') is annotated and CORRECTLY stays failing when an agent answers 'Yes' -- it is a real defect, not a format artifact. The `flagged_for_human_review` and `evidence`/`item_id` fields are documentation-only and are NOT emitted into subset.json.",
+  "annotations": {
+    "financebench_id_00438": {
+      "item_id": "adobe_01",
+      "gold_polarity": "no",
+      "evidence": "No the operating margins of Adobe have recently declined from 36.8% in FY 2021 to 34.6% in FY2022."
+    },
+    "financebench_id_00591": {
+      "item_id": "adobe_02",
+      "gold_polarity": "yes",
+      "evidence": "Yes, the FCF conversion (using net income as the denominator) for Adobe has improved by ~13%"
+    },
+    "financebench_id_00757": {
+      "item_id": "amd_04",
+      "gold_polarity": "yes",
+      "evidence": "Yes, one customer accounted for 16% of consolidated net revenue"
+    },
+    "financebench_id_00460": {
+      "item_id": "best_buy_01",
+      "gold_polarity": "yes",
+      "evidence": "Yes, there is decline in number stores by 1.32% from 982 stores in Q2 FY 2023 to 969 by the end of Q2 FY2024."
+    },
+    "financebench_id_00517": {
+      "item_id": "boeing_01",
+      "gold_polarity": "yes",
+      "evidence": "Yes. Boeing has product and service categories that represent more than 20% of Boeing's revenue for FY2022."
+    },
+    "financebench_id_00464": {
+      "item_id": "boeing_04",
+      "gold_polarity": "yes",
+      "evidence": "Yes, Boeing's business is subject to cyclicality due to its exposure to the airline industry"
+    },
+    "financebench_id_01487": {
+      "item_id": "johnson_johnson_02",
+      "gold_polarity": "yes",
+      "evidence": "Yes, net earnings as a percent of sales increased from 20% in Q2 of FY2022 to 20.1% in Q2 of FY2023."
+    },
+    "financebench_id_00956": {
+      "item_id": "johnson_johnson_07",
+      "gold_polarity": "no",
+      "evidence": "No, JnJ's FY2022 financials are not of a high growth company as sales grew by 1.3% in FY2022."
+    },
+    "financebench_id_01254": {
+      "item_id": "mgm_resorts_03",
+      "gold_polarity": "yes",
+      "evidence": "Yes. MGM maintained 0.01$ per share annual dividend through out FY 2022."
+    },
+    "financebench_id_00302": {
+      "item_id": "pfizer_01",
+      "gold_polarity": "yes",
+      "evidence": "Yes, change in PPNE was positive year over year"
+    },
+    "financebench_id_00215": {
+      "item_id": "verizon_01",
+      "gold_polarity": "yes",
+      "evidence": "Yes. Verizon's capital intensity ratio was approximately 2.774729."
+    },
+    "financebench_id_00566": {
+      "item_id": "verizon_03",
+      "gold_polarity": "no",
+      "evidence": "No. Verizon's debt decreased by $229 million."
+    },
+    "financebench_id_00651": {
+      "item_id": "johnson_johnson_06",
+      "gold_polarity": "no",
+      "evidence": "No, rate of growth in adjusted EPS is expected to decelerate slightly from 3.6% in FY2022 to 3.5% in FY2023."
+    },
+    "financebench_id_01488": {
+      "item_id": "johnson_johnson_03",
+      "gold_canonical": "Consumer Health",
+      "evidence": "The Consumer Health business segment will be treated as a discontinued operation from August 30, 2023 onward."
+    },
+    "financebench_id_00407": {
+      "item_id": "mgm_resorts_02",
+      "gold_canonical": "corporate bonds",
+      "evidence": "the biggest short term investment is in corporate bonds (almost 82% of the total investment)"
+    },
+    "financebench_id_00382": {
+      "item_id": "mgm_resorts_05",
+      "gold_canonical": "Las Vegas",
+      "evidence": "Las Vegas resorts contributed ~90% of company level EBITDAR during FY2022."
+    },
+    "financebench_id_01912": {
+      "item_id": "mgm_resorts_06",
+      "gold_canonical": "MGM China",
+      "evidence": "MGM China experienced the worst topline performance amongst the other regions presented."
+    },
+    "financebench_id_01482": {
+      "item_id": "pepsico_08",
+      "gold_canonical": "defeated",
+      "evidence": "The shareholder proposal for a congruency report by Pepsico on net-zero emissions policies was defeated."
+    },
+    "financebench_id_00724": {
+      "item_id": "pfizer_02",
+      "gold_canonical": "Developed Rest of the World",
+      "evidence": "Developed Rest of the World"
+    },
+    "financebench_id_02416": {
+      "item_id": "pfizer_03",
+      "gold_canonical": ["Trillium", "Array", "Therachon"],
+      "evidence": "Trillium, Array, and Therachon"
+    },
+    "financebench_id_01279": {
+      "item_id": "amd_06",
+      "gold_canonical": "operating",
+      "evidence": "In 2022, AMD brought in the most cashflow from Operations"
+    },
+    "financebench_id_01275": {
+      "item_id": "best_buy_05",
+      "gold_canonical": "operating",
+      "evidence": "Best Buy generated the most cash flow from operating activities in FY 2023 ($1.8 bn)"
+    },
+    "financebench_id_01163": {
+      "item_id": "nike_04",
+      "gold_canonical": "operating",
+      "evidence": "Among the three, cash flow from operations was the highest for Nike in FY2023."
+    },
+    "financebench_id_00222": {
+      "item_id": "amd_01",
+      "gold_polarity": "yes",
+      "evidence": "Yes. The quick ratio is 1.57, calculated as (cash and cash equivalents+Short term investments+Accounts receivable, net+receivables from related parties)/ (current liabilities)."
+    },
+    "financebench_id_00678": {
+      "item_id": "boeing_02",
+      "gold_polarity": "yes",
+      "evidence": "Yes. Boeing has an improving gross margin profile as of FY2022."
+    },
+    "financebench_id_00494": {
+      "item_id": "boeing_05",
+      "gold_canonical": ["737", "777X", "787"],
+      "evidence": "Boeing forecasts an increase in the production rates for the 737, 777X and 787 aircrafts in 2023."
+    },
+    "financebench_id_01474": {
+      "item_id": "pepsico_07",
+      "gold_canonical": "strong start",
+      "evidence": "Pepsico experienced a strong start to FY2023."
+    },
+    "financebench_id_00859": {
+      "item_id": "verizon_04",
+      "gold_canonical": "cross currency swaps",
+      "evidence": "Cross currency swaps. Its notional value was $32,502 million."
+    },
+    "financebench_id_02024": {
+      "item_id": "verizon_05",
+      "gold_value": 1959,
+      "gold_unit": "USD millions",
+      "flagged_for_human_review": true,
+      "evidence": "The estimated pension benefits were $1097 million, and the estimated health care and life insurance benefits were $862 million. FLAGGED FOR HUMAN REVIEW: the question asks how much Verizon expected to pay for its retirees in 2024, i.e. the total; the gold's own expected_formula is literally '1097 + 862' (= 1959), so gold_value=1959 is the gold's intended sum (pension + health/life), NOT agent-derived. Only credit once a human confirms the question wants the combined total."
+    }
+  }
+}

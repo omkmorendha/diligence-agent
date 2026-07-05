@@ -1,0 +1,599 @@
+{
+  "iteration": 900,
+  "label": "pilot: MGM instrumentation check",
+  "generated_at": "2026-07-05T02:21:50.739626+05:30",
+  "aggregate": {
+    "answer_accuracy": 0.3333,
+    "citation_precision": 0.5,
+    "citation_provenance": 1.0,
+    "arithmetic_integrity": 1.0,
+    "trace_shape": 1.0,
+    "abstention_correct_rate": null,
+    "n_items": 6,
+    "answered": 6,
+    "abstained": 0
+  },
+  "by_bucket": {
+    "A_multi_input": {
+      "answer_accuracy": 1.0,
+      "citation_precision": 0.0,
+      "citation_provenance": 1.0,
+      "arithmetic_integrity": 1.0,
+      "trace_shape": 1.0,
+      "n_items": 1,
+      "answered": 1
+    },
+    "B_judgment": {
+      "answer_accuracy": 0.0,
+      "citation_precision": 0.0,
+      "citation_provenance": 1.0,
+      "arithmetic_integrity": 1.0,
+      "trace_shape": 1.0,
+      "n_items": 2,
+      "answered": 2
+    },
+    "C_lookup": {
+      "answer_accuracy": 0.3333,
+      "citation_precision": 1.0,
+      "citation_provenance": 1.0,
+      "arithmetic_integrity": 1.0,
+      "trace_shape": 1.0,
+      "n_items": 3,
+      "answered": 3
+    }
+  },
+  "timing": {
+    "item_wall_p50_s": 12.03,
+    "item_wall_p95_s": 35.24,
+    "item_wall_mean_s": 19.41,
+    "mean_llm_call_s": 3.73,
+    "total_llm_s": 106.8,
+    "run_wall_max_s": 116.49,
+    "slowest_items": [
+      {
+        "item_id": "mgm_resorts_04",
+        "wall_s": 35.24,
+        "llm_calls": 4
+      },
+      {
+        "item_id": "mgm_resorts_01",
+        "wall_s": 29.14,
+        "llm_calls": 6
+      },
+      {
+        "item_id": "mgm_resorts_03",
+        "wall_s": 19.45,
+        "llm_calls": 7
+      },
+      {
+        "item_id": "mgm_resorts_02",
+        "wall_s": 12.03,
+        "llm_calls": 5
+      },
+      {
+        "item_id": "mgm_resorts_06",
+        "wall_s": 10.69,
+        "llm_calls": 4
+      },
+      {
+        "item_id": "mgm_resorts_05",
+        "wall_s": 9.94,
+        "llm_calls": 4
+      }
+    ]
+  },
+  "tokens": {
+    "prompt_total": 219762,
+    "completion_total": 10611,
+    "by_purpose": {
+      "plan": {
+        "prompt": 399,
+        "completion": 3433,
+        "calls": 1,
+        "seconds": 19.1
+      },
+      "item_loop": {
+        "prompt": 219762,
+        "completion": 10611,
+        "calls": 30,
+        "seconds": 106.8
+      }
+    },
+    "mean_prompt_per_item": 36627
+  },
+  "behavior": {
+    "tool_totals": {
+      "search_filing": 9,
+      "get_pages": 4,
+      "calculate": 3,
+      "record_answer": 6
+    },
+    "rejection_totals": {
+      "citation_quote_not_verbatim": 8
+    },
+    "mean_tool_calls_per_item": 3.67,
+    "budget_exhausted_items": [],
+    "llm_error_total": 0
+  },
+  "failure_taxonomy": {
+    "correct": [
+      "mgm_resorts_01",
+      "mgm_resorts_04"
+    ],
+    "wrong_text": [
+      "mgm_resorts_02",
+      "mgm_resorts_03",
+      "mgm_resorts_05",
+      "mgm_resorts_06"
+    ]
+  },
+  "per_run": [
+    {
+      "run_id": "iter900-agent-mgm_resorts",
+      "company": "MGM Resorts",
+      "wall_s": 116.49,
+      "plan_s": 19.09,
+      "n_items": 6,
+      "llm_calls": 31,
+      "llm_errors": 0,
+      "prompt_tokens": 220161,
+      "completion_tokens": 14044
+    }
+  ],
+  "per_item": [
+    {
+      "item_id": "mgm_resorts_01",
+      "run_id": "iter900-agent-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 29.14,
+      "llm_s": 20.17,
+      "llm_calls": 6,
+      "llm_errors": 0,
+      "prompt_tokens": 78997,
+      "completion_tokens": 2865,
+      "tool_counts": {
+        "search_filing": 3,
+        "get_pages": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 0.0,
+          "t1": 1.88
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 1.88,
+          "t1": 10.59
+        },
+        {
+          "kind": "llm",
+          "t0": 10.59,
+          "t1": 13.33
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 13.33,
+          "t1": 13.45
+        },
+        {
+          "kind": "llm",
+          "t0": 13.45,
+          "t1": 15.01
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 15.01,
+          "t1": 15.15
+        },
+        {
+          "kind": "llm",
+          "t0": 15.15,
+          "t1": 16.64
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 16.64,
+          "t1": 16.65
+        },
+        {
+          "kind": "llm",
+          "t0": 16.65,
+          "t1": 20.43
+        },
+        {
+          "kind": "llm",
+          "t0": 20.43,
+          "t1": 29.14
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 20.43,
+          "t1": 20.43
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 29.14,
+          "t1": 29.14
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_02",
+      "run_id": "iter900-agent-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 12.03,
+      "llm_s": 11.89,
+      "llm_calls": 5,
+      "llm_errors": 0,
+      "prompt_tokens": 28562,
+      "completion_tokens": 1495,
+      "tool_counts": {
+        "search_filing": 1,
+        "get_pages": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "citation_quote_not_verbatim": 2
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 29.14,
+          "t1": 31.14
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 31.14,
+          "t1": 31.27
+        },
+        {
+          "kind": "llm",
+          "t0": 31.27,
+          "t1": 34.34
+        },
+        {
+          "kind": "llm",
+          "t0": 34.34,
+          "t1": 36.52
+        },
+        {
+          "kind": "llm",
+          "t0": 36.52,
+          "t1": 38.75
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 38.75,
+          "t1": 38.76
+        },
+        {
+          "kind": "llm",
+          "t0": 38.76,
+          "t1": 41.17
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 41.17,
+          "t1": 41.17
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_03",
+      "run_id": "iter900-agent-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 19.45,
+      "llm_s": 19.2,
+      "llm_calls": 7,
+      "llm_errors": 0,
+      "prompt_tokens": 59594,
+      "completion_tokens": 1970,
+      "tool_counts": {
+        "search_filing": 2,
+        "get_pages": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "citation_quote_not_verbatim": 3
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 41.17,
+          "t1": 42.56
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 42.56,
+          "t1": 42.66
+        },
+        {
+          "kind": "llm",
+          "t0": 42.66,
+          "t1": 44.79
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 44.79,
+          "t1": 44.92
+        },
+        {
+          "kind": "llm",
+          "t0": 44.92,
+          "t1": 48.43
+        },
+        {
+          "kind": "llm",
+          "t0": 48.43,
+          "t1": 51.78
+        },
+        {
+          "kind": "llm",
+          "t0": 51.78,
+          "t1": 53.71
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 53.71,
+          "t1": 53.72
+        },
+        {
+          "kind": "llm",
+          "t0": 53.72,
+          "t1": 56.19
+        },
+        {
+          "kind": "llm",
+          "t0": 56.19,
+          "t1": 60.62
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 60.62,
+          "t1": 60.62
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_04",
+      "run_id": "iter900-agent-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 35.24,
+      "llm_s": 35.12,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 17976,
+      "completion_tokens": 1488,
+      "tool_counts": {
+        "search_filing": 1,
+        "calculate": 2,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 60.62,
+          "t1": 63.47
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 63.47,
+          "t1": 63.58
+        },
+        {
+          "kind": "llm",
+          "t0": 63.58,
+          "t1": 82.24
+        },
+        {
+          "kind": "llm",
+          "t0": 82.24,
+          "t1": 92.88
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 82.24,
+          "t1": 82.24
+        },
+        {
+          "kind": "llm",
+          "t0": 92.88,
+          "t1": 95.86
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 92.88,
+          "t1": 92.88
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 95.86,
+          "t1": 95.86
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_05",
+      "run_id": "iter900-agent-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 9.94,
+      "llm_s": 9.84,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 14231,
+      "completion_tokens": 1353,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "citation_quote_not_verbatim": 2
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 95.86,
+          "t1": 97.24
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 97.24,
+          "t1": 97.34
+        },
+        {
+          "kind": "llm",
+          "t0": 97.34,
+          "t1": 100.23
+        },
+        {
+          "kind": "llm",
+          "t0": 100.23,
+          "t1": 103.0
+        },
+        {
+          "kind": "llm",
+          "t0": 103.0,
+          "t1": 105.8
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 105.8,
+          "t1": 105.8
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_06",
+      "run_id": "iter900-agent-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 10.69,
+      "llm_s": 10.59,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 20402,
+      "completion_tokens": 1440,
+      "tool_counts": {
+        "search_filing": 1,
+        "get_pages": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "citation_quote_not_verbatim": 1
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 105.8,
+          "t1": 107.46
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 107.46,
+          "t1": 107.56
+        },
+        {
+          "kind": "llm",
+          "t0": 107.56,
+          "t1": 110.27
+        },
+        {
+          "kind": "llm",
+          "t0": 110.27,
+          "t1": 114.17
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 110.27,
+          "t1": 110.27
+        },
+        {
+          "kind": "llm",
+          "t0": 114.17,
+          "t1": 116.49
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 116.49,
+          "t1": 116.49
+        }
+      ]
+    }
+  ]
+}

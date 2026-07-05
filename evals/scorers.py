@@ -122,8 +122,88 @@ def _calculate_values(item_id: str, trace_events: list[TraceEvent]) -> list[floa
     return values
 
 
+# --- IMP3-1 (results/iterations/iter2/improvement_plan.json): canonical matching ----
+# The exact-string fallback (normalize_string(answer)==normalize_string(gold_answer))
+# below can only pass when the memo answer is a byte-for-byte-normalized copy of the
+# prose gold, which no free-text answer ever is -- so 27/34 iter2 "failures" were
+# actually CORRECT yes/no and entity answers blocked purely by string form. These two
+# helpers back the polarity and canonical branches that fire ONLY when the item carries
+# a human-reviewed gold_polarity / gold_canonical annotation (data/gold_annotations.json).
+# They ADD pass opportunities gated on those fields; the numeric and exact-string
+# branches are unchanged, so no existing pass ever becomes a fail.
+
+# Tiny, GENERIC financial-domain synonym map (phrase -> canonical token). Deliberately
+# NOT item-specific: it only collapses the standard cash-flow-statement section names
+# to their {operating,investing,financing} choice tokens so "operations" / "operating
+# activities" all read as the same canonical answer. Never add answer-specific phrases.
+_CANON_SYNONYMS = {
+    "operating activities": "operating",
+    "operations": "operating",
+    "investing activities": "investing",
+    "financing activities": "financing",
+}
+# Generic English stopwords so "Developed Rest of the World" == "Developed Rest of
+# World" -- articles/conjunctions carry no entity signal.
+_CANON_STOPWORDS = {"the", "a", "an", "of", "and"}
+
+
+def _canonical_token_set(s: str) -> set[str]:
+    """Normalize `s` and reduce it to a set of content tokens for canonical matching.
+
+    Applies normalize_string (lowercase/strip-punct/collapse-ws), rewrites the generic
+    cash-flow synonyms as whole phrases, then drops stopwords. Set membership (not
+    ordered substring) is what the canonical branch tests against, so token order and
+    filler words don't matter but every content token must be present.
+    """
+    norm = normalize_string(s)
+    for phrase, repl in _CANON_SYNONYMS.items():
+        norm = re.sub(rf"\b{re.escape(phrase)}\b", repl, norm)
+    # normalize_string deliberately PRESERVES '.'/'%' (they carry numeric meaning for
+    # the numeric scorer), so an entity ending a sentence tokenizes as "therachon." /
+    # "bonds." and would never match the punctuation-free gold token. Strip edge
+    # '.'/'%' here so canonical matching is genuinely punct-insensitive as documented.
+    return {tok for t in norm.split() if (tok := t.strip(".%")) and tok not in _CANON_STOPWORDS}
+
+
+def _leading_polarity(answer: str) -> Optional[str]:
+    """The agent answer's leading polarity token: the FIRST 'yes'/'no' in reading order.
+
+    Case/punct-insensitive. normalize_string preserves '.'/'%' (they matter to the
+    numeric scorer), so a leading "No." / "Yes." tokenizes with a trailing period;
+    strip edge '.'/'%' per token so those honest polarity leads still match.
+    """
+    for tok in normalize_string(answer).split():
+        stripped = tok.strip(".%")
+        if stripped in ("yes", "no"):
+            return stripped
+    return None
+
+
+def _canonical_match(answer: str, gold_canonical) -> bool:
+    """True iff every gold canonical entity's content tokens are a subset of the answer's.
+
+    A str gold is one entity (all its tokens must appear); a list gold is an entity set
+    (EVERY listed entity must appear, e.g. "three companies acquired"). Token-set
+    subset, not loose substring: "corporate bonds" needs both tokens present, so a
+    stray "bonds" alone will not false-pass.
+    """
+    ans_tokens = _canonical_token_set(answer)
+    golds = gold_canonical if isinstance(gold_canonical, list) else [gold_canonical]
+    for g in golds:
+        g_tokens = _canonical_token_set(g)
+        if not g_tokens or not g_tokens.issubset(ans_tokens):
+            return False
+    return True
+
+
 def answer_accuracy(memo_item: MemoItem, subset_item: SubsetItem) -> Optional[str]:
-    """Numeric: +/-tolerance relative/absolute match. String: normalized exact match."""
+    """Numeric: +/-tolerance relative/absolute match. String: normalized exact match.
+
+    IMP3-1 adds two branches ABOVE the exact-string fallback, each gated on a
+    human-reviewed annotation being present: a polarity branch (leading yes/no token)
+    and a canonical entity/choice branch. The numeric branch and the exact-string
+    fallback are byte-identical to before.
+    """
     if memo_item.status == "abstained":
         return None
 
@@ -131,6 +211,15 @@ def answer_accuracy(memo_item: MemoItem, subset_item: SubsetItem) -> Optional[st
         tol = subset_item.tolerance
         ok = numeric_within_tolerance(memo_item.value, subset_item.gold_value, tol.relative, tol.absolute)
         return "pass" if ok else "fail"
+
+    # IMP3-1 polarity branch: for annotated yes/no items, polarity IS the answer.
+    if subset_item.gold_polarity is not None:
+        return "pass" if _leading_polarity(memo_item.answer) == subset_item.gold_polarity else "fail"
+
+    # IMP3-1 canonical branch: for annotated entity/choice items, match the canonical
+    # entity (or the full entity set) at the token level with the tiny synonym map.
+    if subset_item.gold_canonical is not None:
+        return "pass" if _canonical_match(memo_item.answer, subset_item.gold_canonical) else "fail"
 
     ok = normalize_string(memo_item.answer) == normalize_string(subset_item.gold_answer)
     return "pass" if ok else "fail"

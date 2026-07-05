@@ -1,0 +1,34 @@
+{
+  "system": "agent",
+  "runs_scored": [
+    "iter2-agent-adobe",
+    "iter2-agent-amd",
+    "iter2-agent-best_buy",
+    "iter2-agent-boeing",
+    "iter2-agent-general_mills",
+    "iter2-agent-johnson_johnson",
+    "iter2-agent-mgm_resorts",
+    "iter2-agent-nike",
+    "iter2-agent-pepsico",
+    "iter2-agent-pfizer",
+    "iter2-agent-verizon"
+  ],
+  "num_items_scored": 61,
+  "answer_accuracy": 0.8448275862068966,
+  "citation_precision": 0.4827586206896552,
+  "citation_provenance": 1.0,
+  "arithmetic_integrity": 1.0,
+  "trace_shape": 0.7377049180327869,
+  "abstention_correct_rate": 0.0,
+  "by_bucket": {
+    "A_multi_input": {
+      "answer_accuracy": 0.9032258064516129
+    },
+    "B_judgment": {
+      "answer_accuracy": 0.7142857142857143
+    },
+    "C_lookup": {
+      "answer_accuracy": 0.8461538461538461
+    }
+  }
+}

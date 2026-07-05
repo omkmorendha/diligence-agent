@@ -1,0 +1,6 @@
+
+=== 2026-07-05T02:18:40.909216+00:00 uv run --project . python -m app.agent --company Pfizer --run-id iter3-agent-pfizer
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[agent] run_id=iter3-agent-pfizer company=Pfizer item_ids=ALL
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 10262.09it/s]
+[agent] done -> runs/iter3-agent-pfizer/{trace.jsonl,memo.json,memo.md}

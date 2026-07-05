@@ -1,0 +1,5711 @@
+{
+  "iteration": 2,
+  "label": "iter2 rescored v3 golds",
+  "generated_at": "2026-07-05T09:29:25.412609+05:30",
+  "aggregate": {
+    "answer_accuracy": 0.8448,
+    "citation_precision": 0.4828,
+    "citation_provenance": 1.0,
+    "arithmetic_integrity": 1.0,
+    "trace_shape": 0.7377,
+    "abstention_correct_rate": 0.0,
+    "n_items": 61,
+    "answered": 58,
+    "abstained": 3
+  },
+  "by_bucket": {
+    "A_multi_input": {
+      "answer_accuracy": 0.9032,
+      "citation_precision": 0.5161,
+      "citation_provenance": 1.0,
+      "arithmetic_integrity": 1.0,
+      "trace_shape": 0.5294,
+      "n_items": 34,
+      "answered": 31
+    },
+    "B_judgment": {
+      "answer_accuracy": 0.7143,
+      "citation_precision": 0.2857,
+      "citation_provenance": 1.0,
+      "arithmetic_integrity": 1.0,
+      "trace_shape": 1.0,
+      "n_items": 14,
+      "answered": 14
+    },
+    "C_lookup": {
+      "answer_accuracy": 0.8462,
+      "citation_precision": 0.6154,
+      "citation_provenance": 1.0,
+      "arithmetic_integrity": 1.0,
+      "trace_shape": 1.0,
+      "n_items": 13,
+      "answered": 13
+    }
+  },
+  "timing": {
+    "item_wall_p50_s": 41.08,
+    "item_wall_p95_s": 105.15,
+    "item_wall_mean_s": 63.03,
+    "mean_llm_call_s": 9.27,
+    "total_llm_s": 3730.5,
+    "run_wall_max_s": 1380.59,
+    "slowest_items": [
+      {
+        "item_id": "verizon_02",
+        "wall_s": 652.47,
+        "llm_calls": 16
+      },
+      {
+        "item_id": "verizon_04",
+        "wall_s": 437.44,
+        "llm_calls": 12
+      },
+      {
+        "item_id": "verizon_01",
+        "wall_s": 155.74,
+        "llm_calls": 8
+      },
+      {
+        "item_id": "johnson_johnson_06",
+        "wall_s": 105.15,
+        "llm_calls": 10
+      },
+      {
+        "item_id": "verizon_03",
+        "wall_s": 101.98,
+        "llm_calls": 7
+      },
+      {
+        "item_id": "johnson_johnson_04",
+        "wall_s": 100.61,
+        "llm_calls": 8
+      },
+      {
+        "item_id": "boeing_02",
+        "wall_s": 97.49,
+        "llm_calls": 9
+      },
+      {
+        "item_id": "adobe_03",
+        "wall_s": 85.28,
+        "llm_calls": 8
+      }
+    ]
+  },
+  "tokens": {
+    "prompt_total": 3201317,
+    "completion_total": 125873,
+    "by_purpose": {
+      "plan": {
+        "prompt": 4587,
+        "completion": 36422,
+        "calls": 11,
+        "seconds": 300.9
+      },
+      "item_loop": {
+        "prompt": 3201317,
+        "completion": 125873,
+        "calls": 354,
+        "seconds": 3730.6
+      }
+    },
+    "mean_prompt_per_item": 52481.0
+  },
+  "behavior": {
+    "tool_totals": {
+      "search_filing": 164,
+      "calculate": 62,
+      "record_answer": 58,
+      "get_pages": 47,
+      "flag_outstanding": 3
+    },
+    "rejection_totals": {
+      "citation_quote_not_verbatim": 18,
+      "citation_unretrieved_chunk": 2,
+      "other_error": 2,
+      "numeric_value_ungrounded": 3
+    },
+    "mean_tool_calls_per_item": 5.48,
+    "budget_exhausted_items": [
+      "best_buy_02",
+      "verizon_02",
+      "verizon_04"
+    ],
+    "llm_error_total": 0
+  },
+  "failure_taxonomy": {
+    "abstained_answerable/budget_exhausted": [
+      "best_buy_02",
+      "verizon_02",
+      "verizon_04"
+    ],
+    "correct": [
+      "adobe_01",
+      "adobe_02",
+      "adobe_03",
+      "adobe_04",
+      "adobe_05",
+      "amd_02",
+      "amd_03",
+      "amd_04",
+      "amd_06",
+      "best_buy_01",
+      "best_buy_03",
+      "best_buy_04",
+      "best_buy_05",
+      "boeing_01",
+      "boeing_03",
+      "boeing_04",
+      "boeing_05",
+      "general_mills_01",
+      "general_mills_02",
+      "general_mills_03",
+      "general_mills_04",
+      "johnson_johnson_01",
+      "johnson_johnson_02",
+      "johnson_johnson_03",
+      "johnson_johnson_04",
+      "johnson_johnson_05",
+      "johnson_johnson_07",
+      "mgm_resorts_01",
+      "mgm_resorts_02",
+      "mgm_resorts_03",
+      "mgm_resorts_04",
+      "mgm_resorts_05",
+      "mgm_resorts_06",
+      "nike_01",
+      "nike_02",
+      "nike_03",
+      "nike_04",
+      "pepsico_01",
+      "pepsico_02",
+      "pepsico_04",
+      "pepsico_05",
+      "pepsico_07",
+      "pepsico_08",
+      "pfizer_01",
+      "pfizer_02",
+      "pfizer_03",
+      "verizon_01",
+      "verizon_03",
+      "verizon_05"
+    ],
+    "wrong_text": [
+      "amd_05",
+      "boeing_02",
+      "boeing_06",
+      "boeing_07",
+      "johnson_johnson_06",
+      "pepsico_03",
+      "pfizer_04"
+    ],
+    "wrong_value": [
+      "amd_01",
+      "pepsico_06"
+    ]
+  },
+  "per_run": [
+    {
+      "run_id": "iter2-agent-adobe",
+      "company": "Adobe",
+      "wall_s": 315.41,
+      "plan_s": 35.16,
+      "n_items": 5,
+      "llm_calls": 40,
+      "llm_errors": 0,
+      "prompt_tokens": 285357,
+      "completion_tokens": 13135
+    },
+    {
+      "run_id": "iter2-agent-amd",
+      "company": "AMD",
+      "wall_s": 331.55,
+      "plan_s": 24.34,
+      "n_items": 6,
+      "llm_calls": 35,
+      "llm_errors": 0,
+      "prompt_tokens": 206920,
+      "completion_tokens": 18600
+    },
+    {
+      "run_id": "iter2-agent-best_buy",
+      "company": "Best Buy",
+      "wall_s": 143.29,
+      "plan_s": 20.67,
+      "n_items": 5,
+      "llm_calls": 27,
+      "llm_errors": 0,
+      "prompt_tokens": 467058,
+      "completion_tokens": 11112
+    },
+    {
+      "run_id": "iter2-agent-boeing",
+      "company": "Boeing",
+      "wall_s": 339.13,
+      "plan_s": 32.03,
+      "n_items": 7,
+      "llm_calls": 39,
+      "llm_errors": 0,
+      "prompt_tokens": 269112,
+      "completion_tokens": 17903
+    },
+    {
+      "run_id": "iter2-agent-general_mills",
+      "company": "General Mills",
+      "wall_s": 111.01,
+      "plan_s": 16.99,
+      "n_items": 4,
+      "llm_calls": 22,
+      "llm_errors": 0,
+      "prompt_tokens": 164537,
+      "completion_tokens": 8192
+    },
+    {
+      "run_id": "iter2-agent-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "wall_s": 426.44,
+      "plan_s": 12.16,
+      "n_items": 7,
+      "llm_calls": 43,
+      "llm_errors": 0,
+      "prompt_tokens": 369568,
+      "completion_tokens": 22518
+    },
+    {
+      "run_id": "iter2-agent-mgm_resorts",
+      "company": "MGM Resorts",
+      "wall_s": 278.95,
+      "plan_s": 23.62,
+      "n_items": 6,
+      "llm_calls": 32,
+      "llm_errors": 0,
+      "prompt_tokens": 353148,
+      "completion_tokens": 14114
+    },
+    {
+      "run_id": "iter2-agent-nike",
+      "company": "Nike",
+      "wall_s": 78.19,
+      "plan_s": 22.8,
+      "n_items": 4,
+      "llm_calls": 15,
+      "llm_errors": 0,
+      "prompt_tokens": 63526,
+      "completion_tokens": 6031
+    },
+    {
+      "run_id": "iter2-agent-pepsico",
+      "company": "PepsiCo",
+      "wall_s": 303.08,
+      "plan_s": 40.25,
+      "n_items": 8,
+      "llm_calls": 34,
+      "llm_errors": 0,
+      "prompt_tokens": 187027,
+      "completion_tokens": 15057
+    },
+    {
+      "run_id": "iter2-agent-pfizer",
+      "company": "Pfizer",
+      "wall_s": 136.87,
+      "plan_s": 36.33,
+      "n_items": 4,
+      "llm_calls": 30,
+      "llm_errors": 0,
+      "prompt_tokens": 303357,
+      "completion_tokens": 11155
+    },
+    {
+      "run_id": "iter2-agent-verizon",
+      "company": "Verizon",
+      "wall_s": 1380.59,
+      "plan_s": 36.52,
+      "n_items": 5,
+      "llm_calls": 48,
+      "llm_errors": 0,
+      "prompt_tokens": 536294,
+      "completion_tokens": 24478
+    }
+  ],
+  "per_item": [
+    {
+      "item_id": "adobe_01",
+      "run_id": "iter2-agent-adobe",
+      "company": "Adobe",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 47.87,
+      "llm_s": 40.86,
+      "llm_calls": 7,
+      "llm_errors": 0,
+      "prompt_tokens": 30831,
+      "completion_tokens": 1928,
+      "tool_counts": {
+        "search_filing": 1,
+        "calculate": 5,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 0.0,
+          "t1": 2.08
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 2.08,
+          "t1": 9.07
+        },
+        {
+          "kind": "llm",
+          "t0": 9.07,
+          "t1": 12.36
+        },
+        {
+          "kind": "llm",
+          "t0": 12.36,
+          "t1": 14.78
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 12.36,
+          "t1": 12.36
+        },
+        {
+          "kind": "llm",
+          "t0": 14.78,
+          "t1": 16.74
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 14.78,
+          "t1": 14.78
+        },
+        {
+          "kind": "llm",
+          "t0": 16.74,
+          "t1": 21.21
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 16.74,
+          "t1": 16.74
+        },
+        {
+          "kind": "llm",
+          "t0": 21.21,
+          "t1": 27.27
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 21.21,
+          "t1": 21.21
+        },
+        {
+          "kind": "llm",
+          "t0": 27.27,
+          "t1": 47.87
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 27.27,
+          "t1": 27.27
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 47.87,
+          "t1": 47.87
+        }
+      ]
+    },
+    {
+      "item_id": "adobe_02",
+      "run_id": "iter2-agent-adobe",
+      "company": "Adobe",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 78.8,
+      "llm_s": 78.33,
+      "llm_calls": 10,
+      "llm_errors": 0,
+      "prompt_tokens": 94513,
+      "completion_tokens": 2557,
+      "tool_counts": {
+        "search_filing": 4,
+        "get_pages": 2,
+        "calculate": 3,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 47.87,
+          "t1": 58.66
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 58.66,
+          "t1": 58.84
+        },
+        {
+          "kind": "llm",
+          "t0": 58.84,
+          "t1": 71.36
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 71.36,
+          "t1": 71.45
+        },
+        {
+          "kind": "llm",
+          "t0": 71.45,
+          "t1": 74.87
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 74.87,
+          "t1": 74.88
+        },
+        {
+          "kind": "llm",
+          "t0": 74.88,
+          "t1": 78.16
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 78.16,
+          "t1": 78.24
+        },
+        {
+          "kind": "llm",
+          "t0": 78.24,
+          "t1": 80.91
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 80.91,
+          "t1": 81.01
+        },
+        {
+          "kind": "llm",
+          "t0": 81.01,
+          "t1": 83.26
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 83.26,
+          "t1": 83.27
+        },
+        {
+          "kind": "llm",
+          "t0": 83.27,
+          "t1": 89.44
+        },
+        {
+          "kind": "llm",
+          "t0": 89.44,
+          "t1": 95.36
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 89.44,
+          "t1": 89.44
+        },
+        {
+          "kind": "llm",
+          "t0": 95.36,
+          "t1": 113.13
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 95.36,
+          "t1": 95.36
+        },
+        {
+          "kind": "llm",
+          "t0": 113.13,
+          "t1": 126.67
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 113.13,
+          "t1": 113.13
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 126.67,
+          "t1": 126.67
+        }
+      ]
+    },
+    {
+      "item_id": "adobe_03",
+      "run_id": "iter2-agent-adobe",
+      "company": "Adobe",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 85.28,
+      "llm_s": 85.02,
+      "llm_calls": 8,
+      "llm_errors": 0,
+      "prompt_tokens": 48589,
+      "completion_tokens": 2080,
+      "tool_counts": {
+        "search_filing": 2,
+        "get_pages": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "citation_quote_not_verbatim": 2,
+        "citation_unretrieved_chunk": 1
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 126.67,
+          "t1": 143.72
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 143.72,
+          "t1": 143.86
+        },
+        {
+          "kind": "llm",
+          "t0": 143.86,
+          "t1": 151.13
+        },
+        {
+          "kind": "llm",
+          "t0": 151.13,
+          "t1": 159.58
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 151.13,
+          "t1": 151.13
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 159.59,
+          "t1": 159.68
+        },
+        {
+          "kind": "llm",
+          "t0": 159.68,
+          "t1": 172.17
+        },
+        {
+          "kind": "llm",
+          "t0": 172.17,
+          "t1": 186.76
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 172.17,
+          "t1": 172.17
+        },
+        {
+          "kind": "llm",
+          "t0": 186.76,
+          "t1": 197.58
+        },
+        {
+          "kind": "llm",
+          "t0": 197.58,
+          "t1": 207.33
+        },
+        {
+          "kind": "llm",
+          "t0": 207.33,
+          "t1": 211.94
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 211.94,
+          "t1": 211.94
+        }
+      ]
+    },
+    {
+      "item_id": "adobe_04",
+      "run_id": "iter2-agent-adobe",
+      "company": "Adobe",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 43.19,
+      "llm_s": 42.91,
+      "llm_calls": 6,
+      "llm_errors": 0,
+      "prompt_tokens": 32040,
+      "completion_tokens": 1555,
+      "tool_counts": {
+        "search_filing": 2,
+        "get_pages": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "citation_quote_not_verbatim": 1
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 211.94,
+          "t1": 217.93
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 217.93,
+          "t1": 218.1
+        },
+        {
+          "kind": "llm",
+          "t0": 218.1,
+          "t1": 222.62
+        },
+        {
+          "kind": "llm",
+          "t0": 222.62,
+          "t1": 228.85
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 222.62,
+          "t1": 222.62
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 228.85,
+          "t1": 228.96
+        },
+        {
+          "kind": "llm",
+          "t0": 228.96,
+          "t1": 235.83
+        },
+        {
+          "kind": "llm",
+          "t0": 235.83,
+          "t1": 241.15
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 235.83,
+          "t1": 235.83
+        },
+        {
+          "kind": "llm",
+          "t0": 241.16,
+          "t1": 255.13
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 255.14,
+          "t1": 255.14
+        }
+      ]
+    },
+    {
+      "item_id": "adobe_05",
+      "run_id": "iter2-agent-adobe",
+      "company": "Adobe",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 60.27,
+      "llm_s": 59.57,
+      "llm_calls": 8,
+      "llm_errors": 0,
+      "prompt_tokens": 78951,
+      "completion_tokens": 1365,
+      "tool_counts": {
+        "search_filing": 4,
+        "get_pages": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "citation_quote_not_verbatim": 1
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 255.14,
+          "t1": 263.08
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 263.08,
+          "t1": 263.51
+        },
+        {
+          "kind": "llm",
+          "t0": 263.51,
+          "t1": 269.28
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 269.28,
+          "t1": 269.37
+        },
+        {
+          "kind": "llm",
+          "t0": 269.37,
+          "t1": 281.67
+        },
+        {
+          "kind": "llm",
+          "t0": 281.67,
+          "t1": 289.88
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 281.67,
+          "t1": 281.67
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 289.88,
+          "t1": 289.95
+        },
+        {
+          "kind": "llm",
+          "t0": 289.95,
+          "t1": 296.58
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 296.58,
+          "t1": 296.67
+        },
+        {
+          "kind": "llm",
+          "t0": 296.67,
+          "t1": 301.4
+        },
+        {
+          "kind": "llm",
+          "t0": 301.4,
+          "t1": 306.74
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 301.4,
+          "t1": 301.4
+        },
+        {
+          "kind": "llm",
+          "t0": 306.74,
+          "t1": 315.4
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 315.4,
+          "t1": 315.4
+        }
+      ]
+    },
+    {
+      "item_id": "amd_01",
+      "run_id": "iter2-agent-amd",
+      "company": "AMD",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "wrong_value",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 58.04,
+      "llm_s": 50.9,
+      "llm_calls": 8,
+      "llm_errors": 0,
+      "prompt_tokens": 66376,
+      "completion_tokens": 2659,
+      "tool_counts": {
+        "search_filing": 4,
+        "get_pages": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "citation_quote_not_verbatim": 1
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 0.0,
+          "t1": 10.92
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 10.92,
+          "t1": 17.67
+        },
+        {
+          "kind": "llm",
+          "t0": 17.67,
+          "t1": 20.31
+        },
+        {
+          "kind": "llm",
+          "t0": 20.31,
+          "t1": 22.3
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 20.31,
+          "t1": 20.31
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 22.3,
+          "t1": 22.47
+        },
+        {
+          "kind": "llm",
+          "t0": 22.47,
+          "t1": 24.1
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 24.1,
+          "t1": 24.19
+        },
+        {
+          "kind": "llm",
+          "t0": 24.19,
+          "t1": 26.25
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 26.25,
+          "t1": 26.34
+        },
+        {
+          "kind": "llm",
+          "t0": 26.34,
+          "t1": 29.52
+        },
+        {
+          "kind": "llm",
+          "t0": 29.53,
+          "t1": 37.23
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 29.53,
+          "t1": 29.53
+        },
+        {
+          "kind": "llm",
+          "t0": 37.23,
+          "t1": 58.03
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 58.04,
+          "t1": 58.04
+        }
+      ]
+    },
+    {
+      "item_id": "amd_02",
+      "run_id": "iter2-agent-amd",
+      "company": "AMD",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 66.71,
+      "llm_s": 66.5,
+      "llm_calls": 5,
+      "llm_errors": 0,
+      "prompt_tokens": 21256,
+      "completion_tokens": 1536,
+      "tool_counts": {
+        "search_filing": 1,
+        "calculate": 3,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 58.04,
+          "t1": 66.85
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 66.86,
+          "t1": 67.05
+        },
+        {
+          "kind": "llm",
+          "t0": 67.05,
+          "t1": 96.71
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 96.71,
+          "t1": 96.72
+        },
+        {
+          "kind": "llm",
+          "t0": 96.72,
+          "t1": 101.33
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 101.33,
+          "t1": 101.33
+        },
+        {
+          "kind": "llm",
+          "t0": 101.34,
+          "t1": 107.38
+        },
+        {
+          "kind": "llm",
+          "t0": 107.39,
+          "t1": 124.75
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 107.39,
+          "t1": 107.39
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 124.75,
+          "t1": 124.75
+        }
+      ]
+    },
+    {
+      "item_id": "amd_03",
+      "run_id": "iter2-agent-amd",
+      "company": "AMD",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 41.08,
+      "llm_s": 40.77,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 18544,
+      "completion_tokens": 683,
+      "tool_counts": {
+        "search_filing": 2,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 124.75,
+          "t1": 135.72
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 135.72,
+          "t1": 135.93
+        },
+        {
+          "kind": "llm",
+          "t0": 135.93,
+          "t1": 153.04
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 153.04,
+          "t1": 153.13
+        },
+        {
+          "kind": "llm",
+          "t0": 153.13,
+          "t1": 158.89
+        },
+        {
+          "kind": "llm",
+          "t0": 158.89,
+          "t1": 165.82
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 158.89,
+          "t1": 158.89
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 165.83,
+          "t1": 165.83
+        }
+      ]
+    },
+    {
+      "item_id": "amd_04",
+      "run_id": "iter2-agent-amd",
+      "company": "AMD",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 80.02,
+      "llm_s": 79.79,
+      "llm_calls": 7,
+      "llm_errors": 0,
+      "prompt_tokens": 37717,
+      "completion_tokens": 4806,
+      "tool_counts": {
+        "search_filing": 2,
+        "get_pages": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "citation_quote_not_verbatim": 3
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 165.83,
+          "t1": 177.67
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 177.68,
+          "t1": 177.82
+        },
+        {
+          "kind": "llm",
+          "t0": 177.82,
+          "t1": 187.66
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 187.66,
+          "t1": 187.73
+        },
+        {
+          "kind": "llm",
+          "t0": 187.73,
+          "t1": 204.77
+        },
+        {
+          "kind": "llm",
+          "t0": 204.77,
+          "t1": 217.07
+        },
+        {
+          "kind": "llm",
+          "t0": 217.08,
+          "t1": 224.91
+        },
+        {
+          "kind": "llm",
+          "t0": 224.92,
+          "t1": 232.76
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 224.92,
+          "t1": 224.92
+        },
+        {
+          "kind": "llm",
+          "t0": 232.76,
+          "t1": 245.85
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 245.85,
+          "t1": 245.85
+        }
+      ]
+    },
+    {
+      "item_id": "amd_05",
+      "run_id": "iter2-agent-amd",
+      "company": "AMD",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 63.07,
+      "llm_s": 62.7,
+      "llm_calls": 7,
+      "llm_errors": 0,
+      "prompt_tokens": 52963,
+      "completion_tokens": 4057,
+      "tool_counts": {
+        "search_filing": 3,
+        "get_pages": 2,
+        "record_answer": 1
+      },
+      "rejections": {
+        "citation_quote_not_verbatim": 1
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 245.85,
+          "t1": 248.63
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 248.63,
+          "t1": 248.82
+        },
+        {
+          "kind": "llm",
+          "t0": 248.82,
+          "t1": 253.1
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 253.1,
+          "t1": 253.19
+        },
+        {
+          "kind": "llm",
+          "t0": 253.19,
+          "t1": 265.32
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 265.32,
+          "t1": 265.38
+        },
+        {
+          "kind": "llm",
+          "t0": 265.38,
+          "t1": 278.76
+        },
+        {
+          "kind": "llm",
+          "t0": 278.76,
+          "t1": 291.45
+        },
+        {
+          "kind": "llm",
+          "t0": 291.45,
+          "t1": 299.89
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 291.45,
+          "t1": 291.45
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 299.89,
+          "t1": 299.9
+        },
+        {
+          "kind": "llm",
+          "t0": 299.9,
+          "t1": 308.91
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 308.92,
+          "t1": 308.92
+        }
+      ]
+    },
+    {
+      "item_id": "amd_06",
+      "run_id": "iter2-agent-amd",
+      "company": "AMD",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 22.63,
+      "llm_s": 22.44,
+      "llm_calls": 3,
+      "llm_errors": 0,
+      "prompt_tokens": 9660,
+      "completion_tokens": 1391,
+      "tool_counts": {
+        "search_filing": 1,
+        "get_pages": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 308.92,
+          "t1": 314.22
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 314.22,
+          "t1": 314.4
+        },
+        {
+          "kind": "llm",
+          "t0": 314.4,
+          "t1": 321.03
+        },
+        {
+          "kind": "llm",
+          "t0": 321.03,
+          "t1": 331.55
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 321.03,
+          "t1": 321.03
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 331.55,
+          "t1": 331.55
+        }
+      ]
+    },
+    {
+      "item_id": "best_buy_01",
+      "run_id": "iter2-agent-best_buy",
+      "company": "Best Buy",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 47.23,
+      "llm_s": 35.01,
+      "llm_calls": 3,
+      "llm_errors": 0,
+      "prompt_tokens": 11884,
+      "completion_tokens": 1985,
+      "tool_counts": {
+        "search_filing": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 0.0,
+          "t1": 18.42
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 18.42,
+          "t1": 30.64
+        },
+        {
+          "kind": "llm",
+          "t0": 30.64,
+          "t1": 36.08
+        },
+        {
+          "kind": "llm",
+          "t0": 36.08,
+          "t1": 47.23
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 36.08,
+          "t1": 36.08
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 47.23,
+          "t1": 47.23
+        }
+      ]
+    },
+    {
+      "item_id": "best_buy_02",
+      "run_id": "iter2-agent-best_buy",
+      "company": "Best Buy",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "budget_exhausted",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 44.96,
+      "llm_s": 44.18,
+      "llm_calls": 12,
+      "llm_errors": 0,
+      "prompt_tokens": 378783,
+      "completion_tokens": 1308,
+      "tool_counts": {
+        "search_filing": 9,
+        "get_pages": 3,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 47.23,
+          "t1": 50.41
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 50.41,
+          "t1": 50.53
+        },
+        {
+          "kind": "llm",
+          "t0": 50.53,
+          "t1": 54.19
+        },
+        {
+          "kind": "llm",
+          "t0": 54.19,
+          "t1": 56.56
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 54.19,
+          "t1": 54.19
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 56.56,
+          "t1": 56.65
+        },
+        {
+          "kind": "llm",
+          "t0": 56.65,
+          "t1": 60.82
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 60.82,
+          "t1": 60.91
+        },
+        {
+          "kind": "llm",
+          "t0": 60.91,
+          "t1": 63.88
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 63.88,
+          "t1": 63.96
+        },
+        {
+          "kind": "llm",
+          "t0": 63.96,
+          "t1": 67.65
+        },
+        {
+          "kind": "llm",
+          "t0": 67.65,
+          "t1": 70.91
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 67.65,
+          "t1": 67.65
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 70.91,
+          "t1": 70.99
+        },
+        {
+          "kind": "llm",
+          "t0": 70.99,
+          "t1": 75.38
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 75.38,
+          "t1": 75.46
+        },
+        {
+          "kind": "llm",
+          "t0": 75.46,
+          "t1": 80.61
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 80.61,
+          "t1": 80.69
+        },
+        {
+          "kind": "llm",
+          "t0": 80.69,
+          "t1": 83.73
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 83.73,
+          "t1": 83.81
+        },
+        {
+          "kind": "llm",
+          "t0": 83.81,
+          "t1": 88.62
+        },
+        {
+          "kind": "llm",
+          "t0": 88.63,
+          "t1": 92.12
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 88.63,
+          "t1": 88.63
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 92.12,
+          "t1": 92.19
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 92.19,
+          "t1": 92.19
+        }
+      ]
+    },
+    {
+      "item_id": "best_buy_03",
+      "run_id": "iter2-agent-best_buy",
+      "company": "Best Buy",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 23.9,
+      "llm_s": 23.67,
+      "llm_calls": 5,
+      "llm_errors": 0,
+      "prompt_tokens": 50808,
+      "completion_tokens": 2253,
+      "tool_counts": {
+        "search_filing": 3,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 92.19,
+          "t1": 95.24
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 95.24,
+          "t1": 95.33
+        },
+        {
+          "kind": "llm",
+          "t0": 95.33,
+          "t1": 101.14
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 101.14,
+          "t1": 101.2
+        },
+        {
+          "kind": "llm",
+          "t0": 101.2,
+          "t1": 106.54
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 106.54,
+          "t1": 106.61
+        },
+        {
+          "kind": "llm",
+          "t0": 106.61,
+          "t1": 112.05
+        },
+        {
+          "kind": "llm",
+          "t0": 112.05,
+          "t1": 116.08
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 112.05,
+          "t1": 112.05
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 116.09,
+          "t1": 116.09
+        }
+      ]
+    },
+    {
+      "item_id": "best_buy_04",
+      "run_id": "iter2-agent-best_buy",
+      "company": "Best Buy",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 5.15,
+      "llm_s": 5.08,
+      "llm_calls": 2,
+      "llm_errors": 0,
+      "prompt_tokens": 6624,
+      "completion_tokens": 484,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 116.09,
+          "t1": 117.99
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 117.99,
+          "t1": 118.06
+        },
+        {
+          "kind": "llm",
+          "t0": 118.06,
+          "t1": 121.23
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 121.24,
+          "t1": 121.24
+        }
+      ]
+    },
+    {
+      "item_id": "best_buy_05",
+      "run_id": "iter2-agent-best_buy",
+      "company": "Best Buy",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 22.05,
+      "llm_s": 21.96,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 18566,
+      "completion_tokens": 2305,
+      "tool_counts": {
+        "search_filing": 1,
+        "get_pages": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "other_error": 1
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 121.24,
+          "t1": 125.71
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 125.71,
+          "t1": 125.8
+        },
+        {
+          "kind": "llm",
+          "t0": 125.8,
+          "t1": 131.3
+        },
+        {
+          "kind": "llm",
+          "t0": 131.3,
+          "t1": 138.75
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 131.3,
+          "t1": 131.3
+        },
+        {
+          "kind": "llm",
+          "t0": 138.75,
+          "t1": 143.29
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 138.75,
+          "t1": 138.75
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 143.29,
+          "t1": 143.29
+        }
+      ]
+    },
+    {
+      "item_id": "boeing_01",
+      "run_id": "iter2-agent-boeing",
+      "company": "Boeing",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 25.63,
+      "llm_s": 18.87,
+      "llm_calls": 5,
+      "llm_errors": 0,
+      "prompt_tokens": 17953,
+      "completion_tokens": 1517,
+      "tool_counts": {
+        "search_filing": 1,
+        "calculate": 3,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 0.0,
+          "t1": 3.97
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 3.97,
+          "t1": 10.72
+        },
+        {
+          "kind": "llm",
+          "t0": 10.72,
+          "t1": 15.86
+        },
+        {
+          "kind": "llm",
+          "t0": 15.86,
+          "t1": 18.4
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 15.86,
+          "t1": 15.86
+        },
+        {
+          "kind": "llm",
+          "t0": 18.4,
+          "t1": 21.6
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 18.4,
+          "t1": 18.4
+        },
+        {
+          "kind": "llm",
+          "t0": 21.6,
+          "t1": 25.62
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 21.6,
+          "t1": 21.6
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 25.63,
+          "t1": 25.63
+        }
+      ]
+    },
+    {
+      "item_id": "boeing_02",
+      "run_id": "iter2-agent-boeing",
+      "company": "Boeing",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 97.49,
+      "llm_s": 97.05,
+      "llm_calls": 9,
+      "llm_errors": 0,
+      "prompt_tokens": 68351,
+      "completion_tokens": 4049,
+      "tool_counts": {
+        "search_filing": 3,
+        "get_pages": 2,
+        "calculate": 3,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 25.63,
+          "t1": 39.67
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 39.67,
+          "t1": 39.85
+        },
+        {
+          "kind": "llm",
+          "t0": 39.85,
+          "t1": 53.96
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 53.96,
+          "t1": 54.02
+        },
+        {
+          "kind": "llm",
+          "t0": 54.02,
+          "t1": 62.54
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 62.54,
+          "t1": 62.55
+        },
+        {
+          "kind": "llm",
+          "t0": 62.55,
+          "t1": 77.43
+        },
+        {
+          "kind": "llm",
+          "t0": 77.43,
+          "t1": 82.78
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 77.43,
+          "t1": 77.43
+        },
+        {
+          "kind": "llm",
+          "t0": 82.78,
+          "t1": 86.51
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 82.78,
+          "t1": 82.78
+        },
+        {
+          "kind": "llm",
+          "t0": 86.51,
+          "t1": 91.08
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 86.51,
+          "t1": 86.51
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 91.08,
+          "t1": 91.25
+        },
+        {
+          "kind": "llm",
+          "t0": 91.25,
+          "t1": 97.2
+        },
+        {
+          "kind": "llm",
+          "t0": 97.2,
+          "t1": 123.11
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 97.2,
+          "t1": 97.2
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 123.11,
+          "t1": 123.11
+        }
+      ]
+    },
+    {
+      "item_id": "boeing_03",
+      "run_id": "iter2-agent-boeing",
+      "company": "Boeing",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 26.15,
+      "llm_s": 26.0,
+      "llm_calls": 2,
+      "llm_errors": 0,
+      "prompt_tokens": 5373,
+      "completion_tokens": 377,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 123.11,
+          "t1": 132.22
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 132.23,
+          "t1": 132.37
+        },
+        {
+          "kind": "llm",
+          "t0": 132.37,
+          "t1": 149.26
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 149.26,
+          "t1": 149.27
+        }
+      ]
+    },
+    {
+      "item_id": "boeing_04",
+      "run_id": "iter2-agent-boeing",
+      "company": "Boeing",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 59.73,
+      "llm_s": 59.55,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 19419,
+      "completion_tokens": 3076,
+      "tool_counts": {
+        "search_filing": 1,
+        "get_pages": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "citation_quote_not_verbatim": 1
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 149.27,
+          "t1": 157.42
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 157.42,
+          "t1": 157.59
+        },
+        {
+          "kind": "llm",
+          "t0": 157.59,
+          "t1": 170.86
+        },
+        {
+          "kind": "llm",
+          "t0": 170.86,
+          "t1": 188.18
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 170.86,
+          "t1": 170.86
+        },
+        {
+          "kind": "llm",
+          "t0": 188.18,
+          "t1": 208.99
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 208.99,
+          "t1": 208.99
+        }
+      ]
+    },
+    {
+      "item_id": "boeing_05",
+      "run_id": "iter2-agent-boeing",
+      "company": "Boeing",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 11.18,
+      "llm_s": 11.04,
+      "llm_calls": 2,
+      "llm_errors": 0,
+      "prompt_tokens": 5070,
+      "completion_tokens": 928,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 208.99,
+          "t1": 212.8
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 212.8,
+          "t1": 212.95
+        },
+        {
+          "kind": "llm",
+          "t0": 212.95,
+          "t1": 220.17
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 220.17,
+          "t1": 220.18
+        }
+      ]
+    },
+    {
+      "item_id": "boeing_06",
+      "run_id": "iter2-agent-boeing",
+      "company": "Boeing",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 34.36,
+      "llm_s": 33.85,
+      "llm_calls": 6,
+      "llm_errors": 0,
+      "prompt_tokens": 39178,
+      "completion_tokens": 1322,
+      "tool_counts": {
+        "search_filing": 3,
+        "get_pages": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 220.18,
+          "t1": 222.83
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 222.83,
+          "t1": 223.2
+        },
+        {
+          "kind": "llm",
+          "t0": 223.2,
+          "t1": 228.54
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 228.54,
+          "t1": 228.6
+        },
+        {
+          "kind": "llm",
+          "t0": 228.6,
+          "t1": 234.91
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 234.91,
+          "t1": 234.98
+        },
+        {
+          "kind": "llm",
+          "t0": 234.98,
+          "t1": 239.28
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 239.28,
+          "t1": 239.29
+        },
+        {
+          "kind": "llm",
+          "t0": 239.29,
+          "t1": 244.05
+        },
+        {
+          "kind": "llm",
+          "t0": 244.06,
+          "t1": 254.53
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 244.06,
+          "t1": 244.06
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 254.53,
+          "t1": 254.53
+        }
+      ]
+    },
+    {
+      "item_id": "boeing_07",
+      "run_id": "iter2-agent-boeing",
+      "company": "Boeing",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 84.6,
+      "llm_s": 83.98,
+      "llm_calls": 10,
+      "llm_errors": 0,
+      "prompt_tokens": 113359,
+      "completion_tokens": 1918,
+      "tool_counts": {
+        "search_filing": 8,
+        "get_pages": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 254.53,
+          "t1": 263.46
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 263.46,
+          "t1": 263.55
+        },
+        {
+          "kind": "llm",
+          "t0": 263.55,
+          "t1": 271.83
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 271.83,
+          "t1": 271.9
+        },
+        {
+          "kind": "llm",
+          "t0": 271.9,
+          "t1": 284.15
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 284.15,
+          "t1": 284.24
+        },
+        {
+          "kind": "llm",
+          "t0": 284.24,
+          "t1": 292.89
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 292.89,
+          "t1": 292.96
+        },
+        {
+          "kind": "llm",
+          "t0": 292.96,
+          "t1": 299.17
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 299.17,
+          "t1": 299.24
+        },
+        {
+          "kind": "llm",
+          "t0": 299.24,
+          "t1": 303.39
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 303.4,
+          "t1": 303.48
+        },
+        {
+          "kind": "llm",
+          "t0": 303.48,
+          "t1": 307.43
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 307.43,
+          "t1": 307.52
+        },
+        {
+          "kind": "llm",
+          "t0": 307.52,
+          "t1": 310.88
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 310.88,
+          "t1": 310.89
+        },
+        {
+          "kind": "llm",
+          "t0": 310.89,
+          "t1": 319.22
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 319.22,
+          "t1": 319.28
+        },
+        {
+          "kind": "llm",
+          "t0": 319.28,
+          "t1": 339.13
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 339.13,
+          "t1": 339.13
+        }
+      ]
+    },
+    {
+      "item_id": "general_mills_01",
+      "run_id": "iter2-agent-general_mills",
+      "company": "General Mills",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 44.1,
+      "llm_s": 32.97,
+      "llm_calls": 3,
+      "llm_errors": 0,
+      "prompt_tokens": 10742,
+      "completion_tokens": 761,
+      "tool_counts": {
+        "search_filing": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 0.0,
+          "t1": 17.95
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 17.95,
+          "t1": 29.06
+        },
+        {
+          "kind": "llm",
+          "t0": 29.06,
+          "t1": 35.75
+        },
+        {
+          "kind": "llm",
+          "t0": 35.75,
+          "t1": 44.09
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 35.75,
+          "t1": 35.75
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 44.1,
+          "t1": 44.1
+        }
+      ]
+    },
+    {
+      "item_id": "general_mills_02",
+      "run_id": "iter2-agent-general_mills",
+      "company": "General Mills",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 33.67,
+      "llm_s": 33.37,
+      "llm_calls": 8,
+      "llm_errors": 0,
+      "prompt_tokens": 76393,
+      "completion_tokens": 2914,
+      "tool_counts": {
+        "search_filing": 3,
+        "calculate": 4,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 44.1,
+          "t1": 47.49
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 47.49,
+          "t1": 47.59
+        },
+        {
+          "kind": "llm",
+          "t0": 47.59,
+          "t1": 49.34
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 49.34,
+          "t1": 49.43
+        },
+        {
+          "kind": "llm",
+          "t0": 49.43,
+          "t1": 52.23
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 52.23,
+          "t1": 52.32
+        },
+        {
+          "kind": "llm",
+          "t0": 52.32,
+          "t1": 57.47
+        },
+        {
+          "kind": "llm",
+          "t0": 57.47,
+          "t1": 59.9
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 57.47,
+          "t1": 57.47
+        },
+        {
+          "kind": "llm",
+          "t0": 59.9,
+          "t1": 64.12
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 59.9,
+          "t1": 59.9
+        },
+        {
+          "kind": "llm",
+          "t0": 64.12,
+          "t1": 66.86
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 64.12,
+          "t1": 64.12
+        },
+        {
+          "kind": "llm",
+          "t0": 66.87,
+          "t1": 77.76
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 66.87,
+          "t1": 66.87
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 77.77,
+          "t1": 77.77
+        }
+      ]
+    },
+    {
+      "item_id": "general_mills_03",
+      "run_id": "iter2-agent-general_mills",
+      "company": "General Mills",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 13.84,
+      "llm_s": 13.7,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 20528,
+      "completion_tokens": 825,
+      "tool_counts": {
+        "search_filing": 1,
+        "get_pages": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 77.77,
+          "t1": 80.89
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 80.89,
+          "t1": 81.02
+        },
+        {
+          "kind": "llm",
+          "t0": 81.02,
+          "t1": 85.74
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 85.74,
+          "t1": 85.75
+        },
+        {
+          "kind": "llm",
+          "t0": 85.75,
+          "t1": 88.49
+        },
+        {
+          "kind": "llm",
+          "t0": 88.49,
+          "t1": 91.6
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 88.49,
+          "t1": 88.49
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 91.61,
+          "t1": 91.61
+        }
+      ]
+    },
+    {
+      "item_id": "general_mills_04",
+      "run_id": "iter2-agent-general_mills",
+      "company": "General Mills",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 19.4,
+      "llm_s": 19.13,
+      "llm_calls": 6,
+      "llm_errors": 0,
+      "prompt_tokens": 56354,
+      "completion_tokens": 1317,
+      "tool_counts": {
+        "search_filing": 3,
+        "get_pages": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 91.61,
+          "t1": 94.3
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 94.3,
+          "t1": 94.42
+        },
+        {
+          "kind": "llm",
+          "t0": 94.42,
+          "t1": 98.6
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 98.6,
+          "t1": 98.66
+        },
+        {
+          "kind": "llm",
+          "t0": 98.66,
+          "t1": 102.36
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 102.36,
+          "t1": 102.43
+        },
+        {
+          "kind": "llm",
+          "t0": 102.43,
+          "t1": 104.48
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 104.48,
+          "t1": 104.49
+        },
+        {
+          "kind": "llm",
+          "t0": 104.49,
+          "t1": 106.7
+        },
+        {
+          "kind": "llm",
+          "t0": 106.7,
+          "t1": 111.0
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 106.7,
+          "t1": 106.7
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 111.01,
+          "t1": 111.01
+        }
+      ]
+    },
+    {
+      "item_id": "johnson_johnson_01",
+      "run_id": "iter2-agent-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 58.24,
+      "llm_s": 50.69,
+      "llm_calls": 6,
+      "llm_errors": 0,
+      "prompt_tokens": 62334,
+      "completion_tokens": 1954,
+      "tool_counts": {
+        "search_filing": 3,
+        "calculate": 2,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 0.0,
+          "t1": 20.71
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 20.71,
+          "t1": 28.05
+        },
+        {
+          "kind": "llm",
+          "t0": 28.05,
+          "t1": 30.24
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 30.24,
+          "t1": 30.35
+        },
+        {
+          "kind": "llm",
+          "t0": 30.35,
+          "t1": 33.11
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 33.11,
+          "t1": 33.2
+        },
+        {
+          "kind": "llm",
+          "t0": 33.2,
+          "t1": 38.83
+        },
+        {
+          "kind": "llm",
+          "t0": 38.83,
+          "t1": 42.6
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 38.83,
+          "t1": 38.83
+        },
+        {
+          "kind": "llm",
+          "t0": 42.6,
+          "t1": 58.23
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 42.6,
+          "t1": 42.6
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 58.24,
+          "t1": 58.24
+        }
+      ]
+    },
+    {
+      "item_id": "johnson_johnson_02",
+      "run_id": "iter2-agent-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 60.33,
+      "llm_s": 60.18,
+      "llm_calls": 6,
+      "llm_errors": 0,
+      "prompt_tokens": 43797,
+      "completion_tokens": 2710,
+      "tool_counts": {
+        "search_filing": 1,
+        "get_pages": 1,
+        "calculate": 3,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 58.24,
+          "t1": 73.6
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 73.6,
+          "t1": 73.74
+        },
+        {
+          "kind": "llm",
+          "t0": 73.74,
+          "t1": 80.57
+        },
+        {
+          "kind": "llm",
+          "t0": 80.58,
+          "t1": 90.89
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 80.58,
+          "t1": 80.58
+        },
+        {
+          "kind": "llm",
+          "t0": 90.89,
+          "t1": 97.58
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 90.89,
+          "t1": 90.89
+        },
+        {
+          "kind": "llm",
+          "t0": 97.58,
+          "t1": 109.81
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 97.58,
+          "t1": 97.58
+        },
+        {
+          "kind": "llm",
+          "t0": 109.81,
+          "t1": 118.56
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 109.81,
+          "t1": 109.81
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 118.56,
+          "t1": 118.56
+        }
+      ]
+    },
+    {
+      "item_id": "johnson_johnson_03",
+      "run_id": "iter2-agent-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 28.6,
+      "llm_s": 28.4,
+      "llm_calls": 2,
+      "llm_errors": 0,
+      "prompt_tokens": 4651,
+      "completion_tokens": 454,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 118.56,
+          "t1": 123.51
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 123.51,
+          "t1": 123.71
+        },
+        {
+          "kind": "llm",
+          "t0": 123.71,
+          "t1": 147.16
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 147.17,
+          "t1": 147.17
+        }
+      ]
+    },
+    {
+      "item_id": "johnson_johnson_04",
+      "run_id": "iter2-agent-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 100.61,
+      "llm_s": 100.43,
+      "llm_calls": 8,
+      "llm_errors": 0,
+      "prompt_tokens": 58801,
+      "completion_tokens": 4367,
+      "tool_counts": {
+        "search_filing": 2,
+        "calculate": 4,
+        "record_answer": 1
+      },
+      "rejections": {
+        "numeric_value_ungrounded": 1
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 147.17,
+          "t1": 166.22
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 166.22,
+          "t1": 166.3
+        },
+        {
+          "kind": "llm",
+          "t0": 166.3,
+          "t1": 187.18
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 187.19,
+          "t1": 187.27
+        },
+        {
+          "kind": "llm",
+          "t0": 187.27,
+          "t1": 198.77
+        },
+        {
+          "kind": "llm",
+          "t0": 198.77,
+          "t1": 217.81
+        },
+        {
+          "kind": "llm",
+          "t0": 217.81,
+          "t1": 227.58
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 217.81,
+          "t1": 217.81
+        },
+        {
+          "kind": "llm",
+          "t0": 227.58,
+          "t1": 233.7
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 227.58,
+          "t1": 227.58
+        },
+        {
+          "kind": "llm",
+          "t0": 233.7,
+          "t1": 240.48
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 233.7,
+          "t1": 233.7
+        },
+        {
+          "kind": "llm",
+          "t0": 240.48,
+          "t1": 247.77
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 240.48,
+          "t1": 240.48
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 247.77,
+          "t1": 247.77
+        }
+      ]
+    },
+    {
+      "item_id": "johnson_johnson_05",
+      "run_id": "iter2-agent-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 39.9,
+      "llm_s": 39.68,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 12613,
+      "completion_tokens": 2777,
+      "tool_counts": {
+        "search_filing": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "numeric_value_ungrounded": 1
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 247.78,
+          "t1": 254.13
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 254.13,
+          "t1": 254.33
+        },
+        {
+          "kind": "llm",
+          "t0": 254.33,
+          "t1": 262.21
+        },
+        {
+          "kind": "llm",
+          "t0": 262.21,
+          "t1": 278.33
+        },
+        {
+          "kind": "llm",
+          "t0": 278.33,
+          "t1": 287.67
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 278.33,
+          "t1": 278.33
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 287.67,
+          "t1": 287.67
+        }
+      ]
+    },
+    {
+      "item_id": "johnson_johnson_06",
+      "run_id": "iter2-agent-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 105.15,
+      "llm_s": 104.71,
+      "llm_calls": 10,
+      "llm_errors": 0,
+      "prompt_tokens": 134404,
+      "completion_tokens": 6197,
+      "tool_counts": {
+        "search_filing": 5,
+        "get_pages": 2,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "citation_quote_not_verbatim": 1
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 287.67,
+          "t1": 294.15
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 294.15,
+          "t1": 294.29
+        },
+        {
+          "kind": "llm",
+          "t0": 294.29,
+          "t1": 311.8
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 311.8,
+          "t1": 311.89
+        },
+        {
+          "kind": "llm",
+          "t0": 311.89,
+          "t1": 315.55
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 315.55,
+          "t1": 315.61
+        },
+        {
+          "kind": "llm",
+          "t0": 315.61,
+          "t1": 321.87
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 321.87,
+          "t1": 321.94
+        },
+        {
+          "kind": "llm",
+          "t0": 321.94,
+          "t1": 324.97
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 324.97,
+          "t1": 325.04
+        },
+        {
+          "kind": "llm",
+          "t0": 325.04,
+          "t1": 329.4
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 329.4,
+          "t1": 329.41
+        },
+        {
+          "kind": "llm",
+          "t0": 329.41,
+          "t1": 340.95
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 340.95,
+          "t1": 340.96
+        },
+        {
+          "kind": "llm",
+          "t0": 340.96,
+          "t1": 374.65
+        },
+        {
+          "kind": "llm",
+          "t0": 374.65,
+          "t1": 385.86
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 374.65,
+          "t1": 374.65
+        },
+        {
+          "kind": "llm",
+          "t0": 385.86,
+          "t1": 392.82
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 392.82,
+          "t1": 392.82
+        }
+      ]
+    },
+    {
+      "item_id": "johnson_johnson_07",
+      "run_id": "iter2-agent-johnson_johnson",
+      "company": "Johnson & Johnson",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 33.62,
+      "llm_s": 33.41,
+      "llm_calls": 6,
+      "llm_errors": 0,
+      "prompt_tokens": 52489,
+      "completion_tokens": 2198,
+      "tool_counts": {
+        "search_filing": 2,
+        "get_pages": 1,
+        "calculate": 2,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 392.82,
+          "t1": 400.26
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 400.26,
+          "t1": 400.4
+        },
+        {
+          "kind": "llm",
+          "t0": 400.4,
+          "t1": 405.62
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 405.62,
+          "t1": 405.67
+        },
+        {
+          "kind": "llm",
+          "t0": 405.67,
+          "t1": 409.28
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 409.28,
+          "t1": 409.29
+        },
+        {
+          "kind": "llm",
+          "t0": 409.29,
+          "t1": 415.91
+        },
+        {
+          "kind": "llm",
+          "t0": 415.91,
+          "t1": 419.79
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 415.91,
+          "t1": 415.91
+        },
+        {
+          "kind": "llm",
+          "t0": 419.79,
+          "t1": 426.43
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 419.79,
+          "t1": 419.79
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 426.44,
+          "t1": 426.44
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_01",
+      "run_id": "iter2-agent-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 53.93,
+      "llm_s": 46.89,
+      "llm_calls": 8,
+      "llm_errors": 0,
+      "prompt_tokens": 151325,
+      "completion_tokens": 2379,
+      "tool_counts": {
+        "search_filing": 3,
+        "get_pages": 3,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 0.0,
+          "t1": 10.56
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 10.56,
+          "t1": 17.34
+        },
+        {
+          "kind": "llm",
+          "t0": 17.34,
+          "t1": 19.63
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 19.63,
+          "t1": 19.74
+        },
+        {
+          "kind": "llm",
+          "t0": 19.74,
+          "t1": 22.12
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 22.12,
+          "t1": 22.23
+        },
+        {
+          "kind": "llm",
+          "t0": 22.23,
+          "t1": 25.85
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 25.85,
+          "t1": 25.86
+        },
+        {
+          "kind": "llm",
+          "t0": 25.86,
+          "t1": 27.98
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 27.98,
+          "t1": 27.99
+        },
+        {
+          "kind": "llm",
+          "t0": 27.99,
+          "t1": 30.74
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 30.74,
+          "t1": 30.75
+        },
+        {
+          "kind": "llm",
+          "t0": 30.75,
+          "t1": 37.71
+        },
+        {
+          "kind": "llm",
+          "t0": 37.71,
+          "t1": 53.93
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 37.71,
+          "t1": 37.71
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 53.93,
+          "t1": 53.93
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_02",
+      "run_id": "iter2-agent-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 24.21,
+      "llm_s": 24.01,
+      "llm_calls": 2,
+      "llm_errors": 0,
+      "prompt_tokens": 6261,
+      "completion_tokens": 595,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 53.93,
+          "t1": 64.27
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 64.27,
+          "t1": 64.46
+        },
+        {
+          "kind": "llm",
+          "t0": 64.46,
+          "t1": 78.14
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 78.14,
+          "t1": 78.14
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_03",
+      "run_id": "iter2-agent-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 31.83,
+      "llm_s": 31.37,
+      "llm_calls": 6,
+      "llm_errors": 0,
+      "prompt_tokens": 72678,
+      "completion_tokens": 1192,
+      "tool_counts": {
+        "search_filing": 4,
+        "get_pages": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 78.14,
+          "t1": 82.32
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 82.32,
+          "t1": 82.43
+        },
+        {
+          "kind": "llm",
+          "t0": 82.43,
+          "t1": 90.16
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 90.16,
+          "t1": 90.26
+        },
+        {
+          "kind": "llm",
+          "t0": 90.26,
+          "t1": 93.56
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 93.56,
+          "t1": 93.67
+        },
+        {
+          "kind": "llm",
+          "t0": 93.67,
+          "t1": 96.9
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 96.9,
+          "t1": 97.02
+        },
+        {
+          "kind": "llm",
+          "t0": 97.02,
+          "t1": 101.3
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 101.3,
+          "t1": 101.31
+        },
+        {
+          "kind": "llm",
+          "t0": 101.31,
+          "t1": 109.97
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 109.97,
+          "t1": 109.97
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_04",
+      "run_id": "iter2-agent-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 56.98,
+      "llm_s": 56.85,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 17678,
+      "completion_tokens": 1319,
+      "tool_counts": {
+        "search_filing": 1,
+        "calculate": 2,
+        "record_answer": 1
+      },
+      "rejections": {
+        "other_error": 1
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 109.97,
+          "t1": 125.86
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 125.86,
+          "t1": 125.98
+        },
+        {
+          "kind": "llm",
+          "t0": 125.98,
+          "t1": 151.02
+        },
+        {
+          "kind": "llm",
+          "t0": 151.02,
+          "t1": 160.81
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 151.02,
+          "t1": 151.02
+        },
+        {
+          "kind": "llm",
+          "t0": 160.81,
+          "t1": 166.95
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 160.81,
+          "t1": 160.81
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 166.95,
+          "t1": 166.95
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_05",
+      "run_id": "iter2-agent-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 27.35,
+      "llm_s": 27.19,
+      "llm_calls": 2,
+      "llm_errors": 0,
+      "prompt_tokens": 7377,
+      "completion_tokens": 592,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 166.95,
+          "t1": 179.19
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 179.19,
+          "t1": 179.35
+        },
+        {
+          "kind": "llm",
+          "t0": 179.35,
+          "t1": 194.3
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 194.3,
+          "t1": 194.3
+        }
+      ]
+    },
+    {
+      "item_id": "mgm_resorts_06",
+      "run_id": "iter2-agent-mgm_resorts",
+      "company": "MGM Resorts",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 84.65,
+      "llm_s": 84.11,
+      "llm_calls": 9,
+      "llm_errors": 0,
+      "prompt_tokens": 97430,
+      "completion_tokens": 4480,
+      "tool_counts": {
+        "search_filing": 4,
+        "get_pages": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "citation_quote_not_verbatim": 2
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 194.3,
+          "t1": 206.61
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 206.61,
+          "t1": 206.72
+        },
+        {
+          "kind": "llm",
+          "t0": 206.72,
+          "t1": 219.11
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 219.12,
+          "t1": 219.22
+        },
+        {
+          "kind": "llm",
+          "t0": 219.22,
+          "t1": 223.66
+        },
+        {
+          "kind": "llm",
+          "t0": 223.66,
+          "t1": 231.49
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 223.66,
+          "t1": 223.66
+        },
+        {
+          "kind": "llm",
+          "t0": 231.49,
+          "t1": 239.89
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 231.49,
+          "t1": 231.49
+        },
+        {
+          "kind": "llm",
+          "t0": 239.89,
+          "t1": 247.11
+        },
+        {
+          "kind": "llm",
+          "t0": 247.11,
+          "t1": 258.15
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 258.15,
+          "t1": 258.34
+        },
+        {
+          "kind": "llm",
+          "t0": 258.34,
+          "t1": 267.39
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 267.39,
+          "t1": 267.5
+        },
+        {
+          "kind": "llm",
+          "t0": 267.5,
+          "t1": 278.95
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 278.95,
+          "t1": 278.95
+        }
+      ]
+    },
+    {
+      "item_id": "nike_01",
+      "run_id": "iter2-agent-nike",
+      "company": "Nike",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 41.42,
+      "llm_s": 28.33,
+      "llm_calls": 5,
+      "llm_errors": 0,
+      "prompt_tokens": 27855,
+      "completion_tokens": 1004,
+      "tool_counts": {
+        "search_filing": 3,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 0.0,
+          "t1": 8.44
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 8.44,
+          "t1": 21.36
+        },
+        {
+          "kind": "llm",
+          "t0": 21.36,
+          "t1": 28.48
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 28.48,
+          "t1": 28.57
+        },
+        {
+          "kind": "llm",
+          "t0": 28.57,
+          "t1": 33.11
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 33.11,
+          "t1": 33.19
+        },
+        {
+          "kind": "llm",
+          "t0": 33.19,
+          "t1": 38.01
+        },
+        {
+          "kind": "llm",
+          "t0": 38.02,
+          "t1": 41.41
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 38.02,
+          "t1": 38.02
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 41.42,
+          "t1": 41.42
+        }
+      ]
+    },
+    {
+      "item_id": "nike_02",
+      "run_id": "iter2-agent-nike",
+      "company": "Nike",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 14.85,
+      "llm_s": 14.59,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 21390,
+      "completion_tokens": 1066,
+      "tool_counts": {
+        "search_filing": 2,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 41.42,
+          "t1": 43.86
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 43.86,
+          "t1": 44.02
+        },
+        {
+          "kind": "llm",
+          "t0": 44.02,
+          "t1": 47.0
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 47.01,
+          "t1": 47.09
+        },
+        {
+          "kind": "llm",
+          "t0": 47.09,
+          "t1": 52.26
+        },
+        {
+          "kind": "llm",
+          "t0": 52.26,
+          "t1": 56.27
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 52.26,
+          "t1": 52.26
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 56.27,
+          "t1": 56.27
+        }
+      ]
+    },
+    {
+      "item_id": "nike_03",
+      "run_id": "iter2-agent-nike",
+      "company": "Nike",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 7.39,
+      "llm_s": 7.29,
+      "llm_calls": 2,
+      "llm_errors": 0,
+      "prompt_tokens": 4730,
+      "completion_tokens": 386,
+      "tool_counts": {
+        "search_filing": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 56.27,
+          "t1": 59.96
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 59.96,
+          "t1": 60.06
+        },
+        {
+          "kind": "llm",
+          "t0": 60.06,
+          "t1": 63.65
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 63.65,
+          "t1": 63.65
+        }
+      ]
+    },
+    {
+      "item_id": "nike_04",
+      "run_id": "iter2-agent-nike",
+      "company": "Nike",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 14.54,
+      "llm_s": 14.44,
+      "llm_calls": 3,
+      "llm_errors": 0,
+      "prompt_tokens": 9165,
+      "completion_tokens": 788,
+      "tool_counts": {
+        "search_filing": 1,
+        "get_pages": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 63.65,
+          "t1": 68.25
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 68.25,
+          "t1": 68.34
+        },
+        {
+          "kind": "llm",
+          "t0": 68.34,
+          "t1": 70.38
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 70.38,
+          "t1": 70.39
+        },
+        {
+          "kind": "llm",
+          "t0": 70.39,
+          "t1": 78.19
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 78.19,
+          "t1": 78.19
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_01",
+      "run_id": "iter2-agent-pepsico",
+      "company": "PepsiCo",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 32.45,
+      "llm_s": 25.3,
+      "llm_calls": 3,
+      "llm_errors": 0,
+      "prompt_tokens": 8408,
+      "completion_tokens": 1246,
+      "tool_counts": {
+        "search_filing": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 0.0,
+          "t1": 1.88
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 1.88,
+          "t1": 9.02
+        },
+        {
+          "kind": "llm",
+          "t0": 9.02,
+          "t1": 15.08
+        },
+        {
+          "kind": "llm",
+          "t0": 15.08,
+          "t1": 32.45
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 15.08,
+          "t1": 15.08
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 32.45,
+          "t1": 32.45
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_02",
+      "run_id": "iter2-agent-pepsico",
+      "company": "PepsiCo",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 40.38,
+      "llm_s": 40.12,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 15107,
+      "completion_tokens": 1427,
+      "tool_counts": {
+        "search_filing": 1,
+        "get_pages": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 32.45,
+          "t1": 48.32
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 48.33,
+          "t1": 48.57
+        },
+        {
+          "kind": "llm",
+          "t0": 48.57,
+          "t1": 59.65
+        },
+        {
+          "kind": "llm",
+          "t0": 59.66,
+          "t1": 66.66
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 59.66,
+          "t1": 59.66
+        },
+        {
+          "kind": "llm",
+          "t0": 66.66,
+          "t1": 72.83
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 66.66,
+          "t1": 66.66
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 72.83,
+          "t1": 72.83
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_03",
+      "run_id": "iter2-agent-pepsico",
+      "company": "PepsiCo",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 17.05,
+      "llm_s": 16.94,
+      "llm_calls": 3,
+      "llm_errors": 0,
+      "prompt_tokens": 9079,
+      "completion_tokens": 1079,
+      "tool_counts": {
+        "search_filing": 1,
+        "get_pages": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 72.83,
+          "t1": 75.95
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 75.95,
+          "t1": 76.04
+        },
+        {
+          "kind": "llm",
+          "t0": 76.04,
+          "t1": 81.9
+        },
+        {
+          "kind": "llm",
+          "t0": 81.9,
+          "t1": 89.87
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 81.9,
+          "t1": 81.9
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 89.88,
+          "t1": 89.88
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_04",
+      "run_id": "iter2-agent-pepsico",
+      "company": "PepsiCo",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 33.3,
+      "llm_s": 33.17,
+      "llm_calls": 3,
+      "llm_errors": 0,
+      "prompt_tokens": 10056,
+      "completion_tokens": 792,
+      "tool_counts": {
+        "search_filing": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 89.88,
+          "t1": 94.7
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 94.7,
+          "t1": 94.81
+        },
+        {
+          "kind": "llm",
+          "t0": 94.81,
+          "t1": 111.86
+        },
+        {
+          "kind": "llm",
+          "t0": 111.86,
+          "t1": 123.17
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 111.86,
+          "t1": 111.86
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 123.17,
+          "t1": 123.17
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_05",
+      "run_id": "iter2-agent-pepsico",
+      "company": "PepsiCo",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 70.51,
+      "llm_s": 69.85,
+      "llm_calls": 6,
+      "llm_errors": 0,
+      "prompt_tokens": 44441,
+      "completion_tokens": 1395,
+      "tool_counts": {
+        "search_filing": 3,
+        "get_pages": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 123.17,
+          "t1": 140.42
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 140.42,
+          "t1": 140.84
+        },
+        {
+          "kind": "llm",
+          "t0": 140.84,
+          "t1": 147.95
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 147.95,
+          "t1": 148.08
+        },
+        {
+          "kind": "llm",
+          "t0": 148.08,
+          "t1": 160.54
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 160.55,
+          "t1": 160.64
+        },
+        {
+          "kind": "llm",
+          "t0": 160.64,
+          "t1": 170.42
+        },
+        {
+          "kind": "llm",
+          "t0": 170.42,
+          "t1": 183.9
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 170.42,
+          "t1": 170.42
+        },
+        {
+          "kind": "llm",
+          "t0": 183.9,
+          "t1": 193.68
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 183.9,
+          "t1": 183.9
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 193.68,
+          "t1": 193.68
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_06",
+      "run_id": "iter2-agent-pepsico",
+      "company": "PepsiCo",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "wrong_value",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 55.15,
+      "llm_s": 54.44,
+      "llm_calls": 7,
+      "llm_errors": 0,
+      "prompt_tokens": 66982,
+      "completion_tokens": 4224,
+      "tool_counts": {
+        "search_filing": 4,
+        "get_pages": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "numeric_value_ungrounded": 1
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 193.68,
+          "t1": 201.75
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 201.75,
+          "t1": 201.93
+        },
+        {
+          "kind": "llm",
+          "t0": 201.93,
+          "t1": 205.89
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 205.89,
+          "t1": 205.98
+        },
+        {
+          "kind": "llm",
+          "t0": 205.98,
+          "t1": 212.33
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 212.33,
+          "t1": 212.34
+        },
+        {
+          "kind": "llm",
+          "t0": 212.34,
+          "t1": 219.46
+        },
+        {
+          "kind": "llm",
+          "t0": 219.47,
+          "t1": 229.02
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 229.03,
+          "t1": 229.37
+        },
+        {
+          "kind": "llm",
+          "t0": 229.37,
+          "t1": 232.02
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 232.02,
+          "t1": 232.11
+        },
+        {
+          "kind": "llm",
+          "t0": 232.11,
+          "t1": 248.83
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 248.84,
+          "t1": 248.84
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_07",
+      "run_id": "iter2-agent-pepsico",
+      "company": "PepsiCo",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 33.24,
+      "llm_s": 33.11,
+      "llm_calls": 3,
+      "llm_errors": 0,
+      "prompt_tokens": 11250,
+      "completion_tokens": 1324,
+      "tool_counts": {
+        "search_filing": 1,
+        "get_pages": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 248.84,
+          "t1": 256.46
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 256.46,
+          "t1": 256.58
+        },
+        {
+          "kind": "llm",
+          "t0": 256.58,
+          "t1": 264.47
+        },
+        {
+          "kind": "llm",
+          "t0": 264.47,
+          "t1": 282.08
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 264.47,
+          "t1": 264.47
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 282.08,
+          "t1": 282.08
+        }
+      ]
+    },
+    {
+      "item_id": "pepsico_08",
+      "run_id": "iter2-agent-pepsico",
+      "company": "PepsiCo",
+      "bucket": "B_judgment",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 21.0,
+      "llm_s": 20.77,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 21153,
+      "completion_tokens": 758,
+      "tool_counts": {
+        "search_filing": 2,
+        "get_pages": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 282.08,
+          "t1": 286.98
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 286.98,
+          "t1": 287.11
+        },
+        {
+          "kind": "llm",
+          "t0": 287.11,
+          "t1": 293.99
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 293.99,
+          "t1": 294.09
+        },
+        {
+          "kind": "llm",
+          "t0": 294.09,
+          "t1": 297.75
+        },
+        {
+          "kind": "llm",
+          "t0": 297.75,
+          "t1": 303.08
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 297.75,
+          "t1": 297.75
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 303.08,
+          "t1": 303.08
+        }
+      ]
+    },
+    {
+      "item_id": "pfizer_01",
+      "run_id": "iter2-agent-pfizer",
+      "company": "Pfizer",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 29.64,
+      "llm_s": 18.38,
+      "llm_calls": 3,
+      "llm_errors": 0,
+      "prompt_tokens": 11223,
+      "completion_tokens": 1200,
+      "tool_counts": {
+        "search_filing": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 0.0,
+          "t1": 5.76
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 5.76,
+          "t1": 17.02
+        },
+        {
+          "kind": "llm",
+          "t0": 17.02,
+          "t1": 25.51
+        },
+        {
+          "kind": "llm",
+          "t0": 25.51,
+          "t1": 29.64
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 25.51,
+          "t1": 25.51
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 29.64,
+          "t1": 29.64
+        }
+      ]
+    },
+    {
+      "item_id": "pfizer_02",
+      "run_id": "iter2-agent-pfizer",
+      "company": "Pfizer",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 25.17,
+      "llm_s": 24.62,
+      "llm_calls": 6,
+      "llm_errors": 0,
+      "prompt_tokens": 40732,
+      "completion_tokens": 1491,
+      "tool_counts": {
+        "search_filing": 4,
+        "get_pages": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 29.65,
+          "t1": 32.98
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 32.98,
+          "t1": 33.29
+        },
+        {
+          "kind": "llm",
+          "t0": 33.29,
+          "t1": 35.51
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 35.51,
+          "t1": 35.6
+        },
+        {
+          "kind": "llm",
+          "t0": 35.6,
+          "t1": 38.79
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 38.79,
+          "t1": 38.86
+        },
+        {
+          "kind": "llm",
+          "t0": 38.86,
+          "t1": 41.02
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 41.02,
+          "t1": 41.09
+        },
+        {
+          "kind": "llm",
+          "t0": 41.09,
+          "t1": 46.54
+        },
+        {
+          "kind": "llm",
+          "t0": 46.55,
+          "t1": 54.81
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 46.55,
+          "t1": 46.55
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 54.81,
+          "t1": 54.81
+        }
+      ]
+    },
+    {
+      "item_id": "pfizer_03",
+      "run_id": "iter2-agent-pfizer",
+      "company": "Pfizer",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 28.97,
+      "llm_s": 28.46,
+      "llm_calls": 10,
+      "llm_errors": 0,
+      "prompt_tokens": 131657,
+      "completion_tokens": 1735,
+      "tool_counts": {
+        "search_filing": 7,
+        "get_pages": 2,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 54.81,
+          "t1": 58.9
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 58.9,
+          "t1": 58.96
+        },
+        {
+          "kind": "llm",
+          "t0": 58.97,
+          "t1": 63.67
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 63.67,
+          "t1": 63.75
+        },
+        {
+          "kind": "llm",
+          "t0": 63.75,
+          "t1": 65.43
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 65.44,
+          "t1": 65.52
+        },
+        {
+          "kind": "llm",
+          "t0": 65.52,
+          "t1": 67.38
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 67.38,
+          "t1": 67.45
+        },
+        {
+          "kind": "llm",
+          "t0": 67.45,
+          "t1": 69.36
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 69.36,
+          "t1": 69.42
+        },
+        {
+          "kind": "llm",
+          "t0": 69.42,
+          "t1": 71.82
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 71.82,
+          "t1": 71.88
+        },
+        {
+          "kind": "llm",
+          "t0": 71.88,
+          "t1": 73.73
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 73.73,
+          "t1": 73.79
+        },
+        {
+          "kind": "llm",
+          "t0": 73.79,
+          "t1": 75.51
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 75.51,
+          "t1": 75.52
+        },
+        {
+          "kind": "llm",
+          "t0": 75.52,
+          "t1": 78.09
+        },
+        {
+          "kind": "llm",
+          "t0": 78.09,
+          "t1": 83.77
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 78.09,
+          "t1": 78.09
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 83.78,
+          "t1": 83.78
+        }
+      ]
+    },
+    {
+      "item_id": "pfizer_04",
+      "run_id": "iter2-agent-pfizer",
+      "company": "Pfizer",
+      "bucket": "C_lookup",
+      "status": "answered",
+      "failure_class": "wrong_text",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "fail",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 53.09,
+      "llm_s": 52.57,
+      "llm_calls": 10,
+      "llm_errors": 0,
+      "prompt_tokens": 119476,
+      "completion_tokens": 3024,
+      "tool_counts": {
+        "search_filing": 7,
+        "get_pages": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "citation_unretrieved_chunk": 1
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 83.78,
+          "t1": 88.5
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 88.5,
+          "t1": 88.57
+        },
+        {
+          "kind": "llm",
+          "t0": 88.57,
+          "t1": 91.02
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 91.02,
+          "t1": 91.11
+        },
+        {
+          "kind": "llm",
+          "t0": 91.11,
+          "t1": 96.48
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 96.48,
+          "t1": 96.55
+        },
+        {
+          "kind": "llm",
+          "t0": 96.55,
+          "t1": 98.28
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 98.28,
+          "t1": 98.37
+        },
+        {
+          "kind": "llm",
+          "t0": 98.37,
+          "t1": 100.66
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 100.66,
+          "t1": 100.72
+        },
+        {
+          "kind": "llm",
+          "t0": 100.72,
+          "t1": 103.24
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 103.24,
+          "t1": 103.33
+        },
+        {
+          "kind": "llm",
+          "t0": 103.33,
+          "t1": 110.32
+        },
+        {
+          "kind": "llm",
+          "t0": 110.32,
+          "t1": 120.42
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 110.32,
+          "t1": 110.32
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 120.42,
+          "t1": 120.47
+        },
+        {
+          "kind": "llm",
+          "t0": 120.47,
+          "t1": 127.66
+        },
+        {
+          "kind": "llm",
+          "t0": 127.66,
+          "t1": 136.86
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 136.87,
+          "t1": 136.87
+        }
+      ]
+    },
+    {
+      "item_id": "verizon_01",
+      "run_id": "iter2-agent-verizon",
+      "company": "Verizon",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 155.74,
+      "llm_s": 148.02,
+      "llm_calls": 8,
+      "llm_errors": 0,
+      "prompt_tokens": 65956,
+      "completion_tokens": 2291,
+      "tool_counts": {
+        "search_filing": 5,
+        "calculate": 2,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 0.0,
+          "t1": 13.9
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 13.9,
+          "t1": 21.08
+        },
+        {
+          "kind": "llm",
+          "t0": 21.08,
+          "t1": 45.47
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 45.47,
+          "t1": 45.55
+        },
+        {
+          "kind": "llm",
+          "t0": 45.55,
+          "t1": 57.1
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 57.1,
+          "t1": 57.25
+        },
+        {
+          "kind": "llm",
+          "t0": 57.25,
+          "t1": 88.98
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 88.99,
+          "t1": 89.2
+        },
+        {
+          "kind": "llm",
+          "t0": 89.2,
+          "t1": 93.7
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 93.7,
+          "t1": 93.78
+        },
+        {
+          "kind": "llm",
+          "t0": 93.78,
+          "t1": 113.09
+        },
+        {
+          "kind": "llm",
+          "t0": 113.1,
+          "t1": 127.89
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 113.1,
+          "t1": 113.1
+        },
+        {
+          "kind": "llm",
+          "t0": 127.89,
+          "t1": 155.74
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 127.89,
+          "t1": 127.89
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 155.74,
+          "t1": 155.74
+        }
+      ]
+    },
+    {
+      "item_id": "verizon_02",
+      "run_id": "iter2-agent-verizon",
+      "company": "Verizon",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "budget_exhausted",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 652.47,
+      "llm_s": 651.68,
+      "llm_calls": 16,
+      "llm_errors": 0,
+      "prompt_tokens": 270614,
+      "completion_tokens": 9356,
+      "tool_counts": {
+        "search_filing": 9,
+        "get_pages": 2,
+        "calculate": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {
+        "citation_quote_not_verbatim": 4
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 155.74,
+          "t1": 163.91
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 163.91,
+          "t1": 164.01
+        },
+        {
+          "kind": "llm",
+          "t0": 164.01,
+          "t1": 172.43
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 172.43,
+          "t1": 172.44
+        },
+        {
+          "kind": "llm",
+          "t0": 172.44,
+          "t1": 189.97
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 189.97,
+          "t1": 190.06
+        },
+        {
+          "kind": "llm",
+          "t0": 190.06,
+          "t1": 206.36
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 206.36,
+          "t1": 206.44
+        },
+        {
+          "kind": "llm",
+          "t0": 206.44,
+          "t1": 223.05
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 223.05,
+          "t1": 223.14
+        },
+        {
+          "kind": "llm",
+          "t0": 223.14,
+          "t1": 243.16
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 243.16,
+          "t1": 243.24
+        },
+        {
+          "kind": "llm",
+          "t0": 243.24,
+          "t1": 260.32
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 260.32,
+          "t1": 260.4
+        },
+        {
+          "kind": "llm",
+          "t0": 260.4,
+          "t1": 288.5
+        },
+        {
+          "kind": "llm",
+          "t0": 288.5,
+          "t1": 319.3
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 288.5,
+          "t1": 288.5
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 319.3,
+          "t1": 319.39
+        },
+        {
+          "kind": "llm",
+          "t0": 319.39,
+          "t1": 374.91
+        },
+        {
+          "kind": "llm",
+          "t0": 374.91,
+          "t1": 410.91
+        },
+        {
+          "kind": "llm",
+          "t0": 410.91,
+          "t1": 454.97
+        },
+        {
+          "kind": "llm",
+          "t0": 454.97,
+          "t1": 504.29
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 504.29,
+          "t1": 504.38
+        },
+        {
+          "kind": "llm",
+          "t0": 504.38,
+          "t1": 530.72
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 530.72,
+          "t1": 530.73
+        },
+        {
+          "kind": "llm",
+          "t0": 530.73,
+          "t1": 585.96
+        },
+        {
+          "kind": "llm",
+          "t0": 585.96,
+          "t1": 808.13
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 808.13,
+          "t1": 808.21
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 808.21,
+          "t1": 808.21
+        }
+      ]
+    },
+    {
+      "item_id": "verizon_03",
+      "run_id": "iter2-agent-verizon",
+      "company": "Verizon",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "fail",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "pass",
+        "abstention": null
+      },
+      "wall_s": 101.98,
+      "llm_s": 101.79,
+      "llm_calls": 7,
+      "llm_errors": 0,
+      "prompt_tokens": 43951,
+      "completion_tokens": 3302,
+      "tool_counts": {
+        "search_filing": 2,
+        "get_pages": 2,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {
+        "citation_quote_not_verbatim": 1
+      },
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 808.21,
+          "t1": 817.43
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 817.43,
+          "t1": 817.52
+        },
+        {
+          "kind": "llm",
+          "t0": 817.52,
+          "t1": 824.18
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 824.18,
+          "t1": 824.19
+        },
+        {
+          "kind": "llm",
+          "t0": 824.19,
+          "t1": 837.15
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 837.15,
+          "t1": 837.24
+        },
+        {
+          "kind": "llm",
+          "t0": 837.24,
+          "t1": 852.56
+        },
+        {
+          "kind": "llm",
+          "t0": 852.56,
+          "t1": 866.14
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 852.56,
+          "t1": 852.56
+        },
+        {
+          "kind": "llm",
+          "t0": 866.14,
+          "t1": 883.54
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 866.14,
+          "t1": 866.14
+        },
+        {
+          "kind": "llm",
+          "t0": 883.54,
+          "t1": 910.19
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 910.19,
+          "t1": 910.19
+        }
+      ]
+    },
+    {
+      "item_id": "verizon_04",
+      "run_id": "iter2-agent-verizon",
+      "company": "Verizon",
+      "bucket": "A_multi_input",
+      "status": "abstained",
+      "failure_class": "abstained_answerable",
+      "abstain_cause": "budget_exhausted",
+      "scores": {
+        "answer_accuracy": null,
+        "citation_precision": null,
+        "citation_provenance": null,
+        "arithmetic_integrity": null,
+        "trace_shape": "fail",
+        "abstention": "incorrect_but_calibrated"
+      },
+      "wall_s": 437.44,
+      "llm_s": 436.62,
+      "llm_calls": 12,
+      "llm_errors": 0,
+      "prompt_tokens": 141455,
+      "completion_tokens": 3532,
+      "tool_counts": {
+        "search_filing": 11,
+        "get_pages": 1,
+        "flag_outstanding": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 910.19,
+          "t1": 986.39
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 986.39,
+          "t1": 986.48
+        },
+        {
+          "kind": "llm",
+          "t0": 986.45,
+          "t1": 1127.12
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 1127.12,
+          "t1": 1127.2
+        },
+        {
+          "kind": "llm",
+          "t0": 1127.2,
+          "t1": 1136.66
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 1136.66,
+          "t1": 1136.74
+        },
+        {
+          "kind": "llm",
+          "t0": 1136.74,
+          "t1": 1151.5
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 1151.5,
+          "t1": 1151.55
+        },
+        {
+          "kind": "llm",
+          "t0": 1151.55,
+          "t1": 1169.0
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 1169.0,
+          "t1": 1169.01
+        },
+        {
+          "kind": "llm",
+          "t0": 1169.01,
+          "t1": 1179.82
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 1179.82,
+          "t1": 1179.89
+        },
+        {
+          "kind": "llm",
+          "t0": 1179.89,
+          "t1": 1200.48
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 1200.48,
+          "t1": 1200.56
+        },
+        {
+          "kind": "llm",
+          "t0": 1200.56,
+          "t1": 1221.38
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 1221.38,
+          "t1": 1221.46
+        },
+        {
+          "kind": "llm",
+          "t0": 1221.46,
+          "t1": 1250.92
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 1250.92,
+          "t1": 1250.98
+        },
+        {
+          "kind": "llm",
+          "t0": 1250.98,
+          "t1": 1274.06
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 1274.06,
+          "t1": 1274.14
+        },
+        {
+          "kind": "llm",
+          "t0": 1274.14,
+          "t1": 1301.3
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 1301.3,
+          "t1": 1301.39
+        },
+        {
+          "kind": "llm",
+          "t0": 1301.39,
+          "t1": 1347.54
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 1347.54,
+          "t1": 1347.63
+        },
+        {
+          "kind": "tool:flag_outstanding",
+          "t0": 1347.63,
+          "t1": 1347.63
+        }
+      ]
+    },
+    {
+      "item_id": "verizon_05",
+      "run_id": "iter2-agent-verizon",
+      "company": "Verizon",
+      "bucket": "A_multi_input",
+      "status": "answered",
+      "failure_class": "correct",
+      "abstain_cause": null,
+      "scores": {
+        "answer_accuracy": "pass",
+        "citation_precision": "pass",
+        "citation_provenance": "pass",
+        "arithmetic_integrity": "pass",
+        "trace_shape": "fail",
+        "abstention": null
+      },
+      "wall_s": 32.97,
+      "llm_s": 32.89,
+      "llm_calls": 4,
+      "llm_errors": 0,
+      "prompt_tokens": 13974,
+      "completion_tokens": 1283,
+      "tool_counts": {
+        "search_filing": 1,
+        "get_pages": 1,
+        "calculate": 1,
+        "record_answer": 1
+      },
+      "rejections": {},
+      "segments": [
+        {
+          "kind": "llm",
+          "t0": 1347.63,
+          "t1": 1350.93
+        },
+        {
+          "kind": "tool:search_filing",
+          "t0": 1350.93,
+          "t1": 1351.0
+        },
+        {
+          "kind": "llm",
+          "t0": 1351.0,
+          "t1": 1358.6
+        },
+        {
+          "kind": "llm",
+          "t0": 1358.6,
+          "t1": 1370.93
+        },
+        {
+          "kind": "tool:get_pages",
+          "t0": 1358.6,
+          "t1": 1358.6
+        },
+        {
+          "kind": "llm",
+          "t0": 1370.93,
+          "t1": 1380.59
+        },
+        {
+          "kind": "tool:calculate",
+          "t0": 1370.93,
+          "t1": 1370.93
+        },
+        {
+          "kind": "tool:record_answer",
+          "t0": 1380.59,
+          "t1": 1380.59
+        }
+      ]
+    }
+  ]
+}

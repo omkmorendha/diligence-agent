@@ -1,0 +1,795 @@
+[
+  {
+    "item_id": "adobe_01",
+    "run_id": "iter3-agent-adobe",
+    "status": "answered",
+    "groundedness": 3,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "Exactly one material claim\u2014that operating margin is a useful metric for Adobe and the explanatory rationale\u2014is unsupported by any cited passage or tool output, while the numerical margin claims are fully grounded.",
+      "actionability": "The answer states a clear conclusion supported by explicit operating margin figures for FY2020\u2013FY2022 (33%, 37%, 35%) and addresses the utility of the metric, making it immediately actionable.",
+      "gold_agreement": "Both answers conclude that Adobe\u2019s operating margin is not improving as of FY2022 and identify the same directional decline from FY2021 to FY2022 by roughly two percentage points, with the memo\u2019s rounded figures (37% to 35%) consistent with the gold\u2019s exact values (36.8% to 34.6%)."
+    }
+  },
+  {
+    "item_id": "adobe_02",
+    "run_id": "iter3-agent-adobe",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "Every material claim is directly supported by tool outputs that correctly map to the requested fiscal periods (FY2020, FY2021, FY2022) and underlying Adobe 10-K data, with no period, entity, or line-item mismatches.",
+      "actionability": "The answer provides specific free cash flow conversion figures for FY2020 (1.01x), FY2021 (1.43x), and FY2022 (1.56x), giving a complete numeric basis for the 'Yes' conclusion and making it immediately actionable.",
+      "gold_agreement": "The memo agrees on the core conclusion that Adobe's FCF conversion improved as of FY2022, matching the gold's key figures for 2021\u20132022 (1.43x/143% to 1.56x/156%) and direction; the inclusion of FY2020 and use of 'x' rather than '%' are immaterial phrasing/extra-detail differences."
+    }
+  },
+  {
+    "item_id": "adobe_03",
+    "run_id": "iter3-agent-adobe",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "All material claims are directly supported by cited FY2017 passages and the tool output, with matching fiscal period, entity, and line items.",
+      "actionability": "The answer asserts the final ratio of 0.83 but omits the underlying cash from operations and total current liabilities figures, so it lacks the stated numeric basis an analyst would need to verify or act on it with confidence.",
+      "gold_agreement": "The memo answer states the operating cash flow ratio is 0.83, which exactly matches the gold answer in magnitude and conclusion."
+    }
+  },
+  {
+    "item_id": "adobe_04",
+    "run_id": "iter3-agent-adobe",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The claimed ratio of 0.66 is directly supported by the tool output, which explicitly uses FY2015 cash from operations (from the FY2015 10-K) and FY2015 total current liabilities (the prior-year figure, 2,213,556, from the FY2016 10-K balance sheet) to compute the ratio; both the inputs and the final value match the requested fiscal period, entity, and line items.",
+      "actionability": "The answer asserts the ratio 0.66 but omits both the cash from operations and total current liabilities figures, so it fails to state its own numeric basis; an analyst can see the conclusion but cannot verify or audit it without independently retrieving the underlying inputs.",
+      "gold_agreement": "The memo answer gives the exact same value (0.66) as the gold answer for the FY2015 operating cash flow ratio, with matching magnitude and polarity."
+    }
+  },
+  {
+    "item_id": "adobe_05",
+    "run_id": "iter3-agent-adobe",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "All material claims\u2014the FY2016 operating income of 1,493,602, the FY2015 operating income of 903,095, and the resulting 65.4% year-over-year change\u2014are directly supported by the cited income-statement passages and tool output, with correct fiscal periods, entity, and line-item matching.",
+      "actionability": "The answer asserts a precise percentage but omits the underlying FY2015 and FY2016 unadjusted operating income figures and the calculation, so an analyst cannot verify or reproduce the result from the text alone.",
+      "gold_agreement": "The memo answer reports 65.4 percent, which matches the gold answer of 65.4% exactly in magnitude, polarity, and period."
+    }
+  },
+  {
+    "item_id": "amd_01",
+    "run_id": "iter3-agent-amd",
+    "status": "answered",
+    "groundedness": 2,
+    "actionability": 4,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "Multiple material claims\u2014including inventory of $3,771 million, inventory as 25% of current assets, operating cash flows of $3,565 million, and an undrawn $3.0 billion revolving credit facility\u2014lack any support in the cited passages or tool outputs, which exceeds the 'exactly one unsupported' threshold for a 3.",
+      "actionability": "The answer states the quick ratio (1.57) and provides extensive supporting liquidity figures, but it omits the denominator (current liabilities) or an explicit quick-assets total, leaving the ratio\u2019s direct computational basis implicit rather than fully self-contained in the text.",
+      "gold_agreement": "The memo agrees with the gold on the core conclusion (yes, reasonably healthy liquidity), the exact quick ratio value (1.57), and the relevance of the metric, while adding extra supporting detail that does not contradict the gold."
+    }
+  },
+  {
+    "item_id": "amd_02",
+    "run_id": "iter3-agent-amd",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 2,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The segment claim is fully supported by the cited FY2022 10-K passage and tool outputs, with correct matching of FY21-FY22 periods, AMD entity, and segment-level sales.",
+      "actionability": "The answer asserts a segment conclusion but states no numeric basis\u2014such as FY21 and FY22 segment sales figures or computed proportional growth rates\u2014so an analyst cannot verify or act on the claim as written.",
+      "gold_agreement": "Both the gold and memo answers identify Data Center as the AMD reporting segment with the largest proportional sales increase from FY21 to FY22 excluding Embedded, reaching the identical substantive conclusion."
+    }
+  },
+  {
+    "item_id": "amd_03",
+    "run_id": "iter3-agent-amd",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The 4.18% claim is directly computed from FY2015 D&A of 167 and FY2015 net revenue of 3,991, both values are explicitly listed in the FY2015 10-K excerpts and correctly paired in the tool output; period, entity, and line-item all match.",
+      "actionability": "It states the final 4.18% margin but omits the underlying FY2015 D&A and revenue figures from the P&L and cash flow statement, so the numeric basis is missing and the answer is thin rather than self-contained.",
+      "gold_agreement": "The memo answer of 4.18% is materially identical to the gold answer of 4.2%, differing only by rounding."
+    }
+  },
+  {
+    "item_id": "amd_04",
+    "run_id": "iter3-agent-amd",
+    "status": "answered",
+    "groundedness": 3,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The general assertion that AMD reported customer concentration is supported by the FY2022 passage, but the specific claim that Customer A represented 16% of consolidated net revenue is not present in the cited text, leaving one material claim unsupported.",
+      "actionability": "The answer provides a definitive yes/no conclusion and explicitly states the numeric basis (16% of consolidated net revenue from Customer A) within the text, making it fully self-contained and immediately actionable.",
+      "gold_agreement": "Both answers affirm customer concentration in FY22 and cite the identical 16% of consolidated net revenue figure; 'Customer A' and 'one customer' refer to the same underlying fact."
+    }
+  },
+  {
+    "item_id": "amd_05",
+    "run_id": "iter3-agent-amd",
+    "status": "abstained",
+    "groundedness": null,
+    "actionability": 2,
+    "gold_agreement": 3,
+    "rationale": {
+      "groundedness": null,
+      "actionability": "The abstention cites attempt exhaustion and lack of verbatim grounding but fails to name the specific missing evidence (e.g., which document, note, or line-item) or the specific next retrieval step required to resolve it, making it a recoverable failure dressed as a conclusion.",
+      "gold_agreement": "The memo abstained without offering any substantive conclusion, whereas the gold identifies specific FY22 revenue drivers (EPYC processors, semi-custom products, and Xilinx embedded sales); under the rubric, abstaining where the gold has a definite answer is partially consistent."
+    }
+  },
+  {
+    "item_id": "amd_06",
+    "run_id": "iter3-agent-amd",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "All material claims are directly supported by the cited FY2022 AMD passages with matching period, entity, and line-item; the comparative conclusion is grounded in the three cited cash flow figures.",
+      "actionability": "The answer provides explicit numeric values for all three cash flow categories\u2014operating ($3,565M), investing ($1,999M), and financing (\u2212$3,264M)\u2014giving a self-contained basis for the conclusion.",
+      "gold_agreement": "The memo reaches the identical substantive conclusion that operating activities provided the most cash flow in FY22, consistent with the gold answer, and the supporting figures reinforce rather than contradict that thesis."
+    }
+  },
+  {
+    "item_id": "best_buy_01",
+    "run_id": "iter3-agent-best_buy",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "Every material claim\u2014the 969 and 982 store counts for Q2 FY2024 and Q2 FY2023 and the 13-store decrease\u2014is explicitly supported by the tool output with matching fiscal periods, entity, and line-item.",
+      "actionability": "The answer states a clear conclusion and provides its full numeric basis in the text itself: 982 stores at the end of Q2 FY2023 and 969 stores at the end of Q2 FY2024, making it immediately actionable without any further retrieval or computation.",
+      "gold_agreement": "Both answers agree that Best Buy stores declined from 982 to 969 between Q2 FY2023 and Q2 FY2024; the memo cites the absolute decrease of 13 stores while the gold cites the equivalent 1.32% decline, representing the same substantive magnitude, direction, and polarity."
+    }
+  },
+  {
+    "item_id": "best_buy_02",
+    "run_id": "iter3-agent-best_buy",
+    "status": "abstained",
+    "groundedness": null,
+    "actionability": 2,
+    "gold_agreement": 3,
+    "rationale": {
+      "groundedness": null,
+      "actionability": "The abstention is a generic budget-exhaustion statement that names no specific missing evidence (e.g., historical gross margin figures or income statements) and no specific next retrieval or computation step, making it a hollow non-answer per the grading rubric.",
+      "gold_agreement": "The memo abstained without offering a substantive conclusion, whereas the gold answer definitively states that gross margins have been consistent with only a minor 1.1% decline."
+    }
+  },
+  {
+    "item_id": "best_buy_03",
+    "run_id": "iter3-agent-best_buy",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The 2.8% claim is directly supported by the tool output computing the FY2015-FY2017 average net profit margin from cited income-statement net earnings and revenue figures, with correct fiscal-year mapping.",
+      "actionability": "The answer asserts a final average of 2.8% but supplies no underlying FY2015\u2013FY2017 net profit or revenue figures (or year-by-year margins), so the numeric basis needed to verify or audit the calculation is entirely absent from the text.",
+      "gold_agreement": "The memo answer states 2.8 percent, which exactly matches the gold answer's 2.8% in value, unit, and rounding."
+    }
+  },
+  {
+    "item_id": "best_buy_04",
+    "run_id": "iter3-agent-best_buy",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 4,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The claimed FY2019 inventory value is directly supported by the cited FY2019 Best Buy 10-K balance sheet line item 'Merchandise inventories 5,409', with matching fiscal period, entity, and line item.",
+      "actionability": "The answer gives the exact inventory figure and unit, so an analyst can use it, but it never cites the specific balance-sheet line item or document source, leaving the numeric basis implicit rather than stated in the text.",
+      "gold_agreement": "The memo answer states $5,409 million, which exactly matches the gold answer of $5409.00 in magnitude, unit, and entity."
+    }
+  },
+  {
+    "item_id": "best_buy_05",
+    "run_id": "iter3-agent-best_buy",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 4,
+    "rationale": {
+      "groundedness": "The answer\u2019s single material claim is fully supported by the three cited FY2023 cash-flow statement line items, which show operating activities as the only positive and largest inflow versus cash used in investing and financing, with matching period, entity, and line-item.",
+      "actionability": "The answer states a clear categorical conclusion but provides no numeric cash flow figures for operating, investing, or financing activities, leaving analysts without the quantitative basis needed to verify or act on the claim.",
+      "gold_agreement": "The memo correctly identifies operating activities as the largest cash flow source, matching the gold's conclusion and polarity, but omits the $1.8 billion magnitude figure."
+    }
+  },
+  {
+    "item_id": "boeing_01",
+    "run_id": "iter3-agent-boeing",
+    "status": "abstained",
+    "groundedness": null,
+    "actionability": 2,
+    "gold_agreement": 3,
+    "rationale": {
+      "groundedness": null,
+      "actionability": "The abstention cites a generic tool-call budget exhaustion without naming the specific missing evidence (e.g., segment or product-line revenue disclosure) or the exact next retrieval step needed, making it a hollow, non-actionable dead end.",
+      "gold_agreement": "The memo abstains without providing a substantive answer, whereas the gold answer definitively confirms that Commercial Airplanes, Defence, and Services each exceed 20% of FY2022 revenue."
+    }
+  },
+  {
+    "item_id": "boeing_02",
+    "run_id": "iter3-agent-boeing",
+    "status": "answered",
+    "groundedness": null,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": null,
+      "actionability": "The answer provides the exact gross margin percentages (-9.70%, 4.90%, 5.30%) that serve as the numeric basis for the improving-profile conclusion, and it cites the specific $5,253 million catch-up adjustment to ground the caveat about limited usefulness, making it fully self-contained and actionable.",
+      "gold_agreement": "The memo reaches the same substantive conclusion as the gold: Boeing's gross margin profile is improving as of FY2022, with gross margin rising to approximately 5.3% from roughly 4.8-4.9% in FY2021. The additional discussion of program accounting and cumulative catch-up adjustments constitutes extra correct detail that does not alter the core agreement."
+    }
+  },
+  {
+    "item_id": "boeing_03",
+    "run_id": "iter3-agent-boeing",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The claimed FY2018 net PP&E value of $12,645 million is directly supported by the cited FY2018 10-K passage showing the identical line-item and amount, with matching period, entity, and unit.",
+      "actionability": "The answer gives a precise figure but does not state its numeric basis\u2014neither citing the specific balance-sheet line item nor confirming the document source\u2014so the conclusion stands unsupported in the text.",
+      "gold_agreement": "The memo answer correctly identifies Boeing's FY2018 net property, plant, and equipment as $12,645 million, matching the gold answer exactly in entity, magnitude, and unit."
+    }
+  },
+  {
+    "item_id": "boeing_04",
+    "run_id": "iter3-agent-boeing",
+    "status": "answered",
+    "groundedness": 3,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "All material claims except one are grounded in the cited FY2022 10-K passages; the claim that deterioration leads to fewer orders, postponements, cancellations, and reduced backlog lacks any supporting evidence in the provided citations.",
+      "actionability": "The answer gives a definitive yes/no conclusion and fully grounds it with explicit qualitative evidence (company statements on industry cyclicality, demand drivers, and macroeconomic linkages), making it self-contained and immediately actionable without needing numeric support.",
+      "gold_agreement": "Both answers reach the identical substantive conclusion that Boeing's business is cyclical due to its exposure to the cyclical airline industry; the memo's additional supporting detail does not alter the core agreement."
+    }
+  },
+  {
+    "item_id": "boeing_05",
+    "run_id": "iter3-agent-boeing",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "All three material claims are directly supported by the cited passage, which explicitly forecasts 2023 production changes for the 787 and 777X and states the 737 increase plan in the same forward-looking 2023 context, matching the FY2023 period asked.",
+      "actionability": "The answer is self-contained and immediately actionable, specifying exact forecasted rates (787 to 5/month, 737 from 31/month, 777X resuming) without requiring further retrieval or computation.",
+      "gold_agreement": "The memo reaches the same substantive conclusion as the gold answer, forecasting production rate increases for the 737, 777X, and 787 programs in FY2023; the additional specifics are consistent with the gold answer\u2019s direction and do not alter its core thesis."
+    }
+  },
+  {
+    "item_id": "boeing_06",
+    "run_id": "iter3-agent-boeing",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 1,
+    "rationale": {
+      "groundedness": "All material claims are directly supported by the cited passages and tool output, with the correct fiscal periods, entity, and line-item matching the question.",
+      "actionability": "The answer explicitly states the FY2022 and FY2021 effective tax rates (-0.6% and 14.7%) and the derived 15.3 percentage point difference, providing a complete, self-contained numeric basis for immediate analyst action.",
+      "gold_agreement": "The memo flips the polarities for both years, stating FY2022 was -0.6% and FY2021 was 14.7%, which is the opposite of the gold answer (0.62% and -14.76%), and therefore incorrectly claims a decrease rather than an increase."
+    }
+  },
+  {
+    "item_id": "boeing_07",
+    "run_id": "iter3-agent-boeing",
+    "status": "abstained",
+    "groundedness": null,
+    "actionability": 2,
+    "gold_agreement": 3,
+    "rationale": {
+      "groundedness": null,
+      "actionability": "The abstention cites repeated grounding failures but never names the specific missing document, note, or line-item, nor does it specify the next retrieval step required to locate Boeing\u2019s FY2022 primary customers; it is a recoverable miss presented as a dead end.",
+      "gold_agreement": "The memo abstains where the gold answer provides a definite conclusion about Boeing's primary customers and the US government's 40% revenue share."
+    }
+  },
+  {
+    "item_id": "general_mills_01",
+    "run_id": "iter3-agent-general_mills",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The claimed FY2020 working capital ratio of 0.68 is fully supported by cited FY2020 total current assets and total current liabilities and the tool output that computes the ratio from those exact inputs, with matching period, entity, and line-items.",
+      "actionability": "The answer asserts a precise ratio of 0.68 but omits the underlying current assets and current liabilities figures from the statement of financial position, so it fails to state its own numeric basis and is not self-contained for verification.",
+      "gold_agreement": "The memo correctly identifies the FY2020 working capital ratio as 0.68, matching the gold answer exactly in both value and definition."
+    }
+  },
+  {
+    "item_id": "general_mills_02",
+    "run_id": "iter3-agent-general_mills",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 2,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The claimed FY2019 CCC of -3.70 days is directly supported by tool output [4], which aggregates DIO, DSO, and DPO values that are each computed from the cited General Mills FY2019 10-K line items with correct FY2019 and FY2018 period assignments, fully matching the question's formula and fiscal period.",
+      "actionability": "The answer asserts a precise final figure (-3.70 days) but provides no component breakdowns (DIO, DSO, DPO) or underlying balance-sheet/income-statement line items, so an analyst cannot verify, reproduce, or act on the computation from the text alone.",
+      "gold_agreement": "The memo answer states the FY2019 CCC is -3.70 days, which matches the gold answer of -3.7 exactly in magnitude, polarity, and entity."
+    }
+  },
+  {
+    "item_id": "general_mills_03",
+    "run_id": "iter3-agent-general_mills",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "Both operating cash flow and capex are explicitly cited from the FY2020 statement of cash flows, and the resulting FCF of 3215.4 is correctly derived from those matching FY2020 figures.",
+      "actionability": "The answer states the final FCF figure but omits the underlying cash from operations and capex amounts, so the numeric basis is missing and the calculation cannot be verified from the text alone.",
+      "gold_agreement": "The memo answer reports FY2020 FCF of 3215.4 USD millions, which matches the gold answer of $3215.00 million except for a trivial rounding difference of 0.4 (0.01%), well within acceptable tolerance."
+    }
+  },
+  {
+    "item_id": "general_mills_04",
+    "run_id": "iter3-agent-general_mills",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "Every material claim is directly supported by the cited FY2022 General Mills passages and tool output, with correct period, entity, and line-item alignment.",
+      "actionability": "The answer gives the final ratio but omits the underlying net income and dividend figures from the income statement and cash flow statement, so an analyst cannot verify or replicate the calculation from the text alone.",
+      "gold_agreement": "The memo answer states the retention ratio is 0.54, which matches the gold answer exactly in value, magnitude, and polarity."
+    }
+  },
+  {
+    "item_id": "johnson_johnson_01",
+    "run_id": "iter3-agent-johnson_johnson",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "Both material claims are directly supported by the FY2022 tool output and cited passages, with the 2.72 value, FY2022 period, J&J entity, and inventory/COGS line items all matching the question.",
+      "actionability": "The answer asserts a precise inventory turnover ratio but omits the underlying COGS and average inventory figures, so the numeric basis is entirely unstated; an analyst can record the headline figure but cannot verify, audit, or document the calculation from the text alone.",
+      "gold_agreement": "The memo concludes that J&J's FY2022 inventory turnover was approximately 2.72x, which matches the gold answer's 2.7x with only trivial rounding variance, and both agree on the same entity, period, and substantive conclusion."
+    }
+  },
+  {
+    "item_id": "johnson_johnson_02",
+    "run_id": "iter3-agent-johnson_johnson",
+    "status": "answered",
+    "groundedness": null,
+    "actionability": 5,
+    "gold_agreement": 3,
+    "rationale": {
+      "groundedness": null,
+      "actionability": "The answer states a clear yes/no conclusion and provides the explicit numeric basis (23.81% to 23.90%) for the comparison, making it fully self-contained and immediately actionable.",
+      "gold_agreement": "The memo agrees on the direction of change (a slight increase) but cites materially different absolute net earnings percentages (23.81% to 23.90% versus the gold's 20% to 20.1%), which would lead an analyst to a markedly different view of JnJ's profitability level."
+    }
+  },
+  {
+    "item_id": "johnson_johnson_03",
+    "run_id": "iter3-agent-johnson_johnson",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The sole material claim is fully supported by the cited 8-K dated August 30, 2023, which explicitly states that Johnson & Johnson will present its Consumer Health business as discontinued operations, matching the requested entity, segment, date, and treatment.",
+      "actionability": "The answer directly names the specific business segment (Consumer Health) with no ambiguity; the question is categorical and requires no numeric basis, so an analyst can act on it immediately.",
+      "gold_agreement": "The memo correctly identifies the Consumer Health segment as the discontinued operation, matching the gold answer's entity and substantive conclusion exactly despite its abbreviated phrasing."
+    }
+  },
+  {
+    "item_id": "johnson_johnson_04",
+    "run_id": "iter3-agent-johnson_johnson",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 2,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "Every material claim is directly supported by the cited August 30, 2023 8-K passage, with correct fiscal period (Q3 2023/FY2023), entity (Johnson & Johnson), segment (Consumer Health), and line-item (gain on separation/discontinued operations).",
+      "actionability": "The answer reads fluently but names no source document, note, line item, or calculation to ground the $20 billion figure, so an analyst cannot verify or act on it with confidence.",
+      "gold_agreement": "The memo answer states approximately $20 billion, matching the gold answer's magnitude, polarity, and entity exactly; the structured value of 20000.0 USD millions is numerically equivalent to $20 billion."
+    }
+  },
+  {
+    "item_id": "johnson_johnson_05",
+    "run_id": "iter3-agent-johnson_johnson",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The claimed $13.2 billion cash proceeds figure is explicitly stated in the cited August 30, 2023 8-K filing, and the period, entity, segment, and line-item all correspond to the question.",
+      "actionability": "The answer directly states the precise cash proceeds figure ($13.2 billion) with a clear unit and date, making it immediately actionable without requiring further computation or retrieval.",
+      "gold_agreement": "The memo answer correctly identifies the same $13.2 billion in cash proceeds from the Kenvue separation, matching the gold answer in entity, magnitude, and polarity; the structured value of 13,200 USD millions is numerically identical."
+    }
+  },
+  {
+    "item_id": "johnson_johnson_06",
+    "run_id": "iter3-agent-johnson_johnson",
+    "status": "answered",
+    "groundedness": null,
+    "actionability": 5,
+    "gold_agreement": 1,
+    "rationale": {
+      "groundedness": null,
+      "actionability": "The answer provides a clear conclusion supported by explicit numeric bases for both historical FY2022 adjusted EPS growth (3.6% from $9.80 to $10.15) and FY2023 guidance figures (4.0%, 6.0%, and 12.5%), including comparability context, making it fully self-contained and immediately actionable.",
+      "gold_agreement": "The memo concludes that adjusted EPS growth was expected to accelerate in FY2023 (Yes), directly contradicting the gold answer which states it was expected to decelerate slightly from 3.6% to 3.5% (No)."
+    }
+  },
+  {
+    "item_id": "johnson_johnson_07",
+    "run_id": "iter3-agent-johnson_johnson",
+    "status": "answered",
+    "groundedness": null,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": null,
+      "actionability": "The answer states a clear conclusion ('No') and provides explicit numeric basis in the text: FY2022 revenue growth of 1.25% with absolute figures ($94,943M vs $93,775M), net earnings decline of 14.07% with absolute figures ($17,941M vs $20,878M), and FY2020\u2013FY2022 annualized growth rates (~7.2% revenue, ~10.4% earnings). An analyst can act on these figures immediately without needing external data.",
+      "gold_agreement": "Both answers conclude JnJ is not a high-growth company and cite nearly identical FY2022 revenue growth (~1.3% vs ~1.25%); the memo's additional earnings decline and management commentary are consistent, supplementary details."
+    }
+  },
+  {
+    "item_id": "mgm_resorts_01",
+    "run_id": "iter3-agent-mgm_resorts",
+    "status": "abstained",
+    "groundedness": null,
+    "actionability": 2,
+    "gold_agreement": 3,
+    "rationale": {
+      "groundedness": null,
+      "actionability": "The answer offers a generic budget-exhaustion abstention that names no specific missing evidence (e.g., FY2018\u20132020 Statements of Cash Flows or capex line items) and prescribes no next retrieval or computation step, making it a recoverable failure dressed as a conclusion.",
+      "gold_agreement": "The memo abstains from answering due to reaching a tool-call budget limit, whereas the gold provides a definite numerical answer of 7.9%, which matches the scale definition for a score of 3."
+    }
+  },
+  {
+    "item_id": "mgm_resorts_02",
+    "run_id": "iter3-agent-mgm_resorts",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 4,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The cited Q2 FY2023 table directly lists Corporate bonds at 416,420, which exceeds all other short-term investment categories shown, and the amount 416,420 is explicitly present in the passage for the relevant entity and period.",
+      "actionability": "The answer names the category and gives a precise dollar amount, but it asserts a comparative ranking ('largest') without stating the numeric basis for that comparison (i.e., the amounts of the other short-term investment types), leaving that supporting figure implicit.",
+      "gold_agreement": "Both answers identify corporate bonds as the largest short-term investment; the memo's absolute dollar figure is extra detail that does not contradict the gold's relative magnitude."
+    }
+  },
+  {
+    "item_id": "mgm_resorts_03",
+    "run_id": "iter3-agent-mgm_resorts",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "Both the affirmative answer and the $4.048 million figure are supported by FY2022 evidence matching the requested entity, period, and line item; the tool output directly computes the 4.048 value from the cited FY2022 filing.",
+      "actionability": "The answer directly states the specific dividend amount ($4.048 million) paid to common shareholders in FY2022, giving a clear numeric basis that makes the conclusion immediately actionable without requiring further inference or retrieval.",
+      "gold_agreement": "Both answers affirm that MGM paid common dividends in FY2022, and the memo\u2019s aggregate $4.048 million is arithmetically consistent with the gold\u2019s $0.01 per-share rate (implying ~405 million shares), so the substantive conclusion, polarity, and magnitude all align."
+    }
+  },
+  {
+    "item_id": "mgm_resorts_04",
+    "run_id": "iter3-agent-mgm_resorts",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The claimed FY2018 accounts payable amount is fully supported by the cited FY2018 balance sheet line item ($302,578 in thousands) and the tool output that converts it to 302.578 million, with matching period, entity, and line item.",
+      "actionability": "The answer explicitly states the FY2018 accounts payable amount ($302.6 million) with clear units, providing a self-contained, directly usable figure that requires no further retrieval or computation.",
+      "gold_agreement": "The memo correctly identifies the FY2018 year-end accounts payable for MGM Resorts; the reported $302.6 million (302.578) is materially the same as the gold $303.00 million, differing only by immaterial rounding (well under 1%)."
+    }
+  },
+  {
+    "item_id": "mgm_resorts_05",
+    "run_id": "iter3-agent-mgm_resorts",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 2,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The cited FY2022 10-K table directly lists Las Vegas Strip Resorts Adjusted EBITDAR of $3,142,308 for 2022, which exceeds all other reported regions/segments, fully matching the question\u2019s period, entity, segment, and line-item.",
+      "actionability": "The answer asserts a definitive conclusion ('Las Vegas Strip Resorts') but provides no EBITDAR figures for any region, so an analyst has no numeric basis to verify the claim or use it in further analysis.",
+      "gold_agreement": "The memo correctly identifies Las Vegas Strip Resorts as the region with the highest EBITDAR contribution, matching the gold answer's substantive conclusion; the omitted ~90% magnitude is secondary to the 'which region' question asked."
+    }
+  },
+  {
+    "item_id": "mgm_resorts_06",
+    "run_id": "iter3-agent-mgm_resorts",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 2,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The claim is fully supported by FY2022 tool outputs and the cited 10-K passage, which show MGM China\u2019s revenue declined 44% while Las Vegas and Regional segments grew, correctly identifying it as the worst-performing region for the requested fiscal period.",
+      "actionability": "The answer asserts a comparative conclusion ('worst topline performance') but provides no numeric basis\u2014such as revenue figures, growth rates, or segment totals for MGM China versus other regions\u2014so an analyst cannot verify the claim or act on it with confidence.",
+      "gold_agreement": "The memo correctly identifies MGM China as the region with the worst topline performance, matching the gold answer\u2019s core entity and substantive conclusion without any contradictory direction or magnitude."
+    }
+  },
+  {
+    "item_id": "nike_01",
+    "run_id": "iter3-agent-nike",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "All material claims are directly supported by the cited passages and tool output with matching fiscal periods, entities, and line items. The FY2021 COGS and the FY2020/FY2021 inventory figures are correctly drawn from the FY2021 10-K, and the tool output explicitly computes the requested ratio as 3.46.",
+      "actionability": "The answer gives the ratio but omits the underlying FY2021 COGS, FY2020 and FY2021 inventory balances, and the average calculation, so the numeric basis is entirely implicit; an analyst cannot verify or replicate the figure without retrieving those components independently.",
+      "gold_agreement": "The memo answer reports an inventory turnover ratio of 3.46, which exactly matches the gold answer\u2019s magnitude, polarity, and entity with no discrepancies."
+    }
+  },
+  {
+    "item_id": "nike_02",
+    "run_id": "iter3-agent-nike",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The single material claim is fully supported by the tool output and the cited FY2018 10-K passage, with matching fiscal periods (FY2016\u2013FY2018), entity (Nike), and line items (Cost of sales / Revenues).",
+      "actionability": "The answer gives a final percentage but omits the underlying yearly COGS and revenue figures and the individual annual ratios, so the numeric basis is entirely implicit rather than stated.",
+      "gold_agreement": "The memo answer states 55.1 percent, which exactly matches the gold answer of 55.1% for the three-year average COGS as a percentage of revenue from FY2016 to FY2018, including correct magnitude, unit, and rounding."
+    }
+  },
+  {
+    "item_id": "nike_03",
+    "run_id": "iter3-agent-nike",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The claim is directly supported by the cited FY2019 10-K passage, which lists Total current assets as 16,525; the fiscal period, entity, and line-item all exactly match the question.",
+      "actionability": "The answer states the exact numeric value ($16,525 million) and unit (USD millions) for Nike's total current assets at the end of FY2019, making it fully self-contained and immediately actionable without any missing caveat or implicit dependency.",
+      "gold_agreement": "The memo answer states the exact same figure ($16,525 million) for Nike's total current assets at the end of FY2019 as the gold answer, with correct unit and polarity."
+    }
+  },
+  {
+    "item_id": "nike_04",
+    "run_id": "iter3-agent-nike",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The operating activities claim is a clean match: the cited FY2023 Nike 10-K passage explicitly lists 5,841 for cash provided by operations, and the comparative ranking follows directly from the other two cited values, all for the correct period and entity.",
+      "actionability": "The answer explicitly lists the cash flow figures for operating ($5,841 million), investing ($564 million), and financing (used $7,447 million) activities, giving a complete numeric basis for the conclusion and enabling immediate action.",
+      "gold_agreement": "The memo reaches the identical conclusion that operating activities provided the highest cash flow, and the supplemental figures are consistent with that conclusion."
+    }
+  },
+  {
+    "item_id": "pepsico_01",
+    "run_id": "iter3-agent-pepsico",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "All material claims\u2014the $400 million increase, the $3.8 billion old agreement, and the $4.2 billion new agreement\u2014are directly supported by the cited FY2023 8-K passages and the tool output, with correct dates, entity, and line-item matching the question.",
+      "actionability": "The answer explicitly states the numeric basis for the $400 million increase, providing both the pre- and post-increase figures ($3.8 billion to $4.2 billion), making it fully self-contained and immediately actionable.",
+      "gold_agreement": "The memo correctly identifies the increase as $400 million, matching the gold answer's $400,000,000 increase, and confirms the same entity and date."
+    }
+  },
+  {
+    "item_id": "pepsico_02",
+    "run_id": "iter3-agent-pepsico",
+    "status": "abstained",
+    "groundedness": null,
+    "actionability": 2,
+    "gold_agreement": 3,
+    "rationale": {
+      "groundedness": null,
+      "actionability": "The answer offers a generic tool-call budget exhaustion without identifying the specific missing evidence or the precise next retrieval step, making it a hollow abstention that presents a recoverable failure as a dead end.",
+      "gold_agreement": "The memo abstained without providing a grounded answer, while the gold supplies a definite figure of $8,400,000,000."
+    }
+  },
+  {
+    "item_id": "pepsico_03",
+    "run_id": "iter3-agent-pepsico",
+    "status": "answered",
+    "groundedness": 3,
+    "actionability": 5,
+    "gold_agreement": 4,
+    "rationale": {
+      "groundedness": "The claim of 'seven geographic regions' cites the 'seven reportable segments,' but the passage shows three segments share the United States and Canada geography, so the count and unit are a mismatch for geographies; all other claims are directly supported by the cited FY2022 text.",
+      "actionability": "The answer is self-contained and directly enumerates the specific geographic regions and key countries in which PepsiCo operates, providing an analyst with immediately usable information without requiring further retrieval or computation.",
+      "gold_agreement": "The memo names the same set of geographies as the gold (North America/U.S. and Canada, Latin America, Europe, AMESA, and APAC), but it incorrectly claims there are 'seven' geographic regions while only listing five, a secondary count error that does not alter the substantive geographic coverage."
+    }
+  },
+  {
+    "item_id": "pepsico_04",
+    "run_id": "iter3-agent-pepsico",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "All material claims are directly supported by the FY2023Q1 cited passages and tool output, with the correct period, entity, and line-item for the full-year 2023 core constant currency EPS guidance update.",
+      "actionability": "The answer states the specific numeric basis for the increase, giving both the prior guidance (8 percent) and the updated guidance (9 percent), so an analyst can act on it immediately without further retrieval.",
+      "gold_agreement": "Both answers agree that PepsiCo raised full-year core constant currency EPS growth guidance by exactly 1 percentage point; the memo\u2019s added detail (from 8% to 9%) is consistent with and does not change the gold\u2019s substantive conclusion or magnitude."
+    }
+  },
+  {
+    "item_id": "pepsico_05",
+    "run_id": "iter3-agent-pepsico",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "All material claims are directly supported by cited FY2022 passages and the tool output, with matching fiscal period, entity, and line-items.",
+      "actionability": "The answer asserts a final figure of $9,068 million but provides no constituent numeric basis\u2014unadjusted operating income, depreciation and amortization, or capex\u2014so an analyst cannot replicate or verify the calculation from the text alone.",
+      "gold_agreement": "The memo answer states $9,068 million, which exactly matches the gold answer of $9068.00 in magnitude, polarity, and entity."
+    }
+  },
+  {
+    "item_id": "pepsico_06",
+    "run_id": "iter3-agent-pepsico",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 2,
+    "gold_agreement": 1,
+    "rationale": {
+      "groundedness": "The claim that restructuring costs equal 0 because they are not explicitly outlined is fully supported by the cited FY2022 income statement, which omits any such line item; the period, entity, and document type all match the question.",
+      "actionability": "The answer asserts '0' but provides no numeric basis in the text\u2014such as noting the absence of a restructuring line item in the FY2022 income statement\u2014so an analyst cannot verify or act on the figure without redoing the search.",
+      "gold_agreement": "The gold answer states restructuring costs were $411 million in FY2022, while the memo answer states 0, directly contradicting the gold's substantive conclusion."
+    }
+  },
+  {
+    "item_id": "pepsico_07",
+    "run_id": "iter3-agent-pepsico",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "All material claims are directly supported by the cited FY2023Q1 earnings passage, and the period, entity, and topic all match the question.",
+      "actionability": "The answer is self-contained and actionable: it states the specific reason for the guidance raise (strong Q1 performance and resilient categories/geographies) and provides the exact numeric basis for the revision (organic revenue guidance raised to 8% from 6% and core constant currency EPS to 9% from 8%), allowing an analyst to act immediately without further retrieval.",
+      "gold_agreement": "The memo identifies the same core driver as the gold\u2014strong first-quarter performance and a strong start to FY2023\u2014and adds consistent supporting detail without any contradiction in polarity, direction, or substance."
+    }
+  },
+  {
+    "item_id": "pepsico_08",
+    "run_id": "iter3-agent-pepsico",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 2,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The claim is directly and explicitly supported by the cited FY2023 8-K filing covering the May 3, 2023 AGM, with matching entity, period, and proposal description.",
+      "actionability": "The answer asserts a binary conclusion ('defeated') but provides no numeric basis\u2014such as vote counts, percentages, or the specific proxy filing\u2014so an analyst cannot verify or act on it with confidence.",
+      "gold_agreement": "Both answers state that the shareholder proposal for a congruency report on net-zero emissions policies was defeated; the omission of 'by Pepsico' is a minor phrasing difference that does not change the substantive conclusion."
+    }
+  },
+  {
+    "item_id": "pfizer_01",
+    "run_id": "iter3-agent-pfizer",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "Every material claim is directly supported by the cited passage and tool outputs, with correct fiscal periods (FY2020 and FY2021) and line-item (Property, plant and equipment) matching the question.",
+      "actionability": "The answer states a clear conclusion and provides the exact numeric basis\u2014FY20 PPNE of $13,745 million and FY21 PPNE of $14,882 million\u2014allowing an analyst to act immediately without further retrieval.",
+      "gold_agreement": "Both answers affirm that Pfizer's PPNE grew between FY20 and FY21 with positive polarity; the memo provides specific figures consistent with the gold's directional conclusion."
+    }
+  },
+  {
+    "item_id": "pfizer_02",
+    "run_id": "iter3-agent-pfizer",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "All material claims are directly supported by the cited Pfizer 2023Q2 10-Q passage and tool outputs, with correct fiscal period, entity, segment, and line-item matching; the lowest-scoring claim is a clean match.",
+      "actionability": "The answer explicitly identifies the region, states the 74% decline, and provides the underlying Q2 2022 and Q2 2023 revenue figures, along with comparative declines for all other regions, making it fully self-contained and immediately actionable.",
+      "gold_agreement": "The memo correctly identifies the same region, Developed Rest of the World, as having the biggest percentage drop in Q2 2023 year-over-year revenues, fully aligning with the gold answer's substantive conclusion."
+    }
+  },
+  {
+    "item_id": "pfizer_03",
+    "run_id": "iter3-agent-pfizer",
+    "status": "abstained",
+    "groundedness": null,
+    "actionability": 2,
+    "gold_agreement": 3,
+    "rationale": {
+      "groundedness": null,
+      "actionability": "The abstention cites a generic tool-call budget limit without identifying the specific missing evidence (e.g., which note or section contains acquisition disclosures) or the next retrieval step needed to find it, making it a hollow non-answer.",
+      "gold_agreement": "The memo abstained without providing an answer, while the gold identifies three definite acquisitions (Trillium, Array, and Therachon)."
+    }
+  },
+  {
+    "item_id": "pfizer_04",
+    "run_id": "iter3-agent-pfizer",
+    "status": "answered",
+    "groundedness": 3,
+    "actionability": 3,
+    "gold_agreement": 1,
+    "rationale": {
+      "groundedness": "The key assertion about no ongoing large spin-offs and the Seagen acquisition details are grounded in the cited Q2 2023 10-Q, but the claim that the Upjohn spin-off was completed in November 2020 is entirely unsupported by any cited passage, constituting exactly one unsupported material claim.",
+      "actionability": "The answer asserts a yes/no conclusion without stating its numeric basis in the text (e.g., no specific discontinued-operations dollar amount, segment revenue percentage, or quantitative threshold to ground the 'no large spin-off' claim), relying only on qualitative descriptors like 'immaterial.'",
+      "gold_agreement": "The gold answer affirms Pfizer is spinning off Upjohn as of Q2'2023, while the memo explicitly denies any ongoing large segment spin-off and states the Upjohn spin-off was completed in November 2020, constituting a direct contradiction in polarity and status."
+    }
+  },
+  {
+    "item_id": "verizon_01",
+    "run_id": "iter3-agent-verizon",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "All material claims are directly supported by the provided FY2022 cited passages or tool outputs, with correct fiscal period, entity, and line-item matching; the lowest-scoring claim is a match.",
+      "actionability": "The answer provides specific FY2022 figures and derived ratios (capex/revenue, PP&E/assets, capex/operating cash flow) that directly support the 'yes' conclusion, making it fully self-contained and immediately actionable.",
+      "gold_agreement": "The memo reaches the identical substantive conclusion\u2014Verizon is capital intensive in FY2022\u2014and its cited underlying figures (total assets of ~$379.7B and revenue of ~$136.8B) are the exact components of the gold\u2019s ~2.77 capital intensity ratio, merely expressed through alternative metrics (CapEx/Revenue, PP&E/Assets, CapEx/OCF) rather than the ratio itself. Polarity, entity, period, and magnitude are all consistent."
+    }
+  },
+  {
+    "item_id": "verizon_02",
+    "run_id": "iter3-agent-verizon",
+    "status": "answered",
+    "groundedness": null,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": null,
+      "actionability": "The answer explicitly states the numeric basis for the 0.54 quick ratio by showing the exact formula and underlying figures\u2014($2,605M + $24,506M) / $50,171M\u2014making it fully self-contained and immediately actionable.",
+      "gold_agreement": "Both answers agree that Verizon\u2019s FY 2022 quick ratio was 0.54 and that this level indicates an unhealthy or constrained liquidity profile by traditional standards. The memo\u2019s additional context about operating cash flows and credit facilities does not alter the substantive conclusion about the quick ratio itself."
+    }
+  },
+  {
+    "item_id": "verizon_03",
+    "run_id": "iter3-agent-verizon",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 5,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "All material claims are directly supported by tool outputs that correctly aggregate cited FY2021 and FY2022 balance-sheet line items (debt maturing within one year and long-term debt), with periods and entities matching the question.",
+      "actionability": "The answer gives a definitive yes/no conclusion and explicitly cites the underlying figures ($150,868 million in FY 2021 and $150,639 million in FY 2022), so an analyst can act on it immediately without further retrieval.",
+      "gold_agreement": "Both answers agree that Verizon did not increase debt between 2021 and 2022, and the memo's cited figures ($150,868M to $150,639M) exactly support the gold's stated $229 million decrease."
+    }
+  },
+  {
+    "item_id": "verizon_04",
+    "run_id": "iter3-agent-verizon",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 4,
+    "rationale": {
+      "groundedness": "The cited FY2021 table directly supports the claim by showing cross currency swaps at $32,502 million, exceeding all other listed derivative instruments at December 31, 2021, with the period, entity, and line-item all matching the question.",
+      "actionability": "The answer names a specific instrument but asserts a 'highest notional value' conclusion without stating any notional amounts or comparative figures in the text, so an analyst cannot verify or act on the claim without returning to the source.",
+      "gold_agreement": "The memo correctly identifies cross currency swaps as the instrument with the highest notional value, matching the gold's entity and conclusion, but it omits the specific notional value of $32,502 million."
+    }
+  },
+  {
+    "item_id": "verizon_05",
+    "run_id": "iter3-agent-verizon",
+    "status": "answered",
+    "groundedness": 5,
+    "actionability": 3,
+    "gold_agreement": 5,
+    "rationale": {
+      "groundedness": "The claimed $1,959 million is directly produced by the provided tool output summing the two FY2021 10-K retiree benefit line items for 2024, so the value, period, entity, and line-item all match the question.",
+      "actionability": "The answer gives the exact expected payment figure but provides no document, note, or table citation showing where the $1,959 million appears in Verizon\u2019s FY2021 filings, so an analyst cannot verify or trace the number without doing extra retrieval.",
+      "gold_agreement": "The memo's $1,959 million is the exact sum of the two components given in the gold answer ($1,097 million in pension benefits plus $862 million in health care and life insurance benefits), so it reaches the same substantive conclusion about total expected 2024 retiree payments."
+    }
+  }
+]

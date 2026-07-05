@@ -14,7 +14,15 @@ import pytest
 
 from app import config
 from app.schemas import Citation, FinancialInput, TraceEvent
-from app.tools import calculate, compute_calculation, flag_outstanding, get_pages, record_answer, search_filing
+from app.tools import (
+    calculate,
+    compute_calculation,
+    flag_outstanding,
+    get_pages,
+    record_answer,
+    recompute_check,
+    search_filing,
+)
 from app.trace import TraceWriter
 
 COMPANY = "amcor"
@@ -72,14 +80,26 @@ def test_get_pages_returns_raw_text_and_emits_events(trace):
     assert result["doc_id"] == "AMCOR_2023_10K"
     assert [p["page"] for p in result["pages"]] == [1, 61]
     assert all(isinstance(p["text"], str) and p["text"] for p in result["pages"])
+    # Each page is exposed as a citable synthetic chunk (IMP-1).
+    assert [p["chunk_id"] for p in result["pages"]] == [
+        "page:AMCOR_2023_10K:1",
+        "page:AMCOR_2023_10K:61",
+    ]
 
-    assert _types(trace.events) == ["tool_call", "tool_result"]
+    # get_pages now emits a `retrieval` event carrying the page chunk_ids so
+    # citation_provenance passes for quotes copied from a full-page read.
+    assert _types(trace.events) == ["tool_call", "retrieval", "tool_result"]
     assert trace.events[0].payload == {
         "tool": "get_pages",
         "input": {"doc_id": "AMCOR_2023_10K", "pages": [1, 61]},
     }
-    assert trace.events[1].payload["tool"] == "get_pages"
-    assert trace.events[1].payload["output"] == result
+    retrieval_chunks = trace.events[1].payload["chunks"]
+    assert [c["chunk_id"] for c in retrieval_chunks] == [
+        "page:AMCOR_2023_10K:1",
+        "page:AMCOR_2023_10K:61",
+    ]
+    assert trace.events[2].payload["tool"] == "get_pages"
+    assert trace.events[2].payload["output"] == result
 
 
 def test_get_pages_missing_doc_emits_error(trace):
@@ -165,3 +185,58 @@ def test_flag_outstanding_emits_events_in_order(trace):
     assert trace.events[0].payload == {"kind": "abstention", "text": "Segment headcount is not disclosed."}
     assert trace.events[2].payload["status"] == "abstained"
     assert trace.events[2].payload["value"] is None
+
+
+# --- IMP3-4: derivation self-check -------------------------------------------
+def test_recompute_check_flags_inventory_in_quick_ratio_numerator():
+    # amd_01's defect: acid test computed as (current_assets - inventory)/CL.
+    warnings = recompute_check(
+        "(current_assets - inventory) / current_liabilities",
+        {"current_assets": 15000.0, "inventory": 2000.0, "current_liabilities": 7000.0},
+        1.857,
+        "ratio",
+    )
+    assert any("EXCLUDES inventory" in w for w in warnings)
+
+
+def test_recompute_check_flags_tax_rate_sign_flip():
+    # boeing_06: pretax income negative -> effective tax rate must stay negative.
+    warnings = recompute_check(
+        "tax_expense / pretax_income",
+        {"tax_expense": 743.0, "pretax_income": -5033.0},
+        14.7,  # recorded positive, but signed re-derivation is negative
+        "percent",
+    )
+    assert any("SIGN" in w for w in warnings)
+
+
+def test_recompute_check_accepts_percent_scale_and_canonical_numerator():
+    # Correct acid-test numerator + percent recorded as fraction*100: no warning.
+    assert (
+        recompute_check(
+            "(cash + short_term_investments + receivables) / current_liabilities",
+            {
+                "cash": 5000.0,
+                "short_term_investments": 3000.0,
+                "receivables": 2000.0,
+                "current_liabilities": 7000.0,
+            },
+            1.4286,
+            "ratio",
+        )
+        == []
+    )
+    # fraction re-derivation 0.1476 recorded as 14.76% -> magnitude accepted.
+    assert (
+        recompute_check(
+            "tax_expense / pretax_income",
+            {"tax_expense": 743.0, "pretax_income": 5033.0},
+            14.76,
+            "percent",
+        )
+        == []
+    )
+
+
+def test_recompute_check_noop_for_non_ratio_units():
+    assert recompute_check("a - b", {"a": 10.0, "b": 3.0}, 7.0, "USD millions") == []

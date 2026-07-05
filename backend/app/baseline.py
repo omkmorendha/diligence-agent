@@ -340,6 +340,8 @@ def _render_memo_md(memo: Memo) -> str:
 def run_baseline(run_id: str, company: str, item_ids: list[str] | None, trace: TraceWriter) -> None:
     """Single retrieve-then-answer pass per checklist item, streaming events into `trace`."""
     created_at = datetime.now(timezone.utc).isoformat()
+    llm.set_usage_sink(llm.jsonl_usage_sink(trace.run_dir / "llm_calls.jsonl"))
+    llm.set_call_context(run_id=run_id, system="baseline")
     items = _load_company_items(company, item_ids)
 
     trace.emit(
@@ -365,6 +367,7 @@ def run_baseline(run_id: str, company: str, item_ids: list[str] | None, trace: T
 
     memo_items: list[MemoItem] = []
     for item in items:
+        llm.set_call_context(purpose="baseline_answer", item_id=item.item_id)
         try:
             memo_items.append(_process_item(trace, company, item))
         except Exception as exc:  # noqa: BLE001 -- one item's failure must not sink the run
@@ -411,6 +414,8 @@ def run_baseline(run_id: str, company: str, item_ids: list[str] | None, trace: T
             "summary_stats": memo.summary.model_dump(),
         },
     )
+    llm.set_usage_sink(None)
+    llm.clear_call_context()
     trace.close()
 
 

@@ -1,12 +1,12 @@
 # D5 subset selection report
 
-Selected **28** questions across **4** companies (fallback tier: 4 companies x <=8 each).
+Selected **61** questions across **11** companies (fallback tier: 11 companies x <=8 each).
 
 ## Bucket composition
 
-- A_multi_input: 12 (ideal ~16)
-- B_judgment: 10 (ideal ~8)
-- C_lookup: 6 (ideal ~8)
+- A_multi_input: 34 (ideal ~16)
+- B_judgment: 14 (ideal ~8)
+- C_lookup: 13 (ideal ~8)
 
 C_lookup questions are scarce in the D3/D4-verified pool for the highest-eligible-count companies on this corpus, so the achieved composition undershoots the ideal 16/8/8 split on A and C in favor of B; this is the actual FinanceBench distribution, not a selection bug (see AMBIGUITIES.md section 6 and data/verified.jsonl bucket_d3 counts).
 
@@ -18,6 +18,13 @@ C_lookup questions are scarce in the D3/D4-verified pool for the highest-eligibl
 | Boeing | 7 | 7 | 2 | 4 | 1 | 6 |
 | Johnson & Johnson | 7 | 7 | 2 | 2 | 3 | 4 |
 | AMD | 6 | 6 | 3 | 2 | 1 | 5 |
+| MGM Resorts | 6 | 6 | 1 | 2 | 3 | 3 |
+| Adobe | 5 | 5 | 5 | 0 | 0 | 5 |
+| Verizon | 5 | 5 | 5 | 0 | 0 | 5 |
+| Best Buy | 5 | 5 | 3 | 1 | 1 | 4 |
+| General Mills | 4 | 4 | 4 | 0 | 0 | 4 |
+| Nike | 4 | 4 | 2 | 1 | 1 | 3 |
+| Pfizer | 4 | 4 | 2 | 0 | 2 | 2 |
 
 ## Selection policy
 

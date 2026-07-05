@@ -1,0 +1,24 @@
+{
+  "system": "agent",
+  "runs_scored": [
+    "iter902-agent-mgm_resorts"
+  ],
+  "num_items_scored": 6,
+  "answer_accuracy": 1.0,
+  "citation_precision": 0.5,
+  "citation_provenance": 1.0,
+  "arithmetic_integrity": 1.0,
+  "trace_shape": 1.0,
+  "abstention_correct_rate": null,
+  "by_bucket": {
+    "A_multi_input": {
+      "answer_accuracy": 1.0
+    },
+    "B_judgment": {
+      "answer_accuracy": 1.0
+    },
+    "C_lookup": {
+      "answer_accuracy": 1.0
+    }
+  }
+}

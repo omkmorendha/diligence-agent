@@ -1,0 +1,391 @@
+{
+  "plan": {
+    "analysis_summary": "Iter2's headline accuracy of 41.4% massively understates true agent quality: of the 34 failures, 27 (79%) are substantively CORRECT answers blocked only by exact-string-match on prose text golds (evals/scorers.py:135). The single largest measured-accuracy lever is therefore eval-side: hand-annotate canonical gold fields (gold_polarity for 12 yes/no items, gold_canonical for 10 entity/choice items) and add matching scorer branches gated on those fields, exactly paralleling the already-accepted IMP-2 gold_value work. This unlocks ~22 items, lifting correct 24->~46 and accuracy ~41%->~75%, with zero agent changes and without weakening any existing scorer (exact-match remains the fallback; genuinely-wrong items like johnson_johnson_06 gold-polarity=No stay failing). The citation_precision 'regression' (61.4%->48.3%) is decomposed and NOT a true grounding regression: it is (a) a denominator shift as 14 formerly-abstained items became answered and (b) 7 genuine pass->fail cases (5 AMD) plus 20-of-30 total fails that are OVER-CITATION -- the agent cites the correct gold page PLUS extra non-gold pages, and the all-or-nothing scorer (scorers.py:153-159) fails the whole item on the extras; IMP-1's get_pages-citable change is the direct cause. A cheap agent-side citation-minimalism rule recovers ~20 items. The judge 'groundedness=5.0 zero-variance' is a MEASUREMENT bug, not saturation: Kimi-K2.6 burns its completion budget in the hidden reasoning channel, nulling 34/61 groundedness and 32/61 actionability scores non-randomly (killing exactly the long multi-claim answers where variance lives); live-proven that adobe_01 returns empty at max_tokens 4000/8000 but valid JSON scoring 3 at 16000. Raising max_tokens and re-running makes all judge numbers honest. Only 5 items are genuine accuracy defects (amd_01/verizon_02 quick-ratio definition, boeing_06 tax-rate sign, johnson_johnson_06 polarity, pepsico_06 'state 0' false-negative, boeing_02 branch selection) -- the confirmed-repeatable target for the deferred IMP-4. IMP-3 is re-scoped: only verizon_04 is a true stall the guard fixes; the hybrid/BM25 recall half has broader leverage (pepsico_06 miss + the 10 genuine citation gold-page/wrong-source-doc misses) than the stall-guard half.",
+    "improvements": [
+      {
+        "id": "IMP3-1",
+        "title": "[EVAL-MEASUREMENT - forces re-scoring all iterations] Canonical gold fields (gold_polarity, gold_canonical) + gated scorer branches so honest polarity/entity/choice matching applies to the 22 correct-but-string-blocked items",
+        "category": "eval_measurement",
+        "rationale": "27 of 34 iter2 failures (79%) are substantively CORRECT but fail because text golds are scored by normalized EXACT string match at evals/scorers.py:135 (normalize_string(answer)==normalize_string(gold_answer)), which no prose gold can pass. This is the single highest-ROI change: it is a scoring artifact, not an agent-quality problem, and the agent ALREADY emits the terse/canonical form (all 12 yes/no items lead with the correct Yes/No token; entities returned as bare names like 'Consumer Health', 'Corporate bonds'). 22 items are honestly unlockable: 12 yes/no with correct leading polarity (adobe_01/02, amd_04, best_buy_01, boeing_01/04, johnson_johnson_02/07, mgm_resorts_03, pfizer_01, verizon_01/03) and 10 entity/choice where the agent gives the right canonical entity/category but gold wraps it in prose or a synonym (johnson_johnson_03, mgm_resorts_02/05/06, pepsico_08, pfizer_02/03, amd_06, best_buy_05, nike_04). This parallels the already-accepted IMP-2 gold_value work and is category-consistent. Crucially it does NOT mask real defects: johnson_johnson_06 (gold polarity No vs agent Yes) correctly STAYS failing under a polarity branch, cleanly separating the format artifacts from the one real B polarity error.",
+        "changes": "(1) In the gold-parsing/dataset path (data/subset.json + backend/app/dataset_builder.py), hand-annotate two new gold fields WITHOUT touching gold_answer/gold_evidence: gold_polarity in {yes,no} for the 12 unambiguous yes/no items, and gold_canonical (a string, or a set for entity-list questions, or one of {operating,investing,financing} for cashflow-source choices) for the 10 entity/choice items. Mark each with human_reviewed=true. (2) In evals/scorers.py answer_accuracy, ADD two branches ABOVE the existing string-match fallback, each firing ONLY when its gold field is present: (a) polarity branch -> extract the agent answer's leading polarity token (first Yes/No, case/punct-insensitive) and pass iff it equals gold_polarity; (b) canonical branch -> case/punct-insensitive containment or normalized set-membership match against gold_canonical, with a small curated synonym map (operations<->operating activities) and stopword tolerance so 'Developed Rest of World'=='Developed Rest of the World'. Keep gold_value numeric branch and the normalize_string exact-match fallback unchanged -- this ADDS pass opportunities gated on new human-annotated fields, it does not weaken the six scorers. (3) Do NOT annotate the 2 borderline items (pfizer_04 gold arguably stale/period-defensible, verizon_05 split-vs-sum) -- flag them human_reviewed=false for separate gold review. (4) Re-score baseline/iter1/iter2 and note the comparability break in the README. Verify evals/run.py --fixtures stays green.",
+        "files": [
+          "data/subset.json",
+          "backend/app/dataset_builder.py",
+          "evals/scorers.py",
+          "results/iterations/"
+        ],
+        "expected_impact": "Correct 24->~46, accuracy ~41.4%->~75% (46/61) with zero agent changes. B_judgment jumps from 0/14 to ~8/14 (the 8 correct+unlockable B items). johnson_johnson_06 stays failing (real defect, targeted by IMP3-4). Requires re-scoring all iterations.",
+        "priority": 1,
+        "risk": "Canonical containment/synonym matching could false-pass a wrong answer; mitigate by hand-annotating only unambiguous items, requiring normalized token/set match (not loose substring), keeping the synonym map tiny and curated, and spot-checking every annotated item's agent answer. Polarity branch is honest (polarity IS the answer for yes/no). Flagged eval change -- forces re-scoring for comparability."
+      },
+      {
+        "id": "IMP3-2",
+        "title": "Citation minimalism: cite only the page(s) that source the reported figures, to reverse the citation_precision regression (20 of 30 fails are over-citation)",
+        "category": "agent_prompt",
+        "rationale": "The citation_precision drop 61.4%->48.3% is NOT a grounding regression. Decomposing all 30 iter2 precision fails: 20 are OVER-CITATION -- the agent cited the correct gold page PLUS extra non-gold pages, and the all-or-nothing scorer (evals/scorers.py:153-159 fails the whole item if ANY citation is outside +/-1 page of a gold-evidence page) fails on the extras. 7 items regressed pass->fail for exactly this reason (5 AMD: e.g. amd_05 cited gold p43 plus p48/p49; amd_01 cited gold p56 plus p13/p51). IMP-1 making get_pages pages citable is the direct cause of increased over-citation surface. The remaining 8 newly-answered (formerly-abstained) items also over-cite. Trimming citations to the minimal load-bearing set recovers ~20 items on this metric -- the highest-certainty citation-precision lever.",
+        "changes": "(1) In SYSTEM_PROMPT_RULES / the record_answer citation guidance (backend/app/agent.py), add a citation-discipline rule: cite the MINIMAL set of pages -- for each material figure in the answer, attach exactly one citation to the page where that figure appears; do NOT attach secondary/context/narrative pages that merely corroborate, and do NOT cite a page unless a number or claim in the final answer is drawn from it. Prefer the primary consolidated-statement page over adjacent MD&A pages. (2) In backend/app/tools.py, only register a get_pages page as a citable span when the agent actually anchors a quote to it, rather than blanket-registering every fetched page (reduces the temptation/surface introduced by IMP-1). (3) Optionally in agent.py, before record_answer, drop any citation whose quote does not contribute a number/claim that appears in the final answer. Must NOT drop a page that is the sole source of a used number (guard against breaking arithmetic_integrity/groundedness). Verify evals/run.py --fixtures stays green and re-check that arithmetic_integrity and citation_provenance do not regress.",
+        "files": [
+          "backend/app/agent.py",
+          "backend/app/tools.py",
+          "backend/app/config.py"
+        ],
+        "expected_impact": "Recovers ~20 citation_precision fails (including the 7 genuine pass->fail regressions); citation_precision recovers toward/above the iter1 61% level on a now-larger answered denominator. No effect on the 10 genuine gold-page/wrong-source-doc misses (addressed by IMP3-5).",
+        "priority": 2,
+        "risk": "Over-aggressive trimming could drop the sole citation grounding a used number, regressing arithmetic_integrity or groundedness; anchor the rule to 'every used number keeps its source page' and add a guard that never removes the last citation supporting a numeric value. Verify no drop in citation_provenance."
+      },
+      {
+        "id": "IMP3-3",
+        "title": "[JUDGE] Fix judge truncation (raise max_tokens), gate headline on coverage, add a long calibration fixture, and add a reference-based gold-agreement criterion",
+        "category": "judge",
+        "rationale": "The 'groundedness=5.0 zero-variance' headline is a MEASUREMENT artifact, not saturation or a lenient rubric. Kimi-K2.6 via Vultr overflows the 4000/3000 max_tokens caps in its hidden reasoning channel and returns empty content, silently nulling 34/61 groundedness and 32/61 actionability scores (run.py sets score=None on the exhausted-retry error path). The censoring is NON-RANDOM: it kills exactly the long multi-claim answers (median 77 vs 20 chars for scored; 68% of A_multi_input null) where variance lives, so the surviving means are biased HIGH and the zero-variance flag is manufactured. LIVE-PROVEN: adobe_01 returns empty at max_tokens 4000/8000 but valid JSON at 16000, scoring groundedness 3 (catches an unsupported sub-claim); recovered actionability nulls score 2,2,3,3. Separately, reference-free judges structurally cannot catch the genuinely-wrong items (boeing_06 got actionability=5 despite a sign error; johnson_johnson_06 wrong-polarity uncaught), and groundedness has ceiling-ed as a QUALITY signal (a bare 'Yes' is trivially 5). B_judgment quality (0/14 on the deterministic scorer) is unmeasurable by either current judge.",
+        "changes": "In evals/judges.py: (1) raise judge_groundedness max_tokens 4000->16000 and judge_actionability 3000->12000 (empirically the reliable thresholds). (2) In evals/run.py, log judge_error on the null path and compute+surface judge_null_rate per criterion; demote a criterion from the headline if null_rate>10% (currently ~56%/52% and invisible). Keep the existing judge_zero_variance flag. (3) Add a long multi-claim (4-5 material claims, ~80+ char answer) A_multi_input-shaped calibration fixture whose known-good answer must score >=4 -- at the old 4000 cap it would null and FAIL the gate, so the fixtures gate catches this class of truncation regression going forward. (4) Add a THIRD 'gold_agreement' judge criterion that (eval-side, allowed) sees gold_answer + gold_evidence and rates 1..5 semantic agreement between the memo answer and the gold thesis (right drivers/direction/entity, not just a supported fragment); route the 5 correct-prose items (amd_05, boeing_05, boeing_07, pepsico_03, pepsico_07) here and use it to flag boeing_06/johnson_johnson_06. Keep gold_agreement OFF the corrupted-citation ceiling gate (it sees gold) but report its mean+stdev+null_rate and zero-variance flag. Do NOT loosen the groundedness/actionability rubrics -- the calibration gate passes (corrupted->1, period-mismatch->3) and every scored answer_accuracy=fail/groundedness=5 item is genuinely period/entity-matched. (5) Re-run judges over baseline/iter1/iter2 so the 5.0/3.97 headlines become honest, un-censored means (expect groundedness to spread with 3s and actionability mean to fall as thin-basis 2s/3s re-enter).",
+        "files": [
+          "evals/judges.py",
+          "evals/run.py",
+          "evals/fixtures/"
+        ],
+        "expected_impact": "Judge coverage goes from ~44%/48% to ~100%; groundedness and actionability means become honest (groundedness spreads below 5, actionability mean falls). gold_agreement gives the first real B_judgment quality signal and catches the sign/polarity defects reference-free judges miss. No agent accuracy effect but essential to trust iter3 trend claims.",
+        "priority": 3,
+        "risk": "Higher max_tokens increases judge latency/cost per call (bounded, one-time per item). gold_agreement seeing gold could be lenient -- calibrate against a couple known-good/known-bad items and report its stdev/null_rate; keep it off the ceiling gate so it cannot mask deterministic-scorer signal."
+      },
+      {
+        "id": "IMP3-4",
+        "title": "IMP-4 ratio/derivation hardening + targeted fixes for the 5 genuine accuracy defects (quick-ratio definition, tax-rate sign, false-negative 0, branch selection)",
+        "category": "agent_prompt",
+        "rationale": "Only 5 iter2 items are genuine accuracy defects, and they are confirmed-repeatable, un-fixed since iter1: amd_01 quick ratio 1.77 vs gold 1.57 -- agent used (current_assets - inventory)/CL instead of the acid-test numerator (cash + ST investments + net receivables)/CL; the SAME definitional ambiguity recurs on verizon_02 (also a quick-ratio question, gold 0.54, abstained both iterations), so canonical quick-ratio has leverage across >=2 items. boeing_06 flipped the sign on FY2021 effective tax rate (gold -14.76% vs agent +14.7%, negative pretax/benefit). johnson_johnson_06 is a directional-inference polarity flip (gold No, growth decelerates 3.6%->3.5%; agent Yes). pepsico_06 answered 0 for restructuring costs (gold $411M) because the 'state 0 if not outlined' clause induced a false-negative when the figure IS disclosed (in a note). boeing_02 selected the wrong branch on an 'is-gross-margin-useful' framing. These are the deferred IMP-4 targets; IMP-4 is a confirmed repeatable win (amd_01, verizon_02, boeing_06), not a speculative one.",
+        "changes": "In backend/app/agent.py SYSTEM_PROMPT_RULES and backend/app/tools.py calculate guidance: (1) canonical quick/acid-test ratio = (cash + short-term investments + net accounts receivable + related-party receivables)/current_liabilities, explicitly EXCLUDING inventory and prepaids/other current assets; (2) effective tax rate = tax expense/pretax income with an explicit instruction to PRESERVE sign when pretax income is negative (rate can be negative); (3) for 'state 0 if not explicitly outlined' questions, require an explicit retrieval attempt for the line item (including note sections) before answering 0 -- do not default to 0 from the face of the statement alone; (4) for 'is-metric-X-useful-else-explain' framings, compute X first and only invoke the 'not useful' branch if X is genuinely undefined. (5) In _verify_answer_before_record, when the recorded value is a ratio/percentage, recompute from the cited line items and flag (not hard-reject) on disagreement beyond tolerance -- catches wrong-numerator and sign-flip before recording. Verify evals/run.py --fixtures stays green.",
+        "files": [
+          "backend/app/agent.py",
+          "backend/app/tools.py"
+        ],
+        "expected_impact": "Recovers amd_01 (numeric within 1%), de-risks verizon_02 (may convert its abstention to a correct answer), fixes boeing_06 sign; the 'require retrieval before 0' rule targets pepsico_06; the compute-then-branch rule targets boeing_02. ~3-5 genuine correct gains, the only true accuracy defects in the set.",
+        "priority": 4,
+        "risk": "Recompute-verify needs machine-extractable cited line items; flag rather than hard-reject to avoid new false abstentions. Formula whitelist must match gold definitions exactly or it could reject correct answers. The 'require retrieval before 0' rule must not force over-abstention on legitimately-zero items -- anchor to an evidence attempt, not a blanket ban."
+      },
+      {
+        "id": "IMP3-5",
+        "title": "Scoped IMP-3: hybrid/BM25 retrieval for recall + right-source-doc, plus a Jaccard near-duplicate stall guard for the one true fixation stall",
+        "category": "agent_code",
+        "rationale": "Re-evaluated against iter2 evidence, IMP-3 is narrower than iter1 assumed but the hybrid-retrieval HALF has broad leverage. The 3 budget-exhausted abstentions are 3 different root causes and only verizon_04 is a true stall (11 near-identical 'interest rate caps swaptions' queries, consecutive token-Jaccard up to 0.92, while the needed cross-currency-swap table WAS retrieved) that a stall guard fixes; best_buy_02 churned for a nonexistent summary table while the computable income statement was in hand (needs the IMP3-4 compute-fallback); verizon_02 is an IMP-1 residual (verbatim numeric-cell quoting), NOT a search stall. The hybrid/BM25 half addresses recall/right-source misses with wider reach: pepsico_06's $411M restructuring note was NEVER retrieved, and of the 10 genuine citation gold-page misses several are WRONG-SOURCE-DOC (mgm_resorts_05 and johnson_johnson_02 cited the 10-K when gold is the earnings release; amd_02 cited p68 vs gold p48). Lexical/BM25 scoring for rare exact terms and doc-scoped filtering surfaces the right note/source. Redundancy is only ~4-6% overall, so expect little aggregate token savings -- payoff is recovering verizon_04 and trimming the p95 tail, plus recall/right-source gains.",
+        "changes": "backend/app/retrieval.py + config.py: (1) add hybrid BM25+dense scoring (behind a config flag) so rare exact terms like 'restructuring' and the correct source document (earnings release vs 10-K) surface; add doc-scoped filtering so the gold source doc is preferred when the question names a period/filing. (2) In backend/app/agent.py _run_item loop, add a stall guard: if N consecutive search_filing calls (e.g. 3) return zero NEW chunk_ids OR consecutive-query token-Jaccard exceeds a threshold (~0.8), stop searching and escalate to get_pages on the best doc or abstain with a specific 'retrieval exhausted' reason -- prevents the verizon_04 fixation. Verify evals/run.py --fixtures stays green.",
+        "files": [
+          "backend/app/retrieval.py",
+          "backend/app/agent.py",
+          "backend/app/config.py"
+        ],
+        "expected_impact": "Recovers verizon_04 (highest-confidence abstention recovery) and trims the residual p95 tail (the 2 remaining slow items are call-count-driven); hybrid/BM25 targets pepsico_06 recall and the wrong-source-doc citation misses (mgm_resorts_05, johnson_johnson_02, amd_02). Modest aggregate cost change (redundancy only ~4-6%).",
+        "priority": 5,
+        "risk": "Stall-guard threshold too aggressive could cut legitimate multi-query research -- require zero-new-chunks OR high Jaccard, not repeated intent alone, and tune N. Hybrid retrieval adds indexing work; keep behind a config flag and A/B against the current dense-only recall so it does not regress items that currently pass."
+      }
+    ]
+  },
+  "analysts": [
+    {
+      "findings": [
+        {
+          "title": "The 3 budget-exhausted items split into 3 distinct root causes, not one \u2014 only verizon_04 is a true retrieval-stall that IMP-3 would fix",
+          "evidence": "Walking traces (all evidence chunks WERE retrieved in every case; none is genuinely-missing-evidence): (a) verizon_04 [12 retrieval events, 28 unique chunks, 0 rejections]: agent fixated on 11 near-identical 'interest rate caps swaptions notional' queries (consecutive-query token-Jaccard up to 0.92, mean 0.55) \u2014 a red herring; the gold answer is cross-currency swaps ($32,502M), and the derivatives table WAS surfaced (verizon:VERIZON_2022_10K:p86:c1 shows 'Cross currency swaps 3,295'). Pure query fixation \u2192 classic IMP-3 stall pattern. (b) best_buy_02 [9 searches +3 get_pages, 0 rejections]: churned looking for a pre-computed 'five-year selected financial data gross profit rate' table (Item 6) that Best Buy doesn't present, while the computable inputs WERE retrieved (BESTBUY_2023_10K p40 Consolidated Statements of Earnings has Revenue/gross profit for FY2023/22/21). (c) verizon_02 [9 searches, 4 verbatim-quote rejections]: balance sheet p56 WAS retrieved and the quick-ratio was computable, but the agent hit the consecutive-rejection cap re-searching for exact strings like 'Total current liabilities 50,171' to satisfy verbatim citation \u2014 searches 9-11 returned 0 NEW chunks. This is an IMP-1 residual (verbatim quoting of numeric table cells), NOT a search-stall.",
+          "severity": "high",
+          "suggested_fix": "IMP-3 stall guard (stop near-identical queries by Jaccard threshold; hybrid BM25+dense) would most likely save verizon_04 and partially best_buy_02 by freeing budget and forcing query diversification. It would NOT fix verizon_02 \u2014 that needs continued IMP-1 work on verbatim quoting of numeric cells (or relaxing the citation to allow number-normalized matches). Also give the agent an explicit 'compute from the income statement if no summary table exists' fallback for best_buy_02.",
+          "affected_items": [
+            "verizon_04",
+            "best_buy_02",
+            "verizon_02"
+          ]
+        },
+        {
+          "title": "amd_01 wrong_value is a quick-ratio DEFINITION mismatch \u2014 IMP-4 (canonical ratio definitions) would catch it; it is still wrong from iter1",
+          "evidence": "Agent computed quick ratio = (current_assets - inventory)/current_liabilities = (15019-3771)/6369 = 1.77 and answered 'healthy, 1.77'. Gold = 1.57, defined as (cash + short-term investments + accounts receivable + related-party receivables)/current_liabilities. The ~0.20 gap is the ~$1,248M of other current assets (prepaids, deferred tax, other) that the (CA\u2212inventory) shortcut wrongly includes but the acid-test definition excludes. Both round to 'Yes/healthy', so the binary answer is right, but the \u00b11% numeric scorer fails (1.77 vs 1.57 = 13% off). amd_01 was answer_accuracy=fail in iter1 AND iter2 (unchanged); note citation_precision also regressed pass\u2192fail on this item in iter2. The SAME definitional ambiguity recurs on verizon_02 (also a quick-ratio question, gold 0.54) \u2014 so canonical quick-ratio definition has leverage across \u22652 items.",
+          "severity": "high",
+          "suggested_fix": "IMP-4 with a canonical quick/acid-test ratio definition = (cash + ST investments + net receivables)/current_liabilities plus a recompute-verify step would directly fix amd_01 and de-risk verizon_02. This is a confirmed, repeatable win \u2014 prioritize IMP-4 despite it being deferred in iter1.",
+          "affected_items": [
+            "amd_01",
+            "verizon_02"
+          ]
+        },
+        {
+          "title": "pepsico_06 wrong_value is a RETRIEVAL miss, not a ratio error \u2014 IMP-4 would NOT catch it",
+          "evidence": "Agent answered 0 (question: restructuring costs on FY2022 income statement, 'state 0 if not explicitly outlined'). Gold = $411M. Across all 4 searches (including a targeted 'Items Affecting Comparability restructuring impairment charges' query) the string '411' and any 'restructur*' chunk were NEVER retrieved (0 hits in retrieved snippets). The agent correctly observed the face of the Consolidated Statement of Income has no line labeled 'restructuring' and defaulted to 0. There is no ratio, sign convention, or recompute here \u2014 IMP-4 is irrelevant. This is a retrieval-recall failure: the $411M disclosure (Productivity Plan / Items Affecting Comparability) was never surfaced. Was fail in iter1 and iter2.",
+          "severity": "medium",
+          "suggested_fix": "This supports the HYBRID-RETRIEVAL half of IMP-3 (keyword/BM25 for rare exact terms like 'restructuring') rather than its stall-guard half, and argues against expecting IMP-4 to move it. Consider a get_pages fallback onto the 'Items Affecting Comparability' note page when a targeted term returns no matching chunk.",
+          "affected_items": [
+            "pepsico_06"
+          ]
+        },
+        {
+          "title": "Prior-iteration regression check: amd_01, boeing_06 still wrong; verizon_02 abstained in BOTH iterations",
+          "evidence": "Cross-referencing iter1 vs iter2 per_item_scores: amd_01 answer_accuracy fail\u2192fail (still wrong, now also citation_precision fail). boeing_06 fail\u2192fail (still wrong; it is wrong_text \u2014 effective tax rate FY2022 0.62% vs FY2021 -14.76%, a sign/near-zero-denominator case that IMP-4 sign-convention hardening targets but which was never implemented). verizon_02 abstained\u2192abstained (persistent budget exhaustion, same quick-ratio + verbatim-citation failure mode two iterations running). None of the three carried-over hard cases improved in iter2 because iter2 shipped IMP-1/2/5, not the retrieval (IMP-3) or ratio (IMP-4) fixes those items need.",
+          "severity": "medium",
+          "suggested_fix": "IMP-3 and IMP-4 are the direct levers for these persistent failures; they should not be deferred a second time. boeing_06 specifically needs the IMP-4 sign-convention / near-zero-denominator handling for effective tax rate.",
+          "affected_items": [
+            "amd_01",
+            "boeing_06",
+            "verizon_02"
+          ]
+        },
+        {
+          "title": "p95 wall collapsed (634s\u2192105s) because the per-LLM-call latency pathology was eliminated; p50 rose (34\u219241s) because more items now do real work instead of fast-failing",
+          "evidence": "Per-call latency: iter1 p90=33.5s, max=104s, 3 items averaging >60s/call (amd_01 626s/6calls=104s/call; boeing_01 103s/call) \u2014 these were the verbatim-citation spiral generating huge outputs / endpoint backoff. iter2: per-call p90=14.2s, max=40.7s, ZERO items over 60s/call; mean_llm_call_s 13.0\u21929.3s. The old 600-880s single-item tail (mgm_01 884s, adobe_01 660s, jnj_01 643s) is gone. p50 rose because: (1) items <15s dropped 11\u21926 while answered rose 44\u219258 \u2014 fewer instant abstain/fail, median item now runs the full plan\u2192retrieve\u2192compute\u2192cite\u2192record loop; (2) base per-call p50 also rose 4.8\u21928.2s. The only survivors of the old tail are the 2 budget churners (verizon_02 652s/16 calls, verizon_04 437s/12 calls) which are slow from MANY calls (40.7s/call), not slow calls.",
+          "severity": "low",
+          "suggested_fix": "Report p95 collapse as an IMP-1 second-order win. Note the residual tail (verizon_02/04) is now call-COUNT-driven, so IMP-3's budget cap would shrink the remaining p95 further AND potentially convert those two abstentions to answers.",
+          "affected_items": [
+            "verizon_02",
+            "verizon_04",
+            "amd_01",
+            "boeing_01"
+          ]
+        },
+        {
+          "title": "Search redundancy is real but modest \u2014 IMP-3's stall-guard value is concentrated in 2-3 fixation items, not broad; hybrid retrieval is the higher-leverage half",
+          "evidence": "15 of 61 items searched >3 times. Pure zero-new-chunk retrievals are only 8/211 = 4% overall (6% among >3-search items) \u2014 so the agent rarely issues a literally-identical search. But diminishing returns are clear: searches #1-3 yield 6-10 NEW chunks each; searches #4+ average only 2.4 new/search (64 late events, 154 new chunks). The concentration is in the fixation cases: verizon_04 (12 searches, mean consecutive-Jaccard 0.55, evidence already present), best_buy_02 (12), verizon_02 (11). Tokens/answered item was flat (40.8K\u219241.6K) and calls/answered flat (5.4\u21925.4), so IMP-3 would not move aggregate cost much \u2014 its payoff is specifically recovering the 2 budget-exhausted abstentions (verizon_04 highest-confidence) and trimming the p95 tail, NOT a broad efficiency gain.",
+          "severity": "medium",
+          "suggested_fix": "Scope IMP-3 realistically: a Jaccard-based near-duplicate stall guard recovers ~1-2 items (verizon_04, maybe best_buy_02) and cuts the tail; the hybrid-retrieval component addresses recall misses (pepsico_06). Do not expect large aggregate token/time savings \u2014 redundancy is only ~4-6%. Pair IMP-3 with IMP-4 (higher, repeatable accuracy payoff: amd_01, verizon_02, boeing_06).",
+          "affected_items": [
+            "verizon_04",
+            "best_buy_02",
+            "verizon_02",
+            "pepsico_06"
+          ]
+        }
+      ],
+      "summary": "Iter2 performance and residual-failure analysis over item-level traces. (Q1) The 3 budget-exhausted items are three DIFFERENT root causes, and in all three the needed evidence was actually retrieved: verizon_04 is a pure query-fixation stall (11 near-identical 'interest rate caps swaptions' queries, Jaccard up to 0.92) that IMP-3 would fix; best_buy_02 churned for a nonexistent summary table while the computable income statement was in hand (IMP-3 partial); verizon_02 is an IMP-1 RESIDUAL \u2014 it hit the consecutive-rejection cap re-searching for verbatim numeric-cell quotes, with searches 9-11 adding 0 new chunks, so IMP-3 would NOT fix it. (Q2) amd_01 wrong_value is a quick-ratio DEFINITION mismatch (agent used (CA\u2212inventory)/CL=1.77 vs gold acid-test 1.57) \u2014 IMP-4 canonical-definition+recompute would catch it, and the same ambiguity recurs on verizon_02; pepsico_06 wrong_value is a retrieval MISS ($411M restructuring never retrieved) that IMP-4 cannot help. Both amd_01 and boeing_06 are still wrong from iter1\u2192iter2, and verizon_02 abstained in both iterations \u2014 none improved because iter2 shipped IMP-1/2/5, not the IMP-3/IMP-4 fixes these items need. (Q3) p95 collapsed 634\u2192105s because the per-call latency pathology was eliminated (per-call max 104\u219241s, zero items >60s/call, verbatim-spiral tail gone); p50 rose 34\u219241s because 14 more items now run the full loop instead of fast-failing (items <15s: 11\u21926) plus a modestly higher base call latency; the only residual slow items are the 2 budget churners, now slow from call COUNT not call latency. (Q4) Search redundancy is modest \u2014 pure zero-new searches are only ~4%, but late searches (#4+) yield 2.4 new chunks vs 6-10 for early ones; IMP-3's stall-guard value is concentrated in ~2-3 fixation items (recovers verizon_04, trims p95) rather than a broad efficiency win, and its hybrid-retrieval half is the higher-leverage piece for recall misses like pepsico_06. Net recommendation for the synthesizer: prioritize the deferred IMP-4 (repeatable, confirmed wins on amd_01/verizon_02/boeing_06) alongside a scoped IMP-3, rather than expecting IMP-3 alone to move accuracy."
+    },
+    {
+      "summary": "Decomposed all 34 iter2 failures (32 wrong_text + 2 wrong_value). Headline: 27 of 34 \"failures\" (79%) are SUBSTANTIVELY CORRECT answers that fail only because text golds are scored by normalized EXACT string match (evals/scorers.py:135 `normalize_string(answer)==normalize_string(gold_answer)`), which no prose gold can pass. Only 5 items are genuinely wrong and 2 are borderline. Breakdown of the 27 correct-but-failing: 12 yes/no items where agent already leads with the correct polarity (Yes/No) but gold is a full sentence; 10 lookup/choice items where agent gives the correct canonical entity/category but gold wraps it in prose; 5 open-ended prose items the agent answers correctly. Category (b) \"agent-fixable via terser phrasing\" is essentially EMPTY: the agent ALREADY emits terse/canonical answers (\"Yes\", \"Consumer Health\", \"Corporate bonds\", \"Operating activities\"); the failure is on the gold/scorer side, not agent phrasing. The lever is a gold-side canonical field + scorer branch (polarity match, entity/set match), NOT answer-style prompt rules. If the 22 canonical-unlockable items (12 yes/no + 10 entity/choice) were scored by honest canonical matching, correct rises 24->46 and accuracy 41.4%->~75% (46/61). B_judgment is 0/14: 8/14 are substantively correct + canonically unlockable, 1 is genuinely wrong (jnj_06 polarity), 5 are prose; ZERO B golds are string-matchable as-is. Both judges fail to catch the wrong B items (reference-free): groundedness is saturated at 5 (zero-variance) and null on ~53% of answered items (judge parse failures); actionability gave boeing_06 a 5 despite a sign error.",
+      "findings": [
+        {
+          "title": "27 of 34 failures are substantively CORRECT, blocked by exact-string-match text scoring",
+          "severity": "high",
+          "evidence": "evals/scorers.py:130-136 scores text golds (gold_value=None, gold_unit='text') by `normalize_string(memo.answer)==normalize_string(gold.answer)` \u2014 a normalized EXACT match (lowercase/strip-punct/collapse-ws only, scorers.py:43-47). No prose gold can pass. Of the 32 wrong_text + 2 wrong_value: 27 are substantively correct (12 yes/no with correct polarity, 10 lookup/choice with correct entity, 5 correct prose), 5 genuinely wrong, 2 borderline. True correctness is ~79%, not the reported 41.4%. Accuracy massively understates agent quality; the metric is measuring gold format, not answer correctness.",
+          "affected_items": [
+            "adobe_01",
+            "adobe_02",
+            "amd_04",
+            "amd_05",
+            "amd_06",
+            "best_buy_01",
+            "best_buy_05",
+            "boeing_01",
+            "boeing_04",
+            "boeing_05",
+            "boeing_07",
+            "johnson_johnson_02",
+            "johnson_johnson_03",
+            "johnson_johnson_07",
+            "mgm_resorts_02",
+            "mgm_resorts_03",
+            "mgm_resorts_05",
+            "mgm_resorts_06",
+            "nike_04",
+            "pepsico_03",
+            "pepsico_07",
+            "pepsico_08",
+            "pfizer_01",
+            "pfizer_02",
+            "pfizer_03",
+            "verizon_01",
+            "verizon_03"
+          ],
+          "suggested_fix": "Do not spend agent effort here. Add gold-side canonical fields + scorer branches (see next two findings). Unlocking the 22 yes/no+entity/choice items lifts correct 24->46, accuracy 41.4%->~75% (46/61) with zero agent changes."
+        },
+        {
+          "title": "Cluster A-YESNO (12 items): correct yes/no polarity, agent already leads with Yes/No, gold is a sentence",
+          "severity": "high",
+          "evidence": "All 12 are genuine yes/no questions where the agent's answer opens with the correct polarity token and gold opens with the same, but gold continues into a full sentence so exact match fails. Confirmed leading tokens: adobe_01 No/No, adobe_02 Yes/Yes, amd_04 Yes/Yes, best_buy_01 Yes/Yes, boeing_01 Yes/Yes, boeing_04 Yes/Yes, jnj_02 Yes/Yes, jnj_07 No/No, mgm_03 Yes/Yes, pfizer_01 Yes/Yes, verizon_01 Yes/Yes, verizon_03 No/No. The agent is ALREADY compliant with an 'answer Yes/No first' convention in all 12 \u2014 the missing piece is purely scorer/gold-side.",
+          "affected_items": [
+            "adobe_01",
+            "adobe_02",
+            "amd_04",
+            "best_buy_01",
+            "boeing_01",
+            "boeing_04",
+            "johnson_johnson_02",
+            "johnson_johnson_07",
+            "mgm_resorts_03",
+            "pfizer_01",
+            "verizon_01",
+            "verizon_03"
+          ],
+          "suggested_fix": "IMP-2 extension: add gold_polarity (yes/no) to these items and a scorer branch that compares the agent answer's leading polarity token to gold_polarity for yes/no-typed questions. Honest and safe (these are unambiguous yes/no). Unlocks all 12."
+        },
+        {
+          "title": "Cluster A-ENTITY/CHOICE (10 items): correct canonical entity/category, gold wraps it in prose or uses a synonym",
+          "severity": "high",
+          "evidence": "7 entity-lookups: jnj_03 gold 'The Consumer Health business segment will be treated...' vs agent 'Consumer Health'; mgm_02 gold 'corporate bonds (~82%)' vs agent 'Corporate bonds'; mgm_05 gold 'Las Vegas resorts (~90%)' vs agent 'Las Vegas Strip Resorts'; mgm_06 gold 'MGM China... declined 44%' vs agent 'MGM China'; pepsico_08 gold '...was defeated.' vs agent 'Defeated'; pfizer_02 gold 'Developed Rest of the World' vs agent 'Developed Rest of World' (differs only by the word 'the'!); pfizer_03 gold 'Trillium, Array, and Therachon' vs agent 'Array (Array BioPharma), Trillium, and Therachon' (same set, reordered + parenthetical). 3 category-choice (which of operations/investing/financing): amd_06 gold 'Operations' vs agent 'Operating activities'; best_buy_05 gold 'operating activities ($1.8bn)' vs agent 'Operating activities...'; nike_04 gold 'operations was the highest' vs agent 'Operating activities'. All 10 are substantively correct; failures are prose-wrapping, synonym (operations=operating activities), token drop ('the'), or set order.",
+          "affected_items": [
+            "johnson_johnson_03",
+            "mgm_resorts_02",
+            "mgm_resorts_05",
+            "mgm_resorts_06",
+            "pepsico_08",
+            "pfizer_02",
+            "pfizer_03",
+            "amd_06",
+            "best_buy_05",
+            "nike_04"
+          ],
+          "suggested_fix": "Add a hand-annotated gold_canonical field (entity string or {operating|investing|financing}) for the 61-item curated set + a scorer branch doing case/punct-insensitive containment or set-membership match, with a small synonym map (operations<->operating activities) and stopword tolerance ('the'). Unlocks ~10. This is the single highest-ROI scorer change."
+        },
+        {
+          "title": "Category (b) 'agent-fixable via terser phrasing' is essentially empty \u2014 the lever is scorer-side, not prompt-side",
+          "severity": "high",
+          "evidence": "Under exact-match scoring, an agent can NEVER match a prose gold no matter how it phrases the answer, so agent-only fixes cannot move accuracy. And where the gold IS terse, the agent already produces the terse canonical form (12/12 yes/no lead with Yes/No; entities returned as bare names). The recurring mismatch is the GOLD being verbose or using a synonym, not the agent being verbose. The few genuinely-verbose agent answers (amd_05, boeing_07, pepsico_03) have golds that are ALSO verbose, so terseness alone still would not exact-match. Answer-style conventions worth encoding for the paired canonical-scoring approach: (1) yes/no -> lead with bare Yes/No (already done); (2) 'which X' lookups -> entity name only (already done); (3) ops/investing/financing choice -> emit the canonical option label; (4) entity-set questions -> normalized sorted set, no parentheticals; (5) preserve source spelling ('Developed Rest of the World'). But note these are NECESSARY-only-with a matching scorer, INSUFFICIENT alone.",
+          "affected_items": [],
+          "suggested_fix": "Do not invest in answer-style prompt rules as a standalone accuracy lever this iteration \u2014 they cannot pass exact-match. Only add them coupled to the gold_canonical + polarity scorer branches, where agent+gold both normalize to the same token."
+        },
+        {
+          "title": "Cluster A-PROSE (5 items): agent correct on open-ended questions, NOT unlockable by any parse",
+          "severity": "medium",
+          "evidence": "amd_05 (revenue drivers: agent names EPYC servers, semi-custom, Xilinx \u2014 all gold drivers \u2014 plus detail); boeing_05 (production rates: agent gives 737/777X/787 increases matching gold, plus 747); boeing_07 (customers: agent gives US govt 40% + commercial airlines, matches gold); pepsico_03 (geographies: agent lists same regions grouped by segment); pepsico_07 (why guidance raised: agent quotes 'strong start to the year' = gold). These golds are genuinely prose with no reducible canonical token; string/parse scoring can never adjudicate them.",
+          "affected_items": [
+            "amd_05",
+            "boeing_05",
+            "boeing_07",
+            "pepsico_03",
+            "pepsico_07"
+          ],
+          "suggested_fix": "Route text-gold items with no gold_value/gold_canonical to a reference-BASED LLM judge (gold_answer vs agent_answer, semantic-equivalence rubric), separate from the current reference-free groundedness/actionability judges. Do not attempt regex parsing."
+        },
+        {
+          "title": "5 genuinely WRONG items with specific root causes",
+          "severity": "high",
+          "evidence": "boeing_02: gold says gross margin IS useful and IMPROVING (4.8%->5.3%); agent chose the 'gross margin not useful (program accounting)' branch and gave no improving conclusion \u2014 wrong branch selection. boeing_06: FY2021 effective tax rate SIGN ERROR \u2014 gold -14.76%, agent '14.7%' (positive); FY2022 fine (0.6% vs 0.62%). johnson_johnson_06: polarity flip \u2014 gold 'No, growth decelerates 3.6%->3.5%', agent 'Yes'. amd_01 (wrong_value): quick ratio 1.77 vs gold 1.57 \u2014 numerator/line-item difference (agent likely included a larger short-term-investment or receivables figure), outside 1% tol. pepsico_06 (wrong_value): answered '0' for restructuring costs; gold is $411M \u2014 retrieval/line-item MISS (restructuring costs ARE disclosed; the 'state 0 if not present' clause led agent to a false negative). Root causes: (i) branch-selection on 'is-metric-useful' framings (boeing_02); (ii) sign handling on negative rates (boeing_06); (iii) directional-inference errors on multi-period comparisons (jnj_06); (iv) ratio line-item selection (amd_01); (v) 'state 0 if absent' clause inducing false-negative when the figure is present (pepsico_06).",
+          "affected_items": [
+            "boeing_02",
+            "boeing_06",
+            "johnson_johnson_06",
+            "amd_01",
+            "pepsico_06"
+          ],
+          "suggested_fix": "Re-evaluate deferred IMP-4 (ratio hardening) against amd_01. Add agent guidance: preserve sign on rates/margins; for 'state 0 if not outlined' questions, require an explicit retrieval attempt for the line item before answering 0; for 'is-X-useful-else-explain' questions, compute X first and only invoke the 'not useful' branch if the metric is truly undefined. These are the only 5 true accuracy defects."
+        },
+        {
+          "title": "2 borderline items where the gold is arguably stale or over-narrow",
+          "severity": "low",
+          "evidence": "pfizer_04: gold 'Yes, spinning off Upjohn'; agent 'No, as of Q2 2023 not spinning off \u2014 Upjohn was the historical 2020 spin-off (Viatris)'. Agent's period reasoning is defensible; Upjohn was spun off in 2020, so 'as of Q2 2023' arguably makes No correct \u2014 gold may be stale. verizon_05: gold gives pension $1,097M and health/life $862M SEPARATELY; agent gives both correct numbers PLUS their sum $1,959M as the total retiree payment. Agent has all gold facts and arguably answers 'how much for retirees' more completely; gold wanted the split.",
+          "affected_items": [
+            "pfizer_04",
+            "verizon_05"
+          ],
+          "suggested_fix": "Flag for human gold review (human_reviewed=false on both). Do not count as agent defects; consider annotating acceptable-answer variants."
+        },
+        {
+          "title": "B_judgment 0/14 fully decomposed: 8 correct+unlockable, 1 wrong, 5 prose; ZERO golds string-matchable as-is",
+          "severity": "medium",
+          "evidence": "All 14 B items are in wrong_text (confirms 0/14). None currently exact-matches (even terse answers are prose-wrapped, e.g. 'In 2022, AMD brought in the most cashflow from Operations' not bare 'Operations'). Substantively correct + canonically unlockable (8): amd_06, best_buy_05, nike_04 (choice=operations), boeing_04, jnj_07 (yes/no), mgm_05, mgm_06 (entity), pepsico_08 (defeated). Genuinely wrong (1): johnson_johnson_06 (Yes vs gold No). Correct prose (5): amd_05, boeing_05, boeing_07, pepsico_07, plus boeing_06 which is a wrong (sign) numeric-in-prose. So the B bucket's 0% is ~57% a scoring artifact, not agent incapability.",
+          "affected_items": [
+            "amd_05",
+            "amd_06",
+            "best_buy_05",
+            "boeing_04",
+            "boeing_05",
+            "boeing_06",
+            "boeing_07",
+            "johnson_johnson_06",
+            "johnson_johnson_07",
+            "mgm_resorts_05",
+            "mgm_resorts_06",
+            "nike_04",
+            "pepsico_07",
+            "pepsico_08"
+          ],
+          "suggested_fix": "Apply the polarity + gold_canonical scorer branches (findings 2-3) to B items; expected B accuracy jumps to ~8/14 immediately, plus the 5 prose items via reference-based judge. Only jnj_06 is a real B defect."
+        },
+        {
+          "title": "Both judges fail to catch wrong answers; groundedness is saturated (5) AND missing on ~53% of answered items",
+          "severity": "medium",
+          "evidence": "results/agent_judge_items.json: groundedness distribution = 27x'5', 34x null (only 3 nulls are abstentions, so ~31 answered items have NO groundedness score \u2014 null rationale => judge parse/API failures). Every groundedness it DID score is 5 (zero variance, confirming judge_zero_variance flag). Judges are reference-free (judges.py: groundedness checks citation support only; actionability sees only the memo item), so neither compares to gold and neither flags the genuinely-wrong items: boeing_06 got actionability=5 ('complete self-contained numeric basis') DESPITE the FY2021 sign error; johnson_johnson_06 (wrong Yes) got actionability=2 only for lacking numbers, not for being wrong-direction. For B items, groundedness=5 wherever scored (amd_05, amd_06, boeing_04, mgm_05, best_buy_05, pepsico_07, pepsico_08) and null for the other 7.",
+          "affected_items": [
+            "boeing_06",
+            "johnson_johnson_06"
+          ],
+          "suggested_fix": "(1) Fix judge reliability \u2014 ~half of groundedness calls returned null (parse/adapter failures); log judge_error and retry so the artifact is complete. (2) groundedness at zero-variance 5 provides no signal; either drop it or add a reference-based correctness judge (gold vs answer) so factual/sign/polarity errors like boeing_06 and jnj_06 are actually caught. Reference-free judges structurally cannot verify correctness."
+        }
+      ]
+    },
+    {
+      "findings": [
+        {
+          "title": "groundedness=5.0/zero-variance is a JUDGE-TRUNCATION ARTIFACT, not saturation: 34/61 items errored to null and the censoring is non-random",
+          "severity": "high",
+          "evidence": "agent_judge_items.json: groundedness is scored on only 27/61 items (all=5 -> zero variance); the other 34 are null. actionability scored on 29/61, 32 null. Null == judge_error (run.py sets score/rationale to None on judges.py's error path when call_json_with_retry exhausts retries). The null rate is heavily skewed by complexity: groundedness null on 23/34 A_multi_input (68%) vs 6/14 B_judgment vs 5/13 C_lookup; median agent-answer length for NULL groundedness = 77 chars vs SCORED = 20 chars. So the judge only successfully scores the TRIVIAL short answers (which are all trivially 5), and errors out on exactly the long multi-claim answers where variance would live. LIVE-PROVEN root cause: Kimi-K2.6 via Vultr burns the entire completion budget in its hidden reasoning channel before emitting content. Re-running judge_groundedness on adobe_01 (a null item): max_tokens=4000 -> content_len=0, 8000 -> 0, 16000 -> valid 835-char JSON. reasoning_effort is already 'none' in config yet reasoning still overflows; effort='low' at 4000 also returned empty. Same for actionability (max_tokens=3000): adobe_02/03/04/05 all empty at 3000, valid at 12000.",
+          "affected_items": [
+            "adobe_01",
+            "adobe_02",
+            "adobe_03",
+            "adobe_04",
+            "adobe_05",
+            "amd_01",
+            "amd_02",
+            "amd_03",
+            "nike_04",
+            "pepsico_06"
+          ],
+          "suggested_fix": "This is the #1 iter3 fix and it is a MEASUREMENT bug, not a rubric bug. In evals/judges.py bump judge_groundedness max_tokens 4000->16000 and judge_actionability max_tokens 3000->12000 (empirically the reliable thresholds). Then re-run judges for baseline/iter1/iter2 so the 5.0/3.97 headline numbers (currently computed over a censored 27/29-item sample) become honest."
+        },
+        {
+          "title": "When the censored multi-claim items are actually scored, groundedness variance RETURNS and both judge means drop -- the current means are inflated upward by dropping the low-scoring items",
+          "severity": "high",
+          "evidence": "Re-scoring previously-null items at adequate token budget: groundedness adobe_01 -> 3 (judge caught an unsupported sub-claim: 'the assertion that operating margin is a useful metric for Adobe is unsupported by any cited passage'), while pepsico_06/nike_04/amd_04 -> 5. So groundedness is NOT stuck at 5; the 3s were being silently discarded as null. Recovered actionability nulls scored 2,2,3,3 (adobe_02/03/04/05 -- all thin numeric-basis answers). Because truncation preferentially kills the reasoning-heavy, multi-claim, terse-value answers -- exactly the ones that score below 5 -- the surviving means (groundedness 5.0, actionability 3.97) are biased HIGH and the zero-variance flag is manufactured by the censoring, not earned.",
+          "affected_items": [
+            "adobe_01",
+            "adobe_02",
+            "adobe_03",
+            "adobe_04",
+            "adobe_05"
+          ],
+          "suggested_fix": "After the max_tokens fix, expect groundedness to spread (5s + 3s from unsupported sub-claims / period issues) and actionability mean to fall as thin-basis 2s/3s re-enter. Keep the judge_zero_variance flag but also compute and gate on coverage: report judge_null_rate per criterion in run.py and refuse to surface a criterion as a headline trend if null_rate>10% (right now 56%/52% of items are unscored and that is invisible in the aggregate)."
+        },
+        {
+          "title": "On the answer_accuracy=fail AND groundedness=5 sample, groundedness=5 is EARNED -- the rubric is not too lenient; accuracy fails for an orthogonal (free-text gold) reason",
+          "severity": "medium",
+          "evidence": "17 of the 27 groundedness=5 items have answer_accuracy=fail. Sampled 7 (adobe_02, amd_05, boeing_04, mgm_resorts_03, pepsico_07, mgm_resorts_05, pfizer_01): in every case the cited quote genuinely supports the claimed value with matching period/entity, per the groundedness rationale cross-checked against the memo and gold. The accuracy failures are deterministic-scorer artifacts on free-text/yes-no golds: e.g. adobe_02 gold 'Yes...143%->156%' vs agent 'Yes' (correct); amd_05 gold lists EPYC/semi-custom/Xilinx drivers, agent gives a richer superset (correct); mgm_resorts_03 gold 'Yes $0.01/share' vs agent same (correct). Independent confirmation the rubric discriminates: the calibration gate PASSES with corrupted_swapped_citation->1, corrupted_wrong_number->1, period_mismatch_wrong_year->3 (corrupted_memo_judge.json). Note: 9 of the groundedness=5 items have deterministic citation_precision=fail, but that is not a contradiction -- groundedness scores whether claims are supported, not whether extra/irrelevant citations were attached (that is precision's job).",
+          "affected_items": [
+            "adobe_02",
+            "amd_05",
+            "boeing_04",
+            "mgm_resorts_03",
+            "pepsico_07",
+            "mgm_resorts_05",
+            "pfizer_01"
+          ],
+          "suggested_fix": "Do NOT loosen or rewrite the groundedness rubric for leniency -- it is calibrated correctly. The real gap is (a) truncation (finding 1) and (b) that groundedness structurally cannot grade B_judgment answer QUALITY vs the gold. Address the latter with a new gold-agreement criterion (next finding), not by changing groundedness anchors."
+        },
+        {
+          "title": "groundedness has ceiling-ed as a QUALITY signal because it only grades 'claims-present-are-supported' -- a bare 'Yes' is trivially 5; actionability already carries the discrimination",
+          "severity": "medium",
+          "evidence": "boeing_04 answer is literally 'Yes' -> groundedness 5 (the single claim is supported) but actionability 2 ('provides no numeric basis...leaving an analyst without any means to verify'). Same shape: pfizer_01 'Yes' (g=5,a=2), mgm_resorts_05 'Las Vegas Strip Resorts' (g=5,a=3), mgm_resorts_02 'Corporate bonds' (a=2), nike_02 '55.1%' (a=2), general_mills_04 '0.54' (a=3), pepsico_05 '9068' (a=3). Actionability distribution (on the 29 scored) is 5x18/3x3/2x8 -- it has real variance and its rationales correctly penalize terse conclusions with no stated numeric basis and hollow abstentions. So for well-formed short answers groundedness is a solved/ceiling-ed axis; the remaining B_judgment signal lives in answer completeness vs gold, which neither current judge measures (groundedness ignores what is NOT claimed by rubric design; actionability judges self-containment, not correctness-vs-gold).",
+          "affected_items": [
+            "boeing_04",
+            "pfizer_01",
+            "mgm_resorts_05",
+            "mgm_resorts_02",
+            "nike_02",
+            "general_mills_04",
+            "pepsico_05"
+          ],
+          "suggested_fix": "Add a THIRD judge criterion for B_judgment quality: a 'gold_agreement' judge that (allowed, eval-side) sees gold_answer + gold_evidence and rates 1..5 semantic agreement between the memo answer and the gold thesis (does it name the right drivers/direction/entity, not just a supported fragment). This directly targets B_judgment (still 0/14 on the deterministic scorer, which cannot credit free-text). Keep it OFF the calibration ceiling gate (it sees gold, so the corrupted-citation fixtures do not bound it) but report it and flag its zero-variance too. Optionally add a lightweight 'completeness' anchor to actionability, but a separate gold-agreement criterion is cleaner and does not muddy actionability's self-containment axis."
+        },
+        {
+          "title": "Abstained items are handled correctly: groundedness skipped, actionability scored -- all 3 abstentions got actionability=2 (rubric working)",
+          "severity": "low",
+          "evidence": "judge_memo_item skips groundedness for status=='abstained' (result['groundedness']=None, correct -- nothing was claimed) and always runs actionability. All 3 abstained items (best_buy_02, verizon_02, verizon_04) are budget-exhaustion templates and each scored actionability=2 with rationales like 'generic budget-exhaustion statement that names no specific missing evidence...and no specific next retrieval' -- exactly the hollow-abstention anchor firing as intended. All 3 iter2 abstentions are budget-exhausted (per the iteration summary), so 2 is the correct floor.",
+          "affected_items": [
+            "best_buy_02",
+            "verizon_02",
+            "verizon_04"
+          ],
+          "suggested_fix": "No change to the abstention handling -- keep groundedness=None and actionability scored. Do NOT auto-assign actionability=1: the rubric's distinction between a hollow budget-abstention (2) and a well-formed abstention that names missing evidence + next step (5) is a useful gradient the agent can climb in later iterations. Keep abstained items IN the actionability denominator."
+        },
+        {
+          "title": "The calibration gate is blind to the truncation failure because its fixtures are short; it certified a judge that silently nulls 56% of real items",
+          "severity": "medium",
+          "evidence": "corrupted_memo_judge.json shows passed=true (fixtures scored 1/1/3) so run.py surfaced the judge scores as headline metrics -- yet the same judge errored to null on 34/61 real groundedness calls. The calibration fixtures (corrupted_swapped_citation, corrupted_wrong_number, period_mismatch_wrong_year) are single-claim short memos that do not overflow the reasoning budget, so the gate never exercises the multi-claim path that actually fails. _score_calibration_fixture already treats a null score as a calibration failure, but no fixture triggers it.",
+          "affected_items": [],
+          "suggested_fix": "Add a long, multi-claim A_multi_input-shaped calibration fixture (4-5 material claims, ~80+ char answer) whose known-good answer must score >=4; at the current 4000-token cap it would return null and FAIL the gate, catching the truncation regression before scores are trusted. Additionally, have run.py fold judge_null_rate into the gate/headline decision so a high null rate demotes the criterion from headline just like zero-variance does."
+        }
+      ],
+      "summary": "The \"groundedness=5.0 zero-variance\" is NOT saturation or a lenient rubric -- it is a judge-truncation artifact. The Kimi-K2.6 judge overflows its 4000/3000 max_tokens caps in the hidden reasoning channel and returns empty content on the complex items, so 34/61 groundedness and 32/61 actionability scores are silently null (judge_error). The censoring is non-random: it kills exactly the long multi-claim answers (median 77 vs 20 chars; 68% of A_multi_input null) where variance lives, leaving only trivial short answers that are all trivially 5. LIVE-PROVEN: adobe_01 returns empty at max_tokens 4000/8000 but valid JSON at 16000, where it scores groundedness 3 (catches an unsupported sub-claim) -- variance returns the moment the budget is adequate; recovered actionability nulls score 2,2,3,3. So both means are inflated upward by dropping the low-scoring items, and the zero-variance flag is manufactured. Where groundedness IS scored, it is EARNED (the calibration gate passes: corrupted->1, period-mismatch->3; and every answer_accuracy=fail/groundedness=5 sampled item has a genuinely period/entity-matched citation -- accuracy fails only because these are free-text/yes-no golds the deterministic scorer cannot credit). But groundedness has structurally ceiling-ed as a QUALITY signal: a bare \"Yes\" is trivially 5, and actionability already discriminates that (boeing_04 g5/a2). Abstained items are handled correctly (groundedness skipped, actionability=2 for all 3 budget-exhaustion templates). Top iter3 evals/judges.py changes: (1) raise max_tokens to 16000 (groundedness) / 12000 (actionability) -- the real fix; (2) re-run judges over baseline/iter1/iter2 for honest, un-censored means and variance; (3) surface judge_null_rate and gate headline metrics on coverage, not just zero-variance; (4) add a long multi-claim calibration fixture so the gate catches truncation (it currently certifies a judge that nulls 56% of items); (5) add a gold-agreement judge criterion (allowed to see gold_answer/gold_evidence, off the ceiling gate) to measure B_judgment quality, which is 0/14 on the deterministic scorer and unmeasurable by groundedness."
+    }
+  ]
+}

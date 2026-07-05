@@ -1,0 +1,237 @@
+{
+  "plan": {
+    "analysis_summary": "Iter3's TOTAL-CORRECT drop (46->43 of 61) decomposes into two independent, separately-fixable problems that the two substantive analyst reports pin down at item-level (the third \"PRECISION + JUDGES\" report is a placeholder stub with no findings, so it yields no action; judges already discriminate well and TOTAL CORRECT is the primary metric).\n\n(1) Scorer false-negatives, not agent errors. Of the 11 residual wrongs, 6 are cases where the agent's answer is substantively correct (LLM judge gold_agreement 4-5) but scorers.answer_accuracy has no annotated branch to credit it and falls through to the exact-string fallback that free text can never satisfy. The scorer machinery (evals/scorers.py answer_accuracy: numeric branch gated on gold_value+memo.value, polarity branch gated on gold_polarity, canonical branch gated on gold_canonical, all ABOVE the exact-string fallback) already exists from IMP3-1; these items simply lack the human-derived annotation in data/gold_annotations.json. amd_01 already carries gold_value=1.57 but the agent returned a Yes/No text answer with memo.value=None, so the numeric branch never fires \u2014 it needs a polarity annotation instead. This is the single highest-ROI, lowest-risk lever: it is a pure rescore (no agent re-run) and lands ~+5-6 immediately.\n\n(2) An over-search/never-commit behavior regression. All 4 true correct->abstain losses (boeing_01, mgm_resorts_01, pepsico_02, pfizer_03) share one signature: the model burned all 12 SUCCESSFUL search calls with ZERO record_answer attempts and ZERO rejections despite the answer-bearing evidence being present in retrieved snippets (iter2 committed on these same items in 1-7 searches). Root cause: iter3's citation-minimalism + verbatim-quote-strictness + get_pages-only-citable-when-quoted prompt changes raised the model's internal bar for a \"citable\" answer, so it hunts for a cleaner quote until budget runs out. This is NOT retrieval recall, NOT the recompute/zero/rejection-cap mechanisms (which fired on zero budget items), and NOT fixable by raising the tool-call budget (these items had zero rejections; more budget = more wasted searches at higher latency). The 2 \"model_choice\" abstentions (amd_05, boeing_07) went wrong->abstain and are TOTAL-CORRECT-neutral (a wrong \"fail\" and an abstain both score not-correct); best_buy_02 was already abstained in iter2 (pre-existing, out of scope).\n\nThe residual TRUE agent errors after annotations are only 3: pepsico_06 (retrieved Note 3/$411M but answered 0 on a literal \"on the face of the income statement\" reading \u2014 interpretation gap), boeing_06 (effective-tax-rate sign-convention conflict: agent's magnitudes match gold but signs flip on a pre-tax loss), and johnson_johnson_06 (genuine wrong-growth-basis miss; annotation already correct and correctly failing). pfizer_04 is contested/stale gold (agent's \"Upjohn completed Nov 2020\" is defensible) \u2014 keep skipped.\n\nPlan orders the four levers by TOTAL-CORRECT-of-61 ROI. Net expected landing ~50-52, clearing iter2's 46 while preserving iter3's precision/quality gains (citation_precision 59.3%, discriminating judges), because none of the levers weakens a scorer or relaxes a grounding check.",
+    "improvements": [
+      {
+        "id": "IMP4-1",
+        "title": "Add 5 honest gold annotations (+1 flagged) to unlock scorer false-negatives on substantively-correct answers",
+        "category": "eval_measurement",
+        "priority": 1,
+        "rationale": "Highest ROI of any lever and near-zero risk: it is a pure RESCORE (no agent re-run) and the scorer branches it feeds already exist and are gated on annotation presence (evals/scorers.py answer_accuracy: polarity branch line ~216, canonical branch line ~221, both ABOVE the exact-string fallback). Six items are answered with substantively-correct content (LLM judge gold_agreement=4-5 on every one) but fail only because they carry no gold_polarity/gold_canonical/gold_value annotation, so answer_accuracy drops to the exact-string fallback that free text cannot satisfy. Each annotation is derived from the item's question + gold_answer TEXT ONLY (never from any agent output), matching the existing _README honesty contract in data/gold_annotations.json.",
+        "changes": "In data/gold_annotations.json (merged into data/subset.json by dataset_builder/d5_select_subset.py), add these annotations, each with an `evidence` field quoting the exact gold_answer fragment that justifies it:\n(a) amd_01 (financebench_id for 'quick ratio FY22') -> gold_polarity='yes'. It is a yes/no question; gold answer leads 'Yes.', agent leads 'Yes.'. NOTE: amd_01 already has gold_value=1.57 but the agent returned a Yes/No TEXT answer with memo.value=None, so the numeric branch (requires memo.value not None) never fires \u2014 the polarity branch is what unlocks it. Do NOT remove gold_value.\n(b) boeing_02 -> gold_polarity='yes' (yes/no gross-margin-trend question; gold and agent both lead 'Yes.').\n(c) boeing_05 -> gold_canonical=['737','777X','787'] (gold enumerates production-rate changes for exactly these three programs; canonical list requires every entity's tokens to be a subset of the answer, which the agent satisfies).\n(d) pepsico_07 -> gold_canonical='strong start' (gold: 'Pepsico experienced a strong start to FY2023'; tokens {strong,start} are a subset of the agent answer).\n(e) verizon_04 -> gold_canonical='cross currency swaps' (gold: 'Cross currency swaps'; clean token subset of the agent answer).\nFLAGGED borderline (previously deliberately un-annotated; restate honesty rules before landing): verizon_05 -> gold_value=1959. HONESTY BASIS: the gold's own expected_formula is literally '1097 + 862' and the gold_answer lists the two retiree components ($1097M pension + $862M health/life); the question asks how much Verizon expected to pay for retirees in 2024, i.e. the total, so 1959 is the gold's intended sum, not agent-derived. Only annotate if a human reviewer confirms the question wants the total. Once set, memo.value 1959 vs gold 1959 passes the numeric branch.\nDO-NOT-ANNOTATE (honesty guard): pfizer_04 stays skipped \u2014 its gold polarity is 'yes' (Upjohn spin-off) while the agent's defensible 'No, completed Nov 2020' would still fail; forcing a pass would be dishonest and the gold is stale for the as-of date. pepsico_03 must NOT get a strict canonical (gold 'North America' vs agent 'United States and Canada' token gap would FALSE-fail a correct answer). After annotating, rescore ALL iterations (iter1-3) with the v2 scorer for apples-to-apples trend continuity, exactly as iter3 did.",
+        "files": [
+          "data/gold_annotations.json",
+          "data/subset.json",
+          "dataset_builder/d5_select_subset.py",
+          "evals/scorers.py"
+        ],
+        "expected_impact": "+5 TOTAL CORRECT near-certain on rescore (amd_01, boeing_02, boeing_05, pepsico_07, verizon_04 \u2014 all already ANSWERED with correct substance in iter3, so they flip to pass with no behavior change), +1 if verizon_05 clears human review (43 -> 48-49 from this lever alone). No latency/token cost, no agent re-run. Non-negative on every other metric (branches only ADD pass opportunities).",
+        "risk": "Very low. Only risk is annotation honesty; mitigated by deriving every annotation from question+gold_answer text with a quoted evidence field, keeping pfizer_04/pepsico_03 out, and flagging verizon_05 for explicit human sign-off."
+      },
+      {
+        "id": "IMP4-2",
+        "title": "Commit-nudge on the over-search/no-commit path + tighten the stall guard so it actually fires",
+        "category": "agent_code",
+        "priority": 2,
+        "rationale": "Directly targets the ONLY behavioral cause of the 4 true correct->abstain regressions: the model exhausted all 12 successful searches with record_answer_attempts==0 and zero rejections while the answer-bearing evidence was already retrieved (boeing_01 got the segment table; pfizer_03 got the acquisition names; pepsico_02 re-retrieved the exact answer 8-K 61x; mgm got the capex line). iter2 committed on these same items in 1-7 searches. The current stall guard (backend/app/agent.py _search_stall_notice ~line 672) fired on only 1 of the 4 fixation loops because SEARCH_STALL_JACCARD_THRESHOLD=0.8 is too high (the model varies surface tokens across near-duplicate-intent queries) and its hint OFFERS an abstain escape (option (c): flag_outstanding 'retrieval exhausted'). Because an abstain-on-answerable and a wrong answer score identically (both not-correct), a nudge that pushes commit is STRICTLY non-negative on TOTAL CORRECT \u2014 record_answer still validates the verbatim citation, so a genuinely-empty item cannot be forced to hallucinate.",
+        "changes": "In backend/app/agent.py:\n(1) Add an over-search/no-commit trigger: track successful search_filing count and record_answer_attempts on _ItemState; when successful searches reach ~6-8 AND record_answer_attempts==0, emit a COMMIT-PUSH notice. Fold this into the existing _search_stall_notice path (or a sibling notice emitted from _dispatch ~line 745) so it rides the same tool-result-hint channel.\n(2) Rewrite the pushed hint to: 'You have retrieved substantial evidence and have not recorded an answer. If your retrieved chunks support an answer, call get_pages to read the single best one in full, then record_answer with a verbatim quote NOW. Stop searching.' REMOVE option (c) (the flag_outstanding/'retrieval exhausted' invitation) from THIS path so it stops nudging toward abstain; keep flag_outstanding available only via the model's own judgment, not the guard's suggestion.\n(3) Lower config.SEARCH_STALL_JACCARD_THRESHOLD 0.8 -> 0.6 (backend/app/config.py line 81) and add a 'same dominant doc_id re-retrieved >= N times' stall trigger (pepsico_02 re-hit one 8-K 61x, boeing_01 cycled Note 21/22/23 variants) so the guard latches during these loops. Do NOT raise MAX_TOOL_CALLS_PER_ITEM (12) as the primary lever \u2014 the regressed items had zero rejections, so more budget just buys wasted searches at higher latency; only consider a 12->14 bump AFTER this lands and only if telemetry shows late commits being truncated.\nRun a 5-10 item pilot (include boeing_01, mgm_resorts_01, pepsico_02, pfizer_03) per the pilot-first directive, verify the commit-nudge fires and record_answer succeeds, then do the full throttled run.",
+        "files": [
+          "backend/app/agent.py",
+          "backend/app/config.py"
+        ],
+        "expected_impact": "+3 near-certain (boeing_01, mgm_resorts_01, pepsico_02 \u2014 clean evidence already retrieved) and +1 probabilistic (pfizer_03 \u2014 fuzzy item), plus a possible bonus on best_buy_02. Restores answered-count toward iter2 levels and cuts wasted late-loop searches (should also help p95, currently 68s). Strictly non-negative on TOTAL CORRECT because record_answer still validates the verbatim citation.",
+        "risk": "Low-moderate. Requires a full agent re-run (behavior change), so pilot first. Spiral risk is bounded: the nudge only fires on the over-search loop that correct-early items never enter, and the verbatim-citation validation still blocks hallucinated commits. Watch that lowering Jaccard to 0.6 doesn't cut legitimate multi-query research short (the guard only HINTS, never force-stops, which contains this)."
+      },
+      {
+        "id": "IMP4-3",
+        "title": "Add two targeted reasoning rules for the genuine derivation/interpretation misses (pepsico_06, boeing_06)",
+        "category": "agent_prompt",
+        "priority": 3,
+        "rationale": "These are the only two residual wrongs that are real agent errors AND plausibly fixable by prompt guidance (johnson_johnson_06 is a genuine miss with correct annotation; pfizer_04 is contested gold). pepsico_06: iter3's require-retrieval-before-zero FIRED correctly and the agent DID retrieve Note 3/page 78 with the $411M restructuring figure, then answered 0 by citing page 62 (the face of the income statement, which shows no restructuring line) on a literal reading of 'if restructuring costs are not explicitly outlined then state 0'. PepsiCo discloses restructuring only in the notes. boeing_06: the agent's effective-tax-rate magnitudes (-0.6%/14.7%) match gold's (0.62%/-14.76%) but the SIGNS flip on the FY2022 pre-tax loss, so the direction of change reverses (agent 'decrease' vs gold 'increase'). iter3 added a sign-convention rule but did not apply it to the source-reported-rate path.",
+        "changes": "In backend/app/agent.py system/derivation prompt:\n(1) Add an interpretation rule: \"'income statement' / 'financial statements' includes the accompanying notes. A figure broken out in a note (e.g. a restructuring/impairment note) counts as 'outlined' \u2014 report that figure rather than 0. Only answer 0 when the item is genuinely absent from both the face statement AND the notes.\"\n(2) Extend the effective-tax-rate sign convention to the reported-rate path: \"effective tax rate = income tax expense / pre-tax income, carrying a pre-tax LOSS as negative (so a tax benefit on a loss reads as a negative rate). When a filing reports its own effective-rate table, recompute from income-tax-expense and pre-tax-income under this convention rather than transcribing the reported percentage sign, so the direction of a year-over-year change is consistent with the pre-tax sign.\"\nOptionally (lower certainty, stretch) add a like-for-like guidance note for EPS-growth-trend items: 'compare FY(n) guidance-midpoint growth against prior-year actual growth on the same basis; do not substitute a mid-year raised-guidance growth number for the initial FY(n) figure' \u2014 this targets johnson_johnson_06 but is speculative, so gate it on the pilot. Include these two items in the IMP4-2 pilot to confirm the rules change the answer without regressing neighbors.",
+        "files": [
+          "backend/app/agent.py"
+        ],
+        "expected_impact": "+1-2 TOTAL CORRECT (pepsico_06 high-confidence once the notes-count-as-outlined rule lands and the $411M evidence is already retrieved; boeing_06 medium-confidence \u2014 depends on the model actually recomputing rather than transcribing). Both are genuine substance fixes, not scoring changes.",
+        "risk": "Low-moderate. Prompt-only, so no scorer/grounding weakening, but adds instruction surface that could shift behavior on other tax/restructuring items \u2014 the pilot must check a few neighbors (other cash-flow/tax items) for collateral regressions. The 'notes count as outlined' rule is genuinely ambiguous (literal 0 is defensible), so pepsico_06 remains a judgment call; treat any gain as a bonus, not a guarantee."
+      },
+      {
+        "id": "IMP4-4",
+        "title": "Make the verbatim quote matcher case-insensitive to lower corpus-wide over-caution and recover amd_05/boeing_07",
+        "category": "agent_code",
+        "priority": 4,
+        "rationale": "amd_05 and boeing_07 each emitted exactly 4 'citation quote must be a verbatim substring' rejections then hit MAX_CONSECUTIVE_FINAL_REJECTIONS=4 and force-abstained \u2014 both on qualitative text items (revenue drivers; primary customers) where the model re-cased/paraphrased the quote. The matcher _match_quote_offsets (backend/app/agent.py ~line 378) via _normalize_for_match (~line 343) folds unicode + whitespace but is CASE-SENSITIVE (no .lower()/casefold), which is the likely cause of the 4x failures. Making it case-insensitive still requires the substring to exist (no hallucination admitted) and lowers the over-caution bar that also feeds the over-search loop targeted by IMP4-2. Do NOT touch the rejection cap, recompute tolerance, or require-retrieval-before-zero \u2014 the analyst confirms those caused zero correct-losses.",
+        "changes": "In backend/app/agent.py, apply case-folding in BOTH _normalize_for_match (line ~343) and _normalized_with_offsets (line ~352) so the quote and the raw chunk projection are compared case-insensitively. CAUTION: keep the offset map 1:1 \u2014 use str.lower() char-by-char inside _normalized_with_offsets's existing per-char loop (not a bulk .casefold() on the whole string), because casefold can change length (e.g. \u00df->ss, \u0130->i\u0307) and would desync offset_map, corrupting the returned raw offsets. If any char lowercases to a different length, fall back to leaving that char unfolded rather than breaking the map. Add/adjust a fixture in evals/fixtures to cover a re-cased quote. Leave MAX_CONSECUTIVE_FINAL_REJECTIONS=4 unchanged.",
+        "files": [
+          "backend/app/agent.py",
+          "evals/fixtures"
+        ],
+        "expected_impact": "+0 to +1 TOTAL CORRECT directly (amd_05 and boeing_07 were both answer_accuracy=fail in iter2, so recovering them as ANSWERED yields correct only if the now-committed answer also matches gold), but it reduces rejection/over-search pressure CORPUS-WIDE at near-zero cost, reinforcing IMP4-2. Best treated as a supporting fix rather than a standalone TOTAL-CORRECT driver.",
+        "risk": "Low. No hallucination admitted (substring must still exist). The only real hazard is offset-map corruption from length-changing case folds, fully mitigated by the char-by-char 1:1 guard above. Ships with IMP4-2's re-run, so no extra run cost."
+      }
+    ]
+  },
+  "analysts": [
+    {
+      "findings": [
+        {
+          "title": "amd_01 (wrong_value): derivation hardening WORKED; failure is a deterministic-scorer false-negative, not a derivation bug",
+          "severity": "high",
+          "affected_items": [
+            "amd_01"
+          ],
+          "evidence": "The iter3 calculate call used EXACTLY the gold formula and inputs: (cash 4835 + short_term_investments 1020 + accounts_receivable 4126 + related_party_receivables 2) / current_liabilities 6369 = 1.57. Gold: expected_formula=(cash_and_cash_equivalents + short_term_investments + accounts_receivable_net + receivables_from_related_parties)/current_liabilities, gold_value=1.57. Agent answer: 'Yes. AMD's quick ratio for FY22 was 1.57...'. Judge gold_agreement=5 ('exact quick ratio value (1.57)'). It scored answer_accuracy=fail because memo.value is None (unit 'text' on a Yes/No item) so scorers.answer_accuracy skips the numeric branch (requires memo.value not None), and gold_polarity/gold_canonical are both null, so it drops to the exact-string fallback which free text can never satisfy. The canonical-ratio + require-retrieval rules did their job; the scorer just can't see the correct number.",
+          "suggested_fix": "Annotate gold_polarity='yes' (this is a yes/no question; gold answer leads 'Yes.', agent leads 'Yes.' -> polarity branch passes). Honest per IMP3-1. Do NOT credit this as a derivation-rule failure in the synthesis."
+        },
+        {
+          "title": "verizon_05 (wrong_value, deliberately-skipped): agent correctly summed the gold's own expected_formula; blocked only by gold_value=null",
+          "severity": "high",
+          "affected_items": [
+            "verizon_05"
+          ],
+          "evidence": "Agent value=1959 ('$1,959 million'), computed via calculate: pension_benefits_2024 1097 + health_care_life_2024 862 = 1959. Gold expected_formula is literally '1097 + 862'; gold_answer lists the two components ('$1097 million' pension + '$862 million' health/life) but sets gold_value=null. Judge gold_agreement=5 ('$1,959 million is the exact sum of the two components'). answer_accuracy fails because gold_value is None so the numeric branch never fires, then exact-string fallback fails.",
+          "suggested_fix": "Annotate gold_value=1959 (retirees = pension + health/life, the total the question asks for; matches gold's own expected_formula). Then memo.value 1959 vs gold 1959 -> numeric pass. Honest to un-skip: the borderline was whether the question wants the total, and expected_formula shows gold intends the sum."
+        },
+        {
+          "title": "verizon_04 (wrong_text): agent gives the exact correct entity; blocked by missing gold_canonical",
+          "severity": "medium",
+          "affected_items": [
+            "verizon_04"
+          ],
+          "evidence": "Question: which derivative had the highest notional value in FY2021. Agent answer: 'Cross currency swaps' (citation_precision=pass). Gold: 'Cross currency swaps. Its notional value was $32,502 million.' Judge gold_agreement=4 ('correctly identifies cross currency swaps... matches the gold's entity and conclusion, but omits the specific notional value'). Fails only via exact-string fallback (gold_canonical=null).",
+          "suggested_fix": "Annotate gold_canonical='cross currency swaps'. Tokens {cross,currency,swaps} are a clean subset of the agent answer -> canonical branch passes. Very low-risk/honest. Optionally an answer-style rule to also state the winning magnitude."
+        },
+        {
+          "title": "boeing_02 (wrong_text): substantively correct 'Yes, improving'; blocked by missing gold_polarity",
+          "severity": "medium",
+          "affected_items": [
+            "boeing_02"
+          ],
+          "evidence": "Yes/no question on gross-margin trend. Agent: 'Yes. Boeing's gross margin improved from -9.70% FY2020 to 4.90% FY2021 and 5.30% FY2022...'. Gold: 'Yes. Boeing has an improving gross margin profile... 4.8% FY2021 to 5.3% FY2022.' Judge gold_agreement=5 ('same substantive conclusion'). Fails via exact-string fallback.",
+          "suggested_fix": "Annotate gold_polarity='yes'. Agent leads 'Yes.' -> polarity branch passes. Honest."
+        },
+        {
+          "title": "boeing_05 (wrong_text): all three gold programs named correctly; blocked by missing gold_canonical",
+          "severity": "medium",
+          "affected_items": [
+            "boeing_05"
+          ],
+          "evidence": "Agent: '787 - increase... to 5 per month; 777X - resume production (currently paused); 737 - gradually increase from 31 per month.' Gold: 'increase in the production rates for the 737, 777X and 787 aircrafts in 2023'; gold expected_inputs enumerate 787->5/month, 777X paused/resume 2023, 737 ~31/month gradual increase. Agent matches all three. citation_precision=pass, judge gold_agreement=5. Fails via exact-string fallback.",
+          "suggested_fix": "Annotate gold_canonical=['737','777X','787'] (or the three-program set). All three tokens present in the agent answer -> canonical (list, every entity required) passes. Honest."
+        },
+        {
+          "title": "pepsico_07 (wrong_text): agent identifies the exact gold driver ('strong start'); blocked by missing gold_canonical",
+          "severity": "medium",
+          "affected_items": [
+            "pepsico_07"
+          ],
+          "evidence": "Gold: 'Pepsico experienced a strong start to FY2023.' Agent: '...raised full-year FY2023 guidance because of strong first-quarter performance... Given our strong start to the year...'. citation_precision=pass, judge gold_agreement=5 ('same core driver'). Fails via exact-string fallback.",
+          "suggested_fix": "Annotate gold_canonical='strong start'. Tokens {strong,start} are a subset of the agent answer -> passes. Slightly generic but honest (captures the causal claim); judge gold_agreement=5 corroborates."
+        },
+        {
+          "title": "pepsico_03 (wrong_text): correct geography set but a self-inconsistent 'seven vs five' count and a North-America-vs-US&Canada token gap make strict canonical risky",
+          "severity": "medium",
+          "affected_items": [
+            "pepsico_03"
+          ],
+          "evidence": "Agent lists the correct segment geographies (US & Canada, Latin America, Europe, 'Africa, Middle East and South Asia (AMESA)', 'Asia Pacific, Australia, New Zealand and China region (APAC)') but says 'seven geographic regions' while enumerating only five. Judge gold_agreement=4 ('names the same set of geographies... incorrectly claims seven while listing five, a secondary count error'). Gold expands to 'North America, Latin America, Europe, Africa, Middle East, South Asia, Asia Pacific, Australia, New Zealand and China'. A strict gold_canonical list built from the gold string would require token 'north' (from 'North America'), which the agent's 'United States and Canada' lacks -> canonical would FALSE-fail.",
+          "suggested_fix": "Do NOT force a strict canonical here. Either (a) an answer-style rule: expand segment abbreviations into constituent geographies and don't assert a region count you don't enumerate; or (b) if annotating, choose a gold_canonical whose tokens the correct answer actually contains (avoid 'North America' vs 'United States and Canada' mismatch). Substance is correct."
+        },
+        {
+          "title": "pepsico_06 (wrong_value): require-retrieval-before-zero FIRED and the agent DID retrieve the restructuring note; the failure is question-interpretation, not the rule",
+          "severity": "high",
+          "affected_items": [
+            "pepsico_06"
+          ],
+          "evidence": "Trace shows the agent searched 'restructuring' twice and get_pages'd pages 60,61,62,76,78 before answering (not a premature zero). Gold evidence lives on page 78: 'Note 3 Restructuring and Impairment Charges... 2019 Multi-Year Productivity Plan' = $411M. The agent cited page 62, the face of the Consolidated Statement of Income (Net Revenue, Cost of sales, Gross profit... no restructuring line) and answered '0'. The question: 'restructuring costs directly outlined in Pepsico's income statements... If restructuring costs are not explicitly outlined then state 0.' PepsiCo shows restructuring ONLY in the notes, not on the face of the statement, so the agent took the literal escape clause. Judge gold_agreement=1 ('memo answer states 0, directly contradicting the gold's $411 million').",
+          "suggested_fix": "Not an annotation and not a retrieval fix. Add an interpretation rule: 'income statement'/'financial statements' includes the accompanying notes; a figure broken out in a note (e.g. a restructuring/impairment note) counts as 'outlined' -> report it rather than 0. Note the item is genuinely ambiguous (literal 0 is defensible), so treat the derivation-hardening target as an interpretation gap, not a require-retrieval-before-zero failure."
+        },
+        {
+          "title": "boeing_06 (wrong_text): sign-convention divergence between the agent's source-reported rates and gold's computed rates; magnitudes agree, signs flip",
+          "severity": "medium",
+          "affected_items": [
+            "boeing_06"
+          ],
+          "evidence": "Agent (value=-15.3, cited to Boeing's tax reconciliation on page 77): FY2022 effective tax rate = (0.6)%, FY2021 = 14.7%, 'a decrease of 15.3 percentage points.' Gold: FY2022 = 0.62%, FY2021 = -14.76% (expected_formula = income tax / loss before income taxes) -> implies an INCREASE. The magnitudes match within rounding (0.6~0.62, 14.7~14.76) but the signs are flipped, so the direction of change is opposite. Judge gold_agreement=1 ('flips the polarities for both years... incorrectly claims a decrease rather than an increase'). The agent's numbers are grounded to Boeing's own reported effective-rate table, so this is a convention conflict, not a retrieval/hallucination error.",
+          "suggested_fix": "Not honestly annotatable (would endorse one sign convention over the source's). Either add a derivation rule fixing the convention (effective rate = income tax expense / pre-tax income, with a pre-tax LOSS carried as negative, so a benefit on a loss reads negative) to match gold, or flag as a gold-vs-source sign-convention dispute. This is the one 'derivation' item where a targeted rule (sign conventions) is genuinely relevant but was not applied to the reported-rate path."
+        },
+        {
+          "title": "johnson_johnson_06 (wrong_text): genuinely wrong polarity \u2014 annotation is already correct and correctly fails the agent",
+          "severity": "medium",
+          "affected_items": [
+            "johnson_johnson_06"
+          ],
+          "evidence": "gold_polarity='no' (already annotated). Gold: 'No, rate of growth in adjusted EPS is expected to decelerate slightly from 3.6% FY2022 to 3.5% FY2023.' Agent: 'Yes. J&J's adjusted EPS growth was expected to accelerate... 6.0% represented acceleration from FY2022's 3.6%.' The agent used the raised July-2023 guidance growth (6.0%) as the FY2023 figure; gold uses ~3.5% (initial guidance midpoint growth). Opposite conclusion. Judge gold_agreement=1. Polarity branch correctly returns fail (agent leads 'Yes', gold 'no').",
+          "suggested_fix": "No annotation change (annotation is honest and correct). This is a genuine substance error: the agent picked the wrong FY2023 growth basis. Fixable only by reasoning quality (use the like-for-like guidance growth vs prior-year growth), not by scoring. Leave as a true miss."
+        },
+        {
+          "title": "pfizer_04 (wrong_text, deliberately-skipped): contested/stale gold \u2014 the agent's 'No' is defensible; no honest annotation unlocks it, keep skipped",
+          "severity": "medium",
+          "affected_items": [
+            "pfizer_04"
+          ],
+          "evidence": "Gold: 'Yes, it's spinning off Upjohn' (based on the 10-Q still disclosing ~$700M Upjohn separation costs, ~90% incurred through Q2 2023). Agent: 'No. As of Q2 2023, Pfizer is not spinning off any large business segments... the Upjohn spin-off was completed in November 2020.' Factually Upjohn was spun off / combined into Viatris in Nov 2020, so 'as of Q2 2023' it is complete, not ongoing; the agent is arguably more accurate, with only residual separation costs remaining. Judge gold_agreement=1 (polarity contradiction). This is exactly the borderline that was deliberately left unannotated.",
+          "suggested_fix": "Do NOT annotate gold_polarity to force a pass (dishonest, and gold's own polarity is 'yes' which would still fail the agent's 'No'). Keep skipped/flag as contested gold-quality (stale for the as-of date). Consider excluding from the scored denominator rather than counting it as an agent miss."
+        }
+      ],
+      "summary": "Of the 11 residual wrong items, 6-7 are DETERMINISTIC-SCORER FALSE NEGATIVES (the LLM judge scores gold_agreement 4-5 on all of them), not agent errors: scorers.answer_accuracy only passes text items via gold_polarity, gold_canonical, or (when memo.value is set) the numeric branch; with all three unset it drops to an exact-string fallback that free text can never satisfy. The two 'wrong_value' derivation-targeted items are the clearest cases: amd_01's calculate reproduced the gold quick-ratio formula EXACTLY (1.57 = (4835+1020+4126+2)/6369) and verizon_05 correctly summed the gold's own expected_formula (1097+862=1959) \u2014 both fail only because the item carries no gold_polarity/gold_canonical/gold_value annotation and the agent left memo.value=None (or gold_value=null). Honest IMP3-1 annotations unlock amd_01 (gold_polarity='yes'), boeing_02 (gold_polarity='yes'), boeing_05 (gold_canonical=three programs), pepsico_07 (gold_canonical='strong start'), verizon_04 (gold_canonical='cross currency swaps'), and verizon_05 (gold_value=1959); pepsico_03 is substantively correct but strict canonical is risky (North America vs US&Canada token gap plus a self-inconsistent 'seven vs five' count). Only 4 items are real gold-agreement failures: pepsico_06 (require-retrieval-before-zero FIRED and the agent DID retrieve Note 3/page 78 with the $411M, but answered 0 on a literal 'on the face of the income statement' reading \u2014 an interpretation gap, not a rule or retrieval failure, fixable via a 'notes count as outlined' rule); boeing_06 (sign-convention divergence \u2014 the agent's rates -0.6%/14.7% are Boeing's own reported table values, magnitudes match gold's 0.62%/-14.76% but signs flip, so it's a convention conflict the sign-convention rule could target); johnson_johnson_06 (genuinely wrong polarity, gold_polarity='no' already correct, agent used the wrong FY2023 growth basis); and pfizer_04 (contested/stale gold \u2014 the agent's 'No, Upjohn was completed Nov 2020' is defensible; keep it skipped, do not force-annotate)."
+    },
+    {
+      "summary": "test",
+      "findings": [
+        {
+          "title": "t",
+          "evidence": "e",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "findings": [
+        {
+          "title": "Only 4 of the 7 abstentions are true TOTAL-CORRECT regressions; the 2 'model_choice' abstentions are wrong->abstain (neutral) and best_buy_02 was already abstained in iter2",
+          "evidence": "Cross-referencing iter3 failure_taxonomy against iter2 per_item_scores/failure_taxonomy: correct->abstain (real -1 each): boeing_01 (iter2 answer_accuracy=pass), mgm_resorts_01 (iter2 correct), pepsico_02 (iter2 pass), pfizer_03 (iter2 correct) -- all in abstained_answerable/budget_exhausted. wrong->abstain (neutral for TOTAL CORRECT): amd_05 (iter2 answer_accuracy=fail) and boeing_07 (iter2 fail), both in abstained_answerable/model_choice. best_buy_02 was abstained_answerable/budget_exhausted in BOTH iter2 and iter3 (pre-existing, not a regression). Scoring confirms abstain-on-answerable scores 'incorrect_but_calibrated' (abstention_correct_rate=0.0) i.e. counts as not-correct, same bucket as a wrong 'fail'. So converting a WRONG answer to an abstention (amd_05, boeing_07) is 0 TOTAL-CORRECT change; the entire 46->43 regression is driven by the 4 correct->abstain budget items (net -3 observed implies one item elsewhere improved +1).",
+          "severity": "high",
+          "affected_items": [
+            "boeing_01",
+            "mgm_resorts_01",
+            "pepsico_02",
+            "pfizer_03",
+            "amd_05",
+            "boeing_07",
+            "best_buy_02"
+          ],
+          "suggested_fix": "Re-label the regression scope: target the 4 budget_exhausted correct-losses. Treat amd_05/boeing_07 (wrong->abstain) as a calibration improvement, not a loss. best_buy_02 is out of scope (pre-existing)."
+        },
+        {
+          "title": "Root cause of all 4 correct->abstain regressions is over-search / never-commit: the model exhausts all 12 successful search calls WITHOUT a single record_answer attempt, even though the answer-bearing evidence was retrieved",
+          "evidence": "For boeing_01, mgm_resorts_01, pepsico_02, pfizer_03 (and best_buy_02): record_answer_attempts=0 and error events=0 in the iter3 trace -- the model never tried to commit and nothing rejected it; the terminal event is the budget-exhaustion 'Abstain' decision. The answer evidence was demonstrably in the retrieved snippets (trace field is .payload.chunks[].snippet, not .text): boeing_01 retrieved 'Commercial Airplanes' x20, 'Defense, Space' x4, 'Global Services' x4, 'Total revenues' x3 (the segment table it needed); pfizer_03 retrieved 'Array' x4, 'Trillium' x4, 'Arena' x3, 'acquisition' x26 (the acquisition names); pepsico_02 retrieved the exact PEPSICO_2023_8K_dated-2023-05-30 credit-agreement doc 61 times (the same doc iter2 answered from in 1 search); mgm_resorts_01 retrieved capital-expenditure snippets. Contrast iter2, which COMMITTED on these same items in 1-7 searches (pepsico_02: 1 search then answer $8.4B; boeing_01: 1 search then answer; mgm: 3 searches then 7.9; pfizer_03: 7 searches then answer). This is an over-caution behavior newly induced by iter3's prompt changes (citation minimalism + 'get_pages pages only citable when quoted' + verbatim-quote strictness) raising the model's internal bar for a 'citable' answer, so it keeps hunting for a cleaner quote until budget runs out. It is NOT a retrieval-recall regression (evidence was present) and NOT any hard abstain mechanism firing.",
+          "severity": "high",
+          "affected_items": [
+            "boeing_01",
+            "mgm_resorts_01",
+            "pepsico_02",
+            "pfizer_03",
+            "best_buy_02"
+          ],
+          "suggested_fix": "PRIMARY RELAXATION (highest yield, low spiral risk): add a commit-nudge on the over-search-no-commit path. Fold it into the existing stall guard (_search_stall_notice in backend/app/agent.py ~line 672): (1) also trigger when successful search count for an item reaches ~6-8 with record_answer_attempts==0; (2) rewrite that branch's hint to PUSH COMMIT -- 'You have retrieved substantial evidence and have not recorded an answer. If your retrieved chunks support an answer, call get_pages to read the best one in full, then record_answer with a verbatim quote NOW. Stop searching.' -- and REMOVE the current option (c) that invites flag_outstanding/'retrieval exhausted' (it pushes abstain). record_answer still validates the verbatim citation, so a genuinely-empty item cannot be forced to hallucinate. Because abstain-on-answerable and a wrong answer score identically (both not-correct), this nudge is strictly non-negative on TOTAL CORRECT for these items, and it only fires on the loop that correct-early items never enter. Expected recovery: +3 near-certain (boeing_01, mgm_resorts_01, pepsico_02 -- clean evidence present) and +1 probabilistic (pfizer_03 -- fuzzy item), plus possible bonus best_buy_02. Realistic +3, restoring ~46."
+        },
+        {
+          "title": "The budget=12 hypothesis is REFUTED for the regressed items, and the stall guard is too loose (fired on only 1 of 4 fixation loops)",
+          "evidence": "The task hypothesis 'should successful-tool budget rise now that rejections are cheap' does not apply: the 4 budget items had ZERO rejections -- they spent all 12 calls on SUCCESSFUL searches and never attempted record_answer. Raising MAX_TOOL_CALLS_PER_ITEM (currently 12) alone therefore just buys more wasted searches, not answers, while raising latency (p95 is 68s) and tokens. Separately, the search stall guard fired only once across the four fixation loops (pepsico_02) and was ignored: SEARCH_STALL_JACCARD_THRESHOLD=0.8 is too high because the model varies surface tokens across near-duplicate-intent queries (boeing_01 cycled 'Note 21/22/23', 'disaggregation', 'product/service categories' with token-Jaccard <0.8 while each search returned new-but-useless chunk_ids, so the 'zero new chunks' arm also never latched).",
+          "severity": "medium",
+          "affected_items": [
+            "boeing_01",
+            "mgm_resorts_01",
+            "pepsico_02",
+            "pfizer_03"
+          ],
+          "suggested_fix": "Do NOT raise the tool-call budget as the primary lever (evidence shows it treats a symptom that isn't the binding constraint); only consider a small 12->14 bump AFTER the commit-nudge lands and if telemetry shows late commits being truncated. Lower SEARCH_STALL_JACCARD_THRESHOLD 0.8->0.6 and add a 'same dominant doc_id re-retrieved >=N times' trigger so the guard actually fires during these loops -- pairing this with the commit-nudge hint from the primary fix."
+        },
+        {
+          "title": "None of iter3's 'hard' abstain mechanisms (recompute check, require-retrieval-before-zero, consecutive-final-rejection) caused any correct-loss; the consecutive-final-rejection path only converted already-wrong answers (amd_05, boeing_07) to abstentions",
+          "evidence": "No budget item had any calculate call, zero-value rejection, or recompute rejection -- these mechanisms are absent from all 4 regression traces. amd_05 and boeing_07 are the only items that hit a hard mechanism: each emitted exactly 4 'record_answer rejected: citation quote must be a verbatim substring of the retrieved chunk' errors then MAX_CONSECUTIVE_FINAL_REJECTIONS=4 force-abstained ('Could not resolve a verbatim citation for the final answer after 4 consecutive attempts'). Both were answer_accuracy=fail (wrong) in iter2, so this is a wrong->abstain calibration improvement, not a loss. The verbatim matcher (_match_quote_offsets, agent.py ~378) folds unicode+whitespace but is case-sensitive, which is the likely reason the model's paraphrased/re-cased quotes for these qualitative text items (revenue drivers; primary customers) failed 4x.",
+          "severity": "medium",
+          "affected_items": [
+            "amd_05",
+            "boeing_07",
+            "amd_01",
+            "pepsico_06"
+          ],
+          "suggested_fix": "Leave recompute tolerance, require-retrieval-before-zero, and MAX_CONSECUTIVE_FINAL_REJECTIONS=4 UNCHANGED (they caused zero correct-losses; lowering the rejection cap would force more abstains, raising it would let wrong answers through). SECONDARY relaxation: make _match_quote_offsets case-insensitive (add .lower() to both normalized projections, alongside the existing unicode/whitespace fold). This does not admit hallucinations (still requires the substring to exist), lowers the over-caution bar that also feeds the over-search loop, and could recover amd_05/boeing_07 as answered. TOTAL-CORRECT yield modest (both were wrong in iter2, so +0 to +1) but it reduces rejection/over-search pressure corpus-wide at near-zero spiral risk. Note amd_01 and pepsico_06 (the derivation-hardening targets) were ANSWERED-but-wrong, not abstained, so they are out of scope for this abstention analysis."
+        }
+      ],
+      "summary": "The iter3 abstention 'regression' is narrower and differently-caused than the headline suggests. Of the 7 abstained-answerable items, only 4 are true TOTAL-CORRECT losses (boeing_01, mgm_resorts_01, pepsico_02, pfizer_03 -- all correct in iter2, all in the budget_exhausted bucket). The 2 'model_choice' items (amd_05, boeing_07) went wrong->abstain and are neutral/positive for TOTAL CORRECT (a wrong 'fail' and an abstain both score not-correct), and best_buy_02 was already abstained in iter2. All 4 real regressions share one unambiguous signature: the model burned all 12 SUCCESSFUL search calls with ZERO record_answer attempts and ZERO rejections, DESPITE the answer-bearing evidence being present in the retrieved snippets (boeing_01 got the segment table; pfizer_03 got the acquisition names; pepsico_02 retrieved the exact answer 8-K 61x; mgm got the capex line). iter2 committed on these same items in 1-7 searches. The root cause is over-search / never-commit over-caution newly induced by iter3's citation-minimalism + verbatim-quote-strictness + get_pages-only-citable-when-quoted prompt changes -- NOT retrieval recall, NOT the recompute check, NOT require-retrieval-before-zero, NOT the consecutive-final-rejection cap (which only fired on amd_05/boeing_07 and only converted already-wrong answers). The budget-raise hypothesis is refuted (these items had zero rejections; more budget = more wasted searches, higher latency). The stall guard is too loose (Jaccard 0.8 fired on only 1 of 4 loops) and its hint offers an abstain option. PRIMARY FIX: a commit-nudge on the over-search-no-commit path (fold into the stall guard, trigger at ~6-8 searches with no record_answer, reword the hint to push get_pages+record_answer NOW and drop the flag_outstanding/abstain option) -- expected recovery +3 (near-certain boeing_01/mgm_resorts_01/pepsico_02, probabilistic pfizer_03), strictly non-negative on TOTAL CORRECT, low spiral risk since record_answer still validates the verbatim citation. SECONDARY: make the verbatim quote match case-insensitive (recovers amd_05/boeing_07, +0-1). Do NOT raise the tool-call budget as the primary lever and do NOT touch the recompute/zero/rejection-cap mechanisms."
+    }
+  ]
+}

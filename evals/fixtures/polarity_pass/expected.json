@@ -1,0 +1,13 @@
+{
+  "fixture": "polarity_pass",
+  "scorer_under_test": "answer_accuracy",
+  "expected_scores": {
+    "answer_accuracy": "pass",
+    "citation_precision": "pass",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "pass",
+    "abstention": null,
+    "trace_shape": "pass"
+  },
+  "notes": "IMP3-1 polarity branch: gold_polarity='yes' is present, so answer_accuracy extracts the memo answer's leading yes/no token ('Yes') and passes because it equals gold_polarity -- even though the prose answer would never match the prose gold under the exact-string fallback. Citation matches the gold page and was retrieved, value is None so arithmetic_integrity is trivially satisfied."
+}

@@ -1,0 +1,74 @@
+[
+  {
+    "answer_accuracy": "pass",
+    "citation_precision": "pass",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "pass",
+    "abstention": null,
+    "trace_shape": "pass",
+    "bucket": "A_multi_input",
+    "item_id": "mgm_resorts_01",
+    "run_id": "iter901-agent-mgm_resorts",
+    "status": "answered"
+  },
+  {
+    "answer_accuracy": "fail",
+    "citation_precision": "pass",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "pass",
+    "abstention": null,
+    "trace_shape": "pass",
+    "bucket": "C_lookup",
+    "item_id": "mgm_resorts_02",
+    "run_id": "iter901-agent-mgm_resorts",
+    "status": "answered"
+  },
+  {
+    "answer_accuracy": "fail",
+    "citation_precision": "fail",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "pass",
+    "abstention": null,
+    "trace_shape": "pass",
+    "bucket": "C_lookup",
+    "item_id": "mgm_resorts_03",
+    "run_id": "iter901-agent-mgm_resorts",
+    "status": "answered"
+  },
+  {
+    "answer_accuracy": "pass",
+    "citation_precision": "pass",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "pass",
+    "abstention": null,
+    "trace_shape": "pass",
+    "bucket": "C_lookup",
+    "item_id": "mgm_resorts_04",
+    "run_id": "iter901-agent-mgm_resorts",
+    "status": "answered"
+  },
+  {
+    "answer_accuracy": "fail",
+    "citation_precision": "fail",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "pass",
+    "abstention": null,
+    "trace_shape": "pass",
+    "bucket": "B_judgment",
+    "item_id": "mgm_resorts_05",
+    "run_id": "iter901-agent-mgm_resorts",
+    "status": "answered"
+  },
+  {
+    "answer_accuracy": "fail",
+    "citation_precision": "fail",
+    "citation_provenance": "pass",
+    "arithmetic_integrity": "pass",
+    "abstention": null,
+    "trace_shape": "pass",
+    "bucket": "B_judgment",
+    "item_id": "mgm_resorts_06",
+    "run_id": "iter901-agent-mgm_resorts",
+    "status": "answered"
+  }
+]

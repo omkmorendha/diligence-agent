@@ -1,0 +1,327 @@
+{
+  "plan": {
+    "analysis_summary": "Iteration 1's headline 29.5% accuracy is dominated by two mechanical defects, not agent reasoning quality. First, a citation-rejection budget spiral: search_filing only shows the model a whitespace-collapsed snippet (tools.py:59 `\" \".join(text.split())`, payload key `snippet` at tools.py:79), but _normalize_citation validates with an exact `chunk.text.find(quote)` against raw newline/\\xa0-laden PDF text (agent.py:282). The model copies quotes from what it sees and can never match, producing all 102 citation_quote_not_verbatim rejections (0 chunk-id hallucinations). Because `tool_calls_used += 1` charges every action before dispatch (agent.py:594), each rejected record_answer burns one of 12 budget slots; 15 of 17 abstentions sum tool-calls + rejections to exactly 12, and for 13 of them calculate had already produced a grounded number before the first rejection. This one root cause explains the 102 rejections, all 17 (answerable) abstentions, and much of the 634s p95 wall and 4.6M prompt tokens. Second, a dataset-labeling measurement artifact: 44/61 golds have gold_value=null and 37 contain digits, so numeric answers are graded by normalized string-match instead of \u00b11% numeric. 27 of 31 answered-but-wrong items are substantively correct and fail only on terse-vs-verbose or number-format string mismatch; true content error rate on answered items is only 4/44 (amd_01 quick-ratio numerator, boeing_06 sign-flipped tax rate, pepsico_06 note-level restructuring miss, pfizer_04 Upjohn spinoff retrieval miss). Third, the LLM judge is non-informative: groundedness and actionability are both a flat 5.0 with zero variance across all 61 items (including 17 known-bad abstentions) in both iter1 and baseline, because the verbatim-citation gate engineers out the only mismatch groundedness can detect and actionability grades only fluency. Highest ROI for iter2 is (1) break the spiral in the agent loop \u2014 a real behavior + latency + token win unlocking ~15 answers, then (2) the eval_measurement gold re-annotation unlocking ~27 mislabeled-correct answers, then retrieval/derivation hardening for the 4 real misses, then a judge redesign to restore signal. The spiral fix and gold parsing are independent and compounding; both must land for measured accuracy to reflect the true ~91% content accuracy on answered items.",
+    "improvements": [
+      {
+        "id": "IMP-1",
+        "title": "Break the citation-rejection budget spiral: whitespace-tolerant verbatim matcher, stop charging rejected record_answer to budget, and let citations resolve against fetched get_pages text",
+        "category": "agent_code",
+        "rationale": "Single highest-ROI change. The model only ever sees the whitespace-collapsed snippet (tools.py:59 _snippet = ' '.join(text.split()), surfaced as payload key 'snippet' at tools.py:79), but _normalize_citation validates with an exact chunk.text.find(quote) against raw newline/\\xa0-laden text (agent.py:282). This produced 100% of the 102 citation_quote_not_verbatim rejections (0 chunk_id-not-found; proof: 73/86 passing citations only succeeded by reproducing raw '\\n'/'\\xa0' formatting via get_pages). Because tool_calls_used += 1 fires for every action before dispatch (agent.py:594) and a rejected citation throws before reaching tools.record_answer, each rejection burns a budget slot. 15 of 17 abstentions sum tool-calls + rejections to exactly the 12 cap; for 13 of them calculate had already produced a grounded number before the first rejection at call 4-10. Fixing matcher + budget accounting converts ~15/17 abstentions to answered and accepts ~90-100 of 102 rejections, cutting the biggest driver of the 634s p95 wall and 4.6M prompt tokens. Does NOT weaken grounding: citations still resolve to genuinely retrieved text; only whitespace is normalized and offsets map back to the real chunk.",
+        "changes": "Three coordinated edits in backend/app/agent.py plus one in tools.py. (1) In _normalize_citation (~agent.py:282) replace exact idx = chunk.text.find(quote) with a whitespace-normalized match: norm_chunk = ' '.join(chunk.text.split()), norm_quote = ' '.join(quote.split()), find norm_quote in norm_chunk, then map the normalized offset back to raw char_start/char_end in chunk.text via a precomputed raw->normalized offset index. Raise ValueError only when the normalized quote is genuinely absent (real hallucination); keep the existing chunk_id-in-registry provenance check. (2) In the _run_item dispatch loop (agent.py ~594) do NOT increment tool_calls_used before dispatch for a record_answer that gets rejected: charge the budget only for successfully-executed retrieval-consuming tools (search_filing/get_pages/calculate), never for a rejected/malformed record_answer caught at ~599. Add a small guard capping consecutive rejected record_answer attempts (e.g. 4) so a persistently-malformed citation cannot loop forever now that it no longer burns retrieval budget. (3) Register fetched get_pages raw page text as citable spans: in tools.get_pages add each returned page's raw text into state.chunk_registry (or a parallel page_registry keyed by a synthetic chunk_id) so _normalize_citation can resolve a verbatim quote that lives on a fetched page but outside the original chunk's char span (residual rejections: pepsico_05, verizon_02/03, pfizer_03, adobe_03). Verify evals/run.py --fixtures still passes 8/8 and rerun failing items to confirm citations resolve.",
+        "files": [
+          "backend/app/agent.py",
+          "backend/app/tools.py"
+        ],
+        "expected_impact": "Converts ~15 of 17 budget-exhausted abstentions to answered; accepts ~90-100 of 102 citation rejections; reduces p95 item wall and prompt tokens by eliminating rejection-retry rounds. Measured accuracy gain depends on IMP-2 landing, but agent behavior and latency improve regardless.",
+        "priority": 1,
+        "risk": "Offset-mapping bug could point a citation at slightly-wrong raw chars; mitigate with a unit test asserting the mapped substring re-collapses to the intended quote. Removing the budget charge for rejections needs the consecutive-rejection cap to avoid a new infinite loop. get_pages registry growth is bounded (~50 calls run-wide)."
+      },
+      {
+        "id": "IMP-2",
+        "title": "[EVAL-MEASUREMENT - forces re-scoring all iterations] Parse gold_value/gold_unit for the 37 numeric text golds so the numeric plus/minus 1% scorer applies instead of string-match",
+        "category": "eval_measurement",
+        "rationale": "FLAG: this changes eval semantics and requires re-running/re-scoring baseline61 and iter1 for comparability. Root cause of the depressed headline: of 61 items, 44 have gold_value=null and 37 of those contain a digit (verified), so numeric/lookup answers are graded by normalized string-match (scorers.py answer_accuracy falls back to string match when gold_value is absent) rather than numeric plus/minus 1%. This produces 27 false-negative 'wrong' items that are substantively correct (pepsico_01 agent '$400 million' vs gold '$400,000,000 increase.'; johnson_johnson_01 '2.72 times' vs gold '2.7 times'; pepsico_02 '$8,400 million' vs gold '$8,400,000,000'). Within A_multi_input, 18 of 34 items are numeric-text. Extracting gold_value+gold_unit routes already-numeric golds to the numeric scorer they should have used WITHOUT touching gold answers/evidence and WITHOUT weakening any scorer, moving measured accuracy from 13/44 toward ~40/44. Higher metric leverage than any single agent change.",
+        "changes": "In the dataset_builder gold-parsing path ONLY (not gold_answer/gold_evidence): for each of the 37 gold_value=null items whose gold_answer contains a digit, extract the primary numeric magnitude and unit into gold_value/gold_unit. Normalize magnitudes ('$400,000,000' -> canonical value+unit matching the existing 6 'USD millions' items; pick ONE convention and apply uniformly), map 'X times' -> ratio, 'X%' -> percent. Prioritize the 18 A_multi_input numeric-text items (pepsico_01-04, boeing_01/02, johnson_johnson_01/02, amd_01, adobe_01/02, verizon_01-05, best_buy_01/02). Leave genuinely-prose golds (boeing_04 cyclicality narrative, mgm_resorts_06) as gold_value=null for the judge/containment scorer. Do NOT modify evals/scorers.py definitions. After re-annotation, re-run scoring for baseline61 and iter1 so all iterations stay comparable, and note in the iteration README that accuracy before/after this change is not directly comparable. Verify evals/run.py --fixtures still passes 8/8.",
+        "files": [
+          "data/subset.json",
+          "backend/app/dataset_builder.py",
+          "results/iterations/baseline61/",
+          "results/iterations/iter1/"
+        ],
+        "expected_impact": "Reclassifies ~27 substantively-correct items from wrong to correct: measured accuracy on answered items rises from 13/44 to ~40/44 (content accuracy ~91%). Requires re-scoring baseline61 + iter1; comparability break noted in README.",
+        "priority": 2,
+        "risk": "Wrong canonical unit convention (millions vs absolute) could mis-score; mitigate by matching the existing 6 'USD millions' golds and spot-checking each parsed value against gold_answer text. Only touches gold_value/gold_unit (allowed), never gold_answer/gold_evidence."
+      },
+      {
+        "id": "IMP-3",
+        "title": "Retrieval coverage + stall guard + anti-confident-negative to fix the 2 pure search-loop exhaustions and 2 note-level content misses",
+        "category": "agent_code",
+        "rationale": "Four items are not helped by IMP-1. Two abstentions (best_buy_02, johnson_johnson_06) spent all 12 calls on near-duplicate search_filing reformulations with 0 get_pages/calculate/record attempts - a retrieval miss with reformulation churn (jj_06's FY2023 guidance is likely absent from the corpus). Two answered-but-wrong items are real content misses on note-level disclosures: pepsico_06 (FY2022 restructuring $411M lives in a note, agent defaulted to the '0' escape hatch) and pfizer_04 (Upjohn spinoff, agent said 'No', never retrieved the disclosure). Both stem from retrieval not surfacing note-section chunks plus the agent confidently emitting a negative ('0'/'No') on weak evidence instead of abstaining.",
+        "changes": "backend/app/retrieval.py and agent.py prompts: (1) Add a retrieval-stall guard in the _run_item loop: track chunk_ids returned across search_filing calls for the item; if N consecutive searches (e.g. 3) return zero NEW chunk_ids, stop searching and either escalate to get_pages on the best doc or abstain with a specific 'retrieval exhausted' reason - prevents the 12-query churn in best_buy_02/jj_06 and frees budget. (2) Improve recall for note-level disclosures: add hybrid/BM25 lexical scoring alongside cosine (or raise k and add doc-scoped filtering) so restructuring/spinoff note sections surface; verify the corpus actually contains the pepsico restructuring note and pfizer Upjohn disclosure (if J&J FY2023 guidance is genuinely absent, document a corpus-coverage gap rather than an agent bug). (3) In SYSTEM_PROMPT_RULES add a rule: do NOT assert a confident negative ('0','No','none') for a lookup unless a cited passage affirmatively states absence; on weak/low-score evidence prefer flag_outstanding / low-confidence abstention over asserting the negative. Verify evals/run.py --fixtures still passes 8/8.",
+        "files": [
+          "backend/app/retrieval.py",
+          "backend/app/agent.py",
+          "backend/app/config.py"
+        ],
+        "expected_impact": "Recovers pepsico_06 and pfizer_04 as correct (or as honest abstentions rather than confident-wrong); stops best_buy_02/jj_06 from burning full budget on churn (latency reduction; answers or abstains faster). ~2-4 items plus a p95 latency reduction on stalled items.",
+        "priority": 3,
+        "risk": "Stall-guard threshold too aggressive could cut off legitimate multi-query research; tune N and require zero-new-chunks, not just repeated intent. Hybrid retrieval adds indexing work; keep behind a config flag. Anti-negative rule could over-abstain on legitimately-zero items - anchor it to evidence score, not blanket."
+      },
+      {
+        "id": "IMP-4",
+        "title": "Calculator/derivation hardening for ratios: canonical quick-ratio numerator, sign convention on negative denominators, and verify-recompute from cited line items",
+        "category": "agent_prompt",
+        "rationale": "Two of the four real content errors are right-evidence/wrong-derivation ratio mistakes. amd_01: agent quick ratio 1.77 vs gold 1.57 - it used a loose 'current assets minus inventory' numerator instead of strict quick assets (cash + ST investments + AR net + related-party receivables). boeing_06: effective tax rate signs flipped on both years ('-0.6% FY2022 / 14.7% FY2021' vs gold '0.62% / -14.76%') because Boeing had a pretax loss/benefit and the agent mishandled the negative denominator. Both pulled correct source figures; only the derivation was wrong - a prompt/formula-selection issue plus a missing recompute check.",
+        "changes": "(1) In SYSTEM_PROMPT_RULES / the calculate tool guidance (agent.py, tools.py compute_calculation) add explicit canonical formulas: quick ratio numerator = whitelist of quick assets only (cash + short-term investments + accounts receivable net + related-party receivables), excluding inventory and prepaids; effective tax rate = tax expense / pretax income with an explicit note that when pretax income is negative the sign must be preserved and the rate can be negative. (2) In _verify_answer_before_record (agent.py), when the recorded answer is a ratio/percentage derived via calculate, recompute the ratio from the cited line-item values and reject/flag if it disagrees beyond tolerance - catching both wrong-numerator and sign-flip classes before recording. Verify evals/run.py --fixtures still passes 8/8.",
+        "files": [
+          "backend/app/agent.py",
+          "backend/app/tools.py"
+        ],
+        "expected_impact": "Recovers amd_01 and boeing_06 (2 items) and hardens the whole A_multi_input ratio bucket against silent derivation errors; small but high-confidence accuracy gain.",
+        "priority": 4,
+        "risk": "Recompute-in-verify needs cited line items to be machine-extractable; if absent it should flag rather than hard-reject to avoid new false abstentions. Formula whitelist must match gold definitions exactly or it could reject correct answers."
+      },
+      {
+        "id": "IMP-5",
+        "title": "Restore judge signal: relevance/period-mismatch anchors, contrastive exemplars, abstention penalties, a hard-negative calibration fixture, and persisted per-item scores",
+        "category": "judge",
+        "rationale": "The judge is non-informative: groundedness_judge and actionability_judge are both exactly 5.0 with zero variance across all 61 items in BOTH iter1 and baseline (integer scores mean every item scored 5, including all 17 known-bad budget-exhausted abstentions). By construction, not a parse bug: recorded memos already passed the verbatim-citation gate so every packet is self-consistent, and GROUNDEDNESS_SYSTEM_PROMPT forbids judging correctness-vs-gold and completeness, removing the only axis it could discriminate on. Wrong B_judgment answers (mgm_resorts_05 'Las Vegas Strip', best_buy_05 'Operating activities', verizon_01 capex%) all trace to their own citations => grounded=5 despite being wrong. Actionability grades only fluency (sees just question/answer/value/status) so fluent Kimi-K2.6 prose and the vague budget-exhaustion template both score 5. B_judgment answer_accuracy is 0.0 yet judges are a uniform 5.0 - zero correlation. Without this, iter2 has no reliable quality signal for judgment-bucket trends.",
+        "changes": "evals/judges.py and evals/run.py: (1) Add a relevance/sufficiency sub-check to GROUNDEDNESS_SYSTEM_PROMPT with anchors not requiring gold: '1 = cited passage is for a different period/entity/metric than the question asks'; '3 = the number appears in the cited passage but its period/entity/line-item does not match the question' - catches FY-mismatch and wrong-segment errors that currently score 5. (2) Add explicit 2 and 4 anchors and 1-2 contrastive few-shot exemplars per criterion (reuse the corrupted fixtures as the low anchor; add a well-cited-but-wrong-fiscal-year case as the mid anchor) to counter top-anchor rounding. (3) In ACTIONABILITY_SYSTEM_PROMPT add: 'for an abstention, score 2 if it does not name the specific missing evidence OR the specific next retrieval that would resolve it' - the 17 budget-exhaustion abstentions use a vague template and must not score 5. (4) Add a hard-negative calibration fixture (well-cited answer citing the wrong fiscal year/segment) and assert groundedness <= 3 so the gate can fail in the operating region; update fixture assertions so evals/run.py --fixtures stays green at its stated count. (5) In _run_judges_over (run.py ~125-156) stop discarding per-item results: write {item_id, criterion, score, justification} rows to a judge_scores.json per iteration and report histogram + stdev alongside the mean; auto-flag any criterion with stdev 0 across items as non-informative and withhold it from the headline.",
+        "files": [
+          "evals/judges.py",
+          "evals/run.py"
+        ],
+        "expected_impact": "Restores discriminating signal so groundedness/actionability correlate with accuracy (especially the 0.0-accuracy B_judgment bucket); produces an auditable per-item judge artifact and a zero-variance auto-flag. No direct agent accuracy/latency effect but essential to trust iter2 trend claims.",
+        "priority": 5,
+        "risk": "New anchors could over-penalize; calibrate against a few known-good and known-bad items before trusting. Adding a fixture changes the count - update the pass assertion so --fixtures stays green. Does not touch the six deterministic scorers."
+      }
+    ]
+  },
+  "analysts": [
+    {
+      "summary": "Deep-dive on the 31 answered-but-wrong (wrong_text) items reveals the headline 29.5% accuracy is almost entirely a scoring artifact, not an agent-quality problem. All 31 wrong_text items have gold_value=null / gold_unit=text, so every one is scored by normalized-string-match rather than numeric \u00b11%. 27 of 31 (87%) are substantively CORRECT answers that fail only because a terse-vs-verbose or number-format string mismatch against a text gold. Only 4 items are genuinely defective: 2 wrong derivations (amd_01 quick ratio, boeing_06 sign-flipped tax rate) and 2 evidence/retrieval failures (pepsico_06 restructuring said 0 vs $411M, pfizer_04 Upjohn spinoff said No vs Yes). Content-level accuracy among the 44 answered is therefore ~40/44 = 91% (13 already-correct + 27 mislabeled-correct), vs the reported 13/44. Root cause is dataset labeling: 44/61 (72.1%) golds have gold_value=null, and 37 of those 44 text golds contain a digit \u2014 i.e. numeric/lookup answers were left as free-text golds that string-match cannot grade. Within A_multi_input specifically, 18 of 34 (53%) items have gold_unit=text with numbers in the gold_answer that should have been parsed to gold_value/gold_unit.",
+      "findings": [
+        {
+          "title": "Class (a) scoring artifact \u2014 27/31 wrong_text items are substantively correct, fail only on string-match against a text gold",
+          "severity": "high",
+          "evidence": "27 items, all gold_unit=text so scored by normalized-string-match: amd_04, amd_05, amd_06, best_buy_01, best_buy_05, boeing_01, boeing_04, boeing_05, boeing_07, johnson_johnson_01, johnson_johnson_03, johnson_johnson_04, johnson_johnson_05, mgm_resorts_02, mgm_resorts_05, mgm_resorts_06, pepsico_01, pepsico_02, pepsico_03, pepsico_04, pepsico_07, pepsico_08, pfizer_01, pfizer_02, verizon_01, verizon_04, verizon_05. Two failure shapes: (1) TERSE agent vs verbose gold \u2014 amd_06 agent 'Operating activities' vs gold 'AMD brought in the most cashflow from Operations'; mgm_resorts_06 agent 'MGM China' vs gold 'MGM China experienced the worst topline performance... revenue declined 44%'; boeing_04 agent 'Yes' vs gold 'Yes, Boeing's business is subject to cyclicality due to... airline industry'. (2) NUMBER-FORMAT mismatch \u2014 pepsico_01 agent '$400 million' vs gold '$400,000,000 increase.'; pepsico_02 agent '$8,400 million' vs gold '$8,400,000,000'; johnson_johnson_01 agent '2.72 times' vs gold '2.7 times'; johnson_johnson_05 agent '$13.2 billion (13,200 USD millions)' vs gold '$13.2 billion'. Several agent answers are strictly MORE complete than gold (best_buy_01 agent 'decreased by 13 stores' = gold's 982->969 delta; verizon_05 agent '$1,959 million comprising $1,097M pension + $862M health' fully contains gold's two figures).",
+          "affected_items": [
+            "amd_04",
+            "amd_05",
+            "amd_06",
+            "best_buy_01",
+            "best_buy_05",
+            "boeing_01",
+            "boeing_04",
+            "boeing_05",
+            "boeing_07",
+            "johnson_johnson_01",
+            "johnson_johnson_03",
+            "johnson_johnson_04",
+            "johnson_johnson_05",
+            "mgm_resorts_02",
+            "mgm_resorts_05",
+            "mgm_resorts_06",
+            "pepsico_01",
+            "pepsico_02",
+            "pepsico_03",
+            "pepsico_04",
+            "pepsico_07",
+            "pepsico_08",
+            "pfizer_01",
+            "pfizer_02",
+            "verizon_01",
+            "verizon_04",
+            "verizon_05"
+          ],
+          "suggested_fix": "Do not treat these as agent failures. Fix the eval: (1) parse gold_value/gold_unit for the numeric text golds so numeric \u00b11% grading applies; (2) for genuinely-prose golds add an LLM-judge or containment/semantic scorer instead of exact normalized-string-match. This alone moves measured accuracy from 13/44 to ~40/44."
+        },
+        {
+          "title": "Class (c) right evidence, wrong derivation \u2014 2 items (quick-ratio line-item selection and effective-tax-rate sign errors)",
+          "severity": "medium",
+          "evidence": "amd_01 (A_multi_input): agent quick ratio 1.77 vs gold 1.57 \u2014 gold formula is (cash+ST investments+AR net+related-party receivables)/current liabilities; agent's 1.77 implies it used a looser 'current assets minus inventory' numerator rather than strict quick assets. Conclusion ('Yes, healthy') is right; the derived number is wrong. boeing_06 (B_judgment): agent 'effective tax rate -0.6% in FY2022... 14.7% in FY2021' vs gold 'FY2022 was 0.62%, compared to -14.76% in FY2021' \u2014 the agent flipped the SIGN on both years (Boeing had a pretax loss/benefit in FY2021), so both the levels and the direction of change are inverted. Both items pulled correct source figures but mis-derived; dominant sub-cause = calculator/formula selection and sign handling on ratios computed from loss-making or multi-line-item inputs.",
+          "affected_items": [
+            "amd_01",
+            "boeing_06"
+          ],
+          "suggested_fix": "Strengthen calculator prompting for (i) canonical quick-ratio numerator (explicit whitelist of quick assets) and (ii) sign convention when denominator (pretax income) is negative; have _verify_answer_before_record recompute ratios from cited line items."
+        },
+        {
+          "title": "Class (d) wrong/insufficient evidence retrieved \u2014 2 items (agent gave the opposite/zero answer)",
+          "severity": "medium",
+          "evidence": "pepsico_06 (C_lookup): question asks FY2022 restructuring costs ('if not explicitly outlined state 0'); agent answered '0' but gold is '$411 million' \u2014 restructuring is disclosed in a note, not on the face of the income statement, and the retriever/agent failed to surface it, defaulting to the 0 escape hatch. pfizer_04 (C_lookup): 'As of Q2 2023, is Pfizer spinning off any large business segments?' agent answered 'No' but gold is 'Yes, it's spinning off Upjohn.' \u2014 agent never retrieved the Upjohn/spin-off disclosure. Dominant sub-cause = retrieval miss on note-level / non-income-statement disclosures, compounded by the agent confidently emitting a negative ('0'/'No') instead of flagging low evidence.",
+          "affected_items": [
+            "pepsico_06",
+            "pfizer_04"
+          ],
+          "suggested_fix": "Add note-section retrieval coverage and discourage confident negatives when supporting chunks are weak (prefer abstain/low-confidence over asserting 0/No). These 2 are the only true content misses besides the 2 class-(c) derivations \u2014 real error rate on answered items is 4/44."
+        },
+        {
+          "title": "Root-cause dataset labeling defect: 44/61 golds are gold_value=null/text, and 37 of them contain digits, so numeric answers are ungradeable by string-match",
+          "severity": "high",
+          "evidence": "Overall: 61 items, gold_value=null for 44 (72.1%); gold_unit distribution = {text:44, USD millions:6, ratio:6, percent:5}. Of the 44 text golds, 37 contain at least one digit (i.e. are effectively numeric but stored as prose). A_multi_input bucket (34 items): 21 are gold_unit=text, and 18 of the 34 (53%) have numbers in gold_answer but were left as text \u2014 pepsico_01, pepsico_02, pepsico_03, pepsico_04, boeing_01, boeing_02, johnson_johnson_01, johnson_johnson_02, amd_01, adobe_01, adobe_02, verizon_01, verizon_02, verizon_03, verizon_04, verizon_05, best_buy_01, best_buy_02. This is the single upstream cause producing the 27 class-(a) false negatives and depressing the headline metric.",
+          "affected_items": [
+            "pepsico_01",
+            "pepsico_02",
+            "pepsico_03",
+            "pepsico_04",
+            "boeing_01",
+            "boeing_02",
+            "johnson_johnson_01",
+            "johnson_johnson_02",
+            "amd_01",
+            "adobe_01",
+            "adobe_02",
+            "verizon_01",
+            "verizon_02",
+            "verizon_03",
+            "verizon_04",
+            "verizon_05",
+            "best_buy_01",
+            "best_buy_02"
+          ],
+          "suggested_fix": "Re-annotate the subset: extract gold_value+gold_unit for the 37 numeric text golds (at minimum the 18 A_multi_input numeric-text items) so the \u00b11% scorer applies; keep true-prose items on a semantic/judge scorer. Prioritize this before any agent-side change \u2014 it is higher leverage than any prompt/retrieval fix."
+        }
+      ]
+    },
+    {
+      "findings": [
+        {
+          "title": "Judge mean is exactly 5.0 = literal ceiling with ZERO variance; every one of 61 items scored 5",
+          "evidence": "agent.json and baseline.json both record groundedness_judge=5.0, actionability_judge=5.0. Scores are integers (evals/judges.py:113 `obj['score']=int(round(score))`), so a mean of exactly 5.0 is only possible if every constituent score is 5. groundedness denom = 44 answered items (abstained skip groundedness, judges.py:220-222) => all 44 scored 5. actionability denom = all 61 items => all 61 scored 5, INCLUDING all 17 budget-exhausted abstentions whose answer text is the templated 'Reached the maximum tool-call budget for this item without a grounded answer.' Not a parsing bug: score is taken straight from model JSON (judges.py:108-113); an all-error path returns None not 5.0 (run.py:154 `if groundedness_scores else None`). The 5s are genuine model outputs.",
+          "severity": "high",
+          "affected_items": [
+            "all 61 iter1 items",
+            "all baseline61 items"
+          ],
+          "suggested_fix": "Report and gate on score DISTRIBUTION/stdev, not just mean. A stdev of 0 across 61 items should auto-flag the judge as non-informative and withhold the numbers from headline. Persist per-item scores (they are computed then discarded at run.py:144-156)."
+        },
+        {
+          "title": "Groundedness collapses to 5 by construction: pipeline engineers out the only mismatch the rubric can detect",
+          "evidence": "Recorded memo items already passed _verify_answer_before_record + a verbatim-citation gate (102 citation_quote_not_verbatim rejections in iter1). So every packet the judge sees is self-consistent: the stated number appears verbatim in a cited passage. The GROUNDEDNESS_SYSTEM_PROMPT (judges.py:58-77) explicitly forbids judging correctness-vs-external-knowledge AND completeness ('do not judge whether the answer is complete'), leaving only quote/claim mismatch as the discriminating axis -- and that axis has been removed upstream. Concrete: mgm_resorts_05 (B_judgment, scored FAIL) answers 'Las Vegas Strip Resorts'; its cited passage literally shows Las Vegas Strip $3,142,308 > Regional Operations $1,294,630, so the claim IS supported by the cited text => grounded=5, yet the answer is wrong per gold. best_buy_05 (B_judgment, FAIL) answers 'Operating activities' with cited 'operating 1,824 / investing (962)' -- claim traces to citations => 5, still wrong. verizon_01 (FAIL) states capex 23,087 = 16.9% of revenue 136,835, all numbers pulled from its 5 citations => 5. The judge is blind to wrong-period / wrong-segment / wrong-definition errors, which are exactly the recorded failure modes.",
+          "severity": "high",
+          "affected_items": [
+            "mgm_resorts_05",
+            "best_buy_05",
+            "verizon_01",
+            "best_buy_01",
+            "all 31 answered-but-wrong items"
+          ],
+          "suggested_fix": "Add a relevance/sufficiency sub-check with anchors that DON'T require gold: '1 = cited passage is for a different period/entity/metric than the question asks'; '3 = the number appears in the cited passage but its period/entity/line-item does not match the question.' This catches FY-mismatch and wrong-segment errors. Add a hard-negative calibration fixture (well-cited answer citing the wrong fiscal year/segment) and assert groundedness<=3 -- the current gate (judges.py:53-54) only tests egregious swap/inject corruption that never occurs in real recorded memos, so it passes trivially (corrupted_memo_judge.json: both fixtures scored 1)."
+        },
+        {
+          "title": "Actionability is a fluency detector; its 5-anchor saturates for any coherent LLM prose, including 17 known-bad abstentions",
+          "evidence": "ACTIONABILITY_SYSTEM_PROMPT (judges.py:79-99) explicitly instructs NOT to judge correctness or citations, and sets 5='clear and actionable... including a clearly-explained abstention', with 3 requiring the answer to look deficient ('understandable but missing basis'). Kimi-K2.6 output is always fluent, so nothing ever reads as a 3. All 17 abstentions are budget-exhausted-but-answerable (headline) -- a genuinely bad outcome -- and their answer text is the vague template 'Reached the maximum tool-call budget... without a grounded answer', which names no missing evidence and no next step. The rubric claims to penalize abstentions that are 'vague about what is missing or why', yet all 17 scored 5. The judge sees only question/answer/value/unit/status (judges.py:117-124, 172-177), so it grades presentation, not substance.",
+          "severity": "high",
+          "affected_items": [
+            "all 17 abstained items (best_buy_02, adobe_01, ...)"
+          ],
+          "suggested_fix": "Add a checklist the abstention/budget case actually fails: 'For an abstention, score 2 if it does not name the specific missing evidence OR the specific next retrieval that would resolve it'; 'penalize answered items that assert a conclusion without stating its numeric basis in the answer text.' Add 1-2 contrastive in-context exemplars so the model anchors against concrete cases instead of rounding to the top."
+        },
+        {
+          "title": "Scale is anchored 1/3/5 with no 2/4 guidance and no exemplars => model rounds to the top anchor",
+          "evidence": "Both rubrics (judges.py:66-72, 89-93) define only 1, 3, 5 verbally, leaving 2 and 4 unspecified, and provide zero worked examples. With a fluent, internally-consistent packet and no contrastive pressure, the natural LLM behavior is to snap to the highest fully-satisfied anchor (5). reasoning_effort is unset (config.py:41 LLM_REASONING_EFFORT defaults None), so no deliberation counteracts the top-anchor bias.",
+          "severity": "medium",
+          "affected_items": [
+            "groundedness prompt",
+            "actionability prompt"
+          ],
+          "suggested_fix": "Add explicit 2/4 anchors and 2 contrastive few-shot examples per criterion (reuse the existing corrupted fixtures as the low anchor; add a period-mismatch case as the mid anchor). Cost is a few hundred one-time prompt tokens per call -- cheap."
+        },
+        {
+          "title": "Per-item judge scores and justifications are computed then thrown away; no artifact to audit or correlate",
+          "evidence": "_run_judges_over (run.py:125-156) calls judge_memo_item per item, appends scores to two lists, returns only the means, and discards item_id/score/justification. Confirmed no per-item judge record exists in any iteration dir (grep for 'groundedness'/'justification' under results/iterations/iter1 hits only source in code_state.diff). So judge-vs-accuracy correlation cannot be computed and B_judgment trend claims are unfalsifiable.",
+          "severity": "medium",
+          "affected_items": [
+            "evals/run.py:125-156",
+            "results/iterations/iter1"
+          ],
+          "suggested_fix": "Write {item_id, criterion, score, justification} rows to a judge_scores.json per iteration (data already in hand at run.py:146-147). Report the histogram + stdev alongside the mean."
+        }
+      ],
+      "summary": "The LLM judge is currently non-informative: groundedness_judge=5.0 and actionability_judge=5.0 in BOTH iter1 and baseline are exact ceilings with ZERO variance -- since scores are integers, a mean of exactly 5.0 means every single item scored 5 (all 44 answered on groundedness; all 61 on actionability, including 17 known-bad budget-exhausted abstentions). This is NOT a parsing bug: scores come straight from model JSON (judges.py:108-113) and an all-error path would return None, not 5.0. It is a design collapse from three compounding causes. (1) Groundedness is engineered out: recorded memos already passed a verbatim-citation gate (102 non-verbatim rejections), so every packet the judge sees is self-consistent, and the rubric (judges.py:58-77) explicitly forbids judging correctness-vs-gold and completeness -- the only remaining discriminating axis (quote/claim mismatch) never occurs in real recorded items. Concretely, wrong B_judgment answers mgm_resorts_05 ('Las Vegas Strip', cited passage literally shows it as largest) and best_buy_05 ('Operating activities', cited numbers match) trace cleanly to their own citations => grounded=5 despite being scored FAIL. (2) Actionability (judges.py:79-99) grades fluency only (sees just question/answer/value/status) and is told not to penalize abstentions lacking a number, so any coherent LLM prose and the vague budget template score 5. (3) Scales anchor 1/3/5 with no 2/4 guidance and no exemplars, biasing to the top anchor; reasoning_effort is unset. The calibration gate PASSES (corrupted_memo_judge.json: both egregious swap/inject fixtures scored 1) but only tests extreme corruption that the pipeline never produces, so it fails to guard the operating region. Per-item judge scores/justifications are computed then discarded (run.py:154-156) -- no artifact exists to audit. SEVERITY: HIGH. The judge provides ZERO signal for B_judgment quality trends -- B_judgment answer_accuracy is 0.0 (all 11 answered B items wrong), yet both judge scores are a uniform 5.0, uncorrelated with accuracy. Fixes are cheap: add relevance/period-mismatch anchors (score<=3 when cited passage is for the wrong period/entity/metric), add contrastive few-shot exemplars, add a hard-negative calibration fixture (well-cited but wrong-year answer) so the gate can fail, make abstention actionability require naming the missing evidence, and persist per-item scores + report stdev/histogram so a zero-variance ceiling auto-flags."
+    },
+    {
+      "summary": "Iter1's 17 budget-exhaustion abstentions and 102 'verbatim substring' citation rejections share ONE root cause: search_filing returns whitespace-collapsed snippets (tools.py:59-62, `\\\" \\\".join(text.split())` flattens newlines, \\\\xa0 non-breaking spaces, and multi-space runs), while _normalize_citation validates with an EXACT chunk.text.find(quote) against the raw PDF text (agent.py:279). The model copies a quote from the space-separated snippet it sees, and it can never be a substring of the newline/\\\\xa0-laden raw chunk. Proof: all 105 citation-path errors are the verbatim type (only 3 numeric-ungrounded, 0 chunk_id-hallucination \u2014 the model always cites REAL retrieved chunk_ids), and 73/86 (85%) of the citations that DID pass are stuffed with '\\\\n' and '\\\\xa0' (e.g. 'Operating\\\\xa0income\\\\n1,854', 'Total assets\\\\n$ \\\\n379,680') \u2014 the model only succeeded when it reproduced raw formatting, usually via get_pages. The spiral: agent.py:594 charges tool_calls_used += 1 for EVERY action before dispatch, so each rejected record_answer burns one of the 12 budget slots. Budget accounting is exact \u2014 adobe_01 = 2 search + 2 get_pages + 3 calculate + 5 verbatim-rejections = 12; 15 of 17 exhausted items sum tool calls + rejections to exactly 12; 53 of the 102 rejections landed on these 17 items. The first rejection lands at call 4-10 (budget still remaining) and for 13 of 15 items calculate had already produced a grounded number \u2014 the ONLY blocker was the whitespace quote check. A whitespace-tolerant matcher (normalize both sides) plus not charging rejections to budget would accept ~90-100 of the 102 rejections and convert ~15 of 17 abstentions to answered. The other 2 exhaustions (best_buy_02, johnson_johnson_06) are DIFFERENT: pure search-loops (12 near-duplicate query reformulations, 0 record attempts) chasing a retrieval miss \u2014 a tolerant matcher won't help those; they need a stall guard and better retrieval/corpus coverage. Note: rejected quotes are never persisted (no tool_call event, generic error detail, llm_calls.jsonl has no bodies), so per-rejection categorization was inferred from the mechanism and accepted-quote formatting.",
+      "findings": [
+        {
+          "title": "Root cause: search_filing snippets are whitespace-collapsed but _normalize_citation does an EXACT chunk.text.find() against raw PDF text \u2014 the model cannot copy a verbatim quote from what it sees",
+          "evidence": "tools.py:59-62 `_snippet` = `\" \".join(text.split())` collapses every newline, \\xa0 non-breaking space, and multi-space run into single ASCII spaces; that collapsed snippet is the ONLY chunk text returned to the model in search_filing tool_result (chunk payload carries 'snippet' only, no full text). agent.py:279 `idx = chunk.text.find(quote)` matches against RAW chunk.text. All 102 'verbatim substring' rejections came from this; 0 were chunk_id-not-found (model always cites real chunk_ids). Proof raw text is newline/\\xa0 laden: 73/86 (85%) of the citations that PASSED contain '\\n', e.g. best_buy_03 `'Revenue\\n$\\n39,403...Operating\\xa0income\\n1,854'`, verizon_01 `'Total assets\\n$ \\n379,680'`.",
+          "severity": "high",
+          "affected_items": [
+            "tools.py:59",
+            "agent.py:279"
+          ],
+          "suggested_fix": "Compare `\" \".join(quote.split())` against `\" \".join(chunk.text.split())` (map offsets back), OR return raw newline-preserving chunk text in search_filing output. Estimated to accept ~90-100 of 102 rejections."
+        },
+        {
+          "title": "Rejected record_answer attempts consume the 12-call budget, turning citation rejections into forced abstentions (the spiral)",
+          "evidence": "agent.py:594 `tool_calls_used += 1` fires for EVERY action before dispatch; a record_answer rejected in _normalize_citation (line 452) throws, is caught at 599, and the budget is already spent. Exact accounting: adobe_01 = 2 search + 2 get_pages + 3 calculate + 5 verbatim-rejections = 12; adobe_02 = 4+2+3+3 = 12; jj_02 = 2+1+2+7 = 12; all 15 rejection-bearing exhausted items sum to exactly 12. 53 of 102 rejections landed on the 17 exhausted items. All 17 abstentions are behavior.budget_exhausted (answerable, lost to the loop).",
+          "severity": "high",
+          "affected_items": [
+            "agent.py:594",
+            "adobe_01",
+            "adobe_02",
+            "adobe_03",
+            "adobe_04",
+            "johnson_johnson_02",
+            "johnson_johnson_07",
+            "mgm_resorts_03",
+            "boeing_02",
+            "general_mills_03",
+            "pepsico_05",
+            "verizon_02",
+            "verizon_03"
+          ],
+          "suggested_fix": "Only charge successful tool executions to the retrieval budget, not rejected/malformed record_answer attempts; combined with a tolerant matcher this converts ~15/17 abstentions to answered."
+        },
+        {
+          "title": "A tolerant matcher would prevent ~15 of 17 exhaustions; for 13 a grounded computed answer was already ready at the first rejection",
+          "evidence": "First verbatim rejection (= first record_answer attempt) lands at tool-call 4-10 for all 15 rejection-bearing items, i.e. 2-8 calls of budget still unused. For 13 of 15, calculate had already run before that first rejection (adobe_01=3 calc, adobe_02=3, boeing_02=2, jj_02=2, jj_07=2, general_mills_03/04=1, pepsico_05=1, verizon_02=1, verizon_03=1, adobe_03/04=1) \u2014 the numeric answer was computed/grounded and the ONLY blocker was the whitespace quote check.",
+          "severity": "high",
+          "affected_items": [
+            "adobe_01",
+            "adobe_02",
+            "adobe_03",
+            "adobe_04",
+            "boeing_02",
+            "general_mills_03",
+            "general_mills_04",
+            "johnson_johnson_02",
+            "johnson_johnson_07",
+            "pepsico_05",
+            "verizon_02",
+            "verizon_03",
+            "mgm_resorts_03",
+            "nike_04",
+            "pfizer_03"
+          ],
+          "suggested_fix": "Ship the whitespace-normalized matcher and stop charging rejections to budget; 15/17 exhausted items stop abstaining (per-item correctness then depends on the underlying number)."
+        },
+        {
+          "title": "2 of 17 exhaustions are retrieval misses, not citation problems \u2014 a tolerant matcher will NOT fix them",
+          "evidence": "best_buy_02 and johnson_johnson_06 spent all 12 calls on search_filing with 0 get_pages, 0 calculate, 0 record_answer attempts, 0 verbatim rejections. Queries are near-duplicate reformulations of one intent (best_buy_02: 12 variants of 'gross profit revenue consolidated statements of earnings'; jj_06: 12 variants chasing 'FY2023 adjusted EPS $10.70 $10.68'). Retrieval never surfaced the needed chunk; jj_06's FY2023 guidance is likely absent from the corpus. Only 1 item run-wide issued a literal duplicate query \u2014 this is reformulation-churn against a genuine miss.",
+          "severity": "medium",
+          "affected_items": [
+            "best_buy_02",
+            "johnson_johnson_06"
+          ],
+          "suggested_fix": "Add a retrieval-stall guard (stop after N searches return no new chunk_ids), verify corpus coverage for J&J FY2023 guidance, and improve retrieval (hybrid/BM25, doc-scoped filters)."
+        },
+        {
+          "title": "Citations validate only against the specific CHUNK, so genuinely-verbatim quotes read via get_pages (full-page text) are still rejected",
+          "evidence": "get_pages (tools.py:144-186) returns full raw PAGE text (newlines preserved) and is called 50 times run-wide, heavily on exhausted items reaching for raw text (pepsico_05=3, verizon_02/03=3, pfizer_03=3, adobe_03=3). But _normalize_citation only accepts a substring of the one chunk.text (agent.py:271-279); a quote from a page region outside that chunk's char span is rejected despite being verbatim on the page. This is the residual slice of the 102 that pure whitespace normalization won't catch. 6 items also re-issued identical get_pages calls, wasting budget.",
+          "severity": "medium",
+          "affected_items": [
+            "pepsico_05",
+            "verizon_02",
+            "verizon_03",
+            "pfizer_03",
+            "adobe_03"
+          ],
+          "suggested_fix": "Let citations reference get_pages content (register fetched page spans in chunk_registry, or validate against retrieved chunks + fetched pages for the item). De-duplicate repeated get_pages calls."
+        },
+        {
+          "title": "Instrumentation gap: rejected citation quotes are never persisted, blocking per-rejection root-cause attribution",
+          "evidence": "tool_call events are emitted only inside tool functions in tools.py AFTER successful dispatch; a rejected record_answer throws in _normalize_citation before reaching tools.record_answer, so no event/payload is written. error events carry only the generic 'citation quote must be a verbatim substring...' detail (no attempted quote). llm_calls.jsonl logs only token/timing metadata (grep 'quote' = 0 hits). Rejection categorization had to be inferred from the mechanism + the 86 accepted quotes rather than measured directly.",
+          "severity": "low",
+          "affected_items": [
+            "trace schema",
+            "llm_calls.jsonl"
+          ],
+          "suggested_fix": "On citation rejection, emit the attempted quote, chunk_id, and a normalized diff into the error event payload for future iterations."
+        }
+      ]
+    },
+    {
+      "summary": "test",
+      "findings": [
+        {
+          "title": "t",
+          "evidence": "e",
+          "severity": "high"
+        }
+      ]
+    }
+  ]
+}
