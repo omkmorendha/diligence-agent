@@ -3,17 +3,19 @@ import { AgentTab } from "./components/AgentTab";
 import { RunTab } from "./components/RunTab";
 import { MemoTab } from "./components/MemoTab";
 import { EvalsTab } from "./components/EvalsTab";
+import { DocumentationTab } from "./components/DocumentationTab";
 
-// Two top-level tabs (v1-spec §1.9 / §12): Agent | RAG, Agent default. The existing
+// Top-level tabs (v1-spec §1.9 / §12): Agent | RAG | Documentation, Agent default. The existing
 // v0 Run/Memo/Evals tabs mount unchanged as sub-tabs under RAG. No router needed.
 // Ledger redesign: sticky top bar, tab nav, theme toggle (auto/light/dark).
-type TopTab = "agent" | "rag";
+type TopTab = "agent" | "rag" | "documentation";
 type RagTab = "run" | "memo" | "evals";
 type Theme = "auto" | "light" | "dark";
 
 const TOP_TABS: { id: TopTab; label: string }[] = [
   { id: "agent", label: "Agent" },
   { id: "rag", label: "RAG" },
+  { id: "documentation", label: "Documentation" },
 ];
 
 const RAG_TABS: { id: RagTab; label: string }[] = [
@@ -184,6 +186,7 @@ export function App() {
 
       <main style={{ maxWidth: 1240, margin: "0 auto", padding: "28px 28px 64px" }}>
         {topTab === "agent" && <AgentTab />}
+        {topTab === "documentation" && <DocumentationTab />}
         {topTab === "rag" && ragTab === "run" && <RunTab onOpenMemo={openMemo} />}
         {topTab === "rag" && ragTab === "memo" && (
           <MemoTab runId={memoRunId} onSelectRun={setMemoRunId} />
