@@ -26,15 +26,6 @@ from typing import Optional
 from .. import config
 from ..schemas import Claim, Verdict
 
-# A claim year within this many years past the latest covered filing is still
-# treated as in-scope, so the verification agent (not the scope pre-check) earns
-# the NOT_IN_CORPUS / CONTRADICTED verdict. The corpus 10-Ks carry forward
-# guidance about the following year (e.g. a Boeing FY2022 10-K discusses 2023
-# production rates), so a hard period cut here would wrongly bury verifiable
-# forward-looking claims as OUT_OF_SCOPE. See report NOTES for the spec §1.4
-# tension this resolves.
-PERIOD_FORWARD_HORIZON = 1
-
 # Explicit company-alias table for the 11 corpus companies (spec section 8:
 # "small explicit alias table, extendable"). Keys are the canonical display
 # names as they appear in data/subset.json; values are common variants. Matching
@@ -221,9 +212,10 @@ def corpus_registry() -> dict:
 def _period_covered(claim_period: Optional[str], periods: list[str]) -> bool:
     """Whether a claim period falls within a company's corpus coverage.
 
-    Lenient by design (see PERIOD_FORWARD_HORIZON): an unparseable period never
-    blocks; a parseable year is covered if it matches a filing exactly, shares a
-    year with one, or sits within [earliest, latest + horizon]."""
+    Unparseable or missing periods are allowed through because extraction may not
+    always tag a period. Once a year/quarter is parsed, the pre-check is strict:
+    only explicitly covered filing periods or the same filing year are in scope.
+    It must not infer continuous coverage between sparse FinanceBench years."""
     claim_token, claim_year = _period_token_year(claim_period)
     if claim_year is None:
         return True
@@ -241,10 +233,6 @@ def _period_covered(claim_period: Optional[str], periods: list[str]) -> bool:
         return True
     if claim_year in covered_years:
         return True
-    if covered_years:
-        lo, hi = min(covered_years), max(covered_years)
-        if lo <= claim_year <= hi + PERIOD_FORWARD_HORIZON:
-            return True
     return False
 
 
@@ -292,13 +280,17 @@ def scope_verdict(claim: Claim, registry: Optional[dict] = None) -> tuple[Option
 def scope_check(claims: list[Claim]) -> list[Claim]:
     """Tag claims in/out of corpus scope; out-of-scope claims skip the agent run.
 
-    Mutates and returns the same claims: any claim resolving to `OUT_OF_SCOPE` or
-    `UNVERIFIABLE` has `status` set to `"SKIPPED"` so the verification fan-out
-    passes over it (the frozen Claim schema carries no verdict field; recover the
-    precise verdict + explanation with `scope_verdict`). In-scope claims are left
-    untouched."""
+    Mutates and returns the same claims: aliases are rewritten to canonical
+    corpus company names before verification, and any claim resolving to
+    `OUT_OF_SCOPE` or `UNVERIFIABLE` has `status` set to `"SKIPPED"` so the
+    verification fan-out passes over it (the frozen Claim schema carries no
+    verdict field; recover the precise verdict + explanation with
+    `scope_verdict`)."""
     reg = corpus_registry()
     for claim in claims:
+        canonical = normalize_company(claim.company, reg)
+        if canonical is not None:
+            claim.company = canonical
         verdict, _ = scope_verdict(claim, reg)
         if verdict is not None:
             claim.status = "SKIPPED"

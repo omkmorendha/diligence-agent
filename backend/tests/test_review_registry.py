@@ -167,13 +167,14 @@ def test_missing_period_is_in_scope(subset_only) -> None:
     assert verdict is None
 
 
-def test_forward_looking_period_within_horizon_is_in_scope(subset_only) -> None:
-    # Boeing corpus is FY2018/FY2022; a FY2022 10-K discusses 2023 production,
-    # and PepsiCo FY2024 sits one year past latest coverage. Both must reach the
-    # agent (earning CONTRADICTED / NOT_IN_CORPUS) rather than being buried
-    # OUT_OF_SCOPE by the pre-check.
-    assert scope_verdict(_claim("Boeing", period="2023"))[0] is None
-    assert scope_verdict(_claim("PepsiCo", period="FY2024"))[0] is None
+def test_uncovered_year_between_sparse_filings_is_out_of_scope(subset_only) -> None:
+    # Coverage is sparse, not continuous: Boeing FY2020 is not covered just
+    # because FY2018 and FY2022 filings are in the corpus.
+    assert scope_verdict(_claim("Boeing", period="FY2020"))[0] == "OUT_OF_SCOPE"
+
+
+def test_future_year_beyond_latest_filing_is_out_of_scope(subset_only) -> None:
+    assert scope_verdict(_claim("PepsiCo", period="FY2024"))[0] == "OUT_OF_SCOPE"
 
 
 def test_far_future_period_is_out_of_scope(subset_only) -> None:
@@ -208,6 +209,13 @@ def test_scope_check_marks_and_skips(subset_only) -> None:
     assert claims[1].status == "SKIPPED"
     assert claims[2].status == "SKIPPED"
     assert claims[3].status == "SKIPPED"
+
+
+def test_scope_check_canonicalizes_company_aliases(subset_only) -> None:
+    claims = [_claim("PepsiCo, Inc.", period="FY2022")]
+    scope_check(claims)
+    assert claims[0].company == "PepsiCo"
+    assert claims[0].status == "PENDING"
 
 
 # --- out_of_scope_fraction --------------------------------------------------
