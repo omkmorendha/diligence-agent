@@ -7,9 +7,13 @@ import type {
   CompanyChecklist,
   CreateRunRequest,
   CreateRunResponse,
+  CreateReviewResponse,
   IterationsReport,
   Memo,
   PageResponse,
+  ReviewCard,
+  ReviewReport,
+  ReviewStatusResponse,
   RunCard,
   RunStatusResponse,
 } from "./types";
@@ -94,6 +98,75 @@ export function getEvalIterations(): Promise<IterationsReport> {
   return getJson<IterationsReport>("/evals/iterations");
 }
 
+export function listReviews(): Promise<ReviewCard[]> {
+  return getJson<ReviewCard[]>("/reviews");
+}
+
+export function getReview(reviewId: string): Promise<ReviewStatusResponse> {
+  return getJson<ReviewStatusResponse>(`/reviews/${encodeURIComponent(reviewId)}`);
+}
+
+export async function createReview(file: File, pilot = true): Promise<CreateReviewResponse> {
+  const form = new FormData();
+  form.append("file", file);
+  form.append("pilot", String(pilot));
+  const res = await fetch("/reviews", {
+    method: "POST",
+    body: form,
+  });
+  if (!res.ok) {
+    let detail = res.statusText;
+    try {
+      const body = await res.json();
+      detail = body.detail ?? detail;
+    } catch {
+      // response body wasn't JSON; keep statusText
+    }
+    throw new ApiError(res.status, detail);
+  }
+  return res.json() as Promise<CreateReviewResponse>;
+}
+
+export async function runFullReview(reviewId: string): Promise<CreateReviewResponse | ReviewStatusResponse> {
+  const res = await fetch(`/reviews/${encodeURIComponent(reviewId)}/full`, {
+    method: "POST",
+  });
+  if (!res.ok) {
+    let detail = res.statusText;
+    try {
+      const body = await res.json();
+      detail = body.detail ?? detail;
+    } catch {
+      // response body wasn't JSON; keep statusText
+    }
+    throw new ApiError(res.status, detail);
+  }
+  return res.json() as Promise<CreateReviewResponse | ReviewStatusResponse>;
+}
+
+export function getReviewReport(reviewId: string): Promise<ReviewReport> {
+  return getJson<ReviewReport>(`/reviews/${encodeURIComponent(reviewId)}/report`);
+}
+
+export async function getReviewReportHtml(reviewId: string): Promise<string> {
+  const res = await fetch(`/reviews/${encodeURIComponent(reviewId)}/report?format=html`);
+  if (!res.ok) {
+    let detail = res.statusText;
+    try {
+      const body = await res.json();
+      detail = body.detail ?? detail;
+    } catch {
+      // response body wasn't JSON; keep statusText
+    }
+    throw new ApiError(res.status, detail);
+  }
+  return res.text();
+}
+
+export function annotatedReviewUrl(reviewId: string): string {
+  return `/reviews/${encodeURIComponent(reviewId)}/annotated`;
+}
+
 /** GET /runs/{id}/events (SSE): live queue while running, replay-with-sleeps once
  * complete -- same EventSource code path either way (spec section 23). Returns a
  * cleanup function; call it to close the connection (e.g. on unmount / re-run). */
@@ -115,6 +188,29 @@ export function streamRunEvents<T>(
     // EventSource fires onerror when the server closes the stream (both live-end
     // and replay-end look like this to the browser) as well as on real network
     // errors; either way there is nothing more to read, so close and notify.
+    source.close();
+    onDone();
+    onError?.();
+  };
+  return () => source.close();
+}
+
+/** GET /reviews/{id}/events (SSE): live review events while running, replay once complete. */
+export function streamReviewEvents<T>(
+  reviewId: string,
+  onEvent: (event: T) => void,
+  onDone: () => void,
+  onError?: () => void,
+): () => void {
+  const source = new EventSource(`/reviews/${encodeURIComponent(reviewId)}/events`);
+  source.onmessage = (e) => {
+    try {
+      onEvent(JSON.parse(e.data) as T);
+    } catch {
+      // malformed event; ignore rather than tear down the stream
+    }
+  };
+  source.onerror = () => {
     source.close();
     onDone();
     onError?.();
